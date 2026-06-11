@@ -1,0 +1,32 @@
+{
+  "exportedAt": "2026-06-09T15:00:00.000Z",
+  "scenes": [
+    {
+      "sceneId": "living_aballs_collection_01",
+      "sceneName": "Living Aballs Collection",
+      "sceneMode": "collection-scene",
+      "space": "living",
+      "products": [
+        "DVA-Aballs A II Ceiling Light",
+        "DVA-Aballs A Wall Light",
+        "DVA-Aballs M Table Lamp"
+      ],
+      "commercialIntent": "Warm residential lighting collection",
+      "reason": "Combines ambient, accent and decorative lighting from the Aballs family for a complete and balanced living setup.",
+      "productRoles": [
+        { "product": "DVA-Aballs A II Ceiling Light", "role": "ambient lighting / ceiling fixture" },
+        { "product": "DVA-Aballs A Wall Light", "role": "wall accent / accent lighting" },
+        { "product": "DVA-Aballs M Table Lamp", "role": "decorative lighting / task lighting" }
+      ],
+      "aiPrompt": "Create a premium modern living room scene featuring a coordinated lighting collection. The space includes DVA-Aballs A II Ceiling Light, DVA-Aballs A Wall Light, DVA-Aballs M Table Lamp. Show a warm, elegant residential atmosphere with a sofa, side table or coffee table, a visible feature wall, dark neutral materials, soft textures and natural wood or stone details. All lighting products should be clearly visible, well integrated into the scene, with balanced protagonism — no single product dominates the others. Camera: wide eye-level interior catalog shot, premium composition, realistic lighting, high-end showroom style.",
+      "renderBrief": "Use a wide eye-level camera showing the full living area. Place the DVA-Aballs A II Ceiling Light at the ceiling center. Place the DVA-Aballs A Wall Light at the feature wall. Place the DVA-Aballs M Table Lamp at the side table near sofa. Use warm ambient lighting plus accent lighting from the wall and decorative fixtures. Keep all products clearly visible without overcrowding the scene. Avoid extreme angles, hidden fixtures or harsh shadows.",
+      "appDescription": "A warm living setup combining ceiling, wall and decorative lighting in a balanced residential composition.",
+      "hotspotPlan": [
+        { "product": "DVA-Aballs A II Ceiling Light", "suggestedArea": "ceiling center" },
+        { "product": "DVA-Aballs A Wall Light", "suggestedArea": "feature wall" },
+        { "product": "DVA-Aballs M Table Lamp", "suggestedArea": "side table near sofa" }
+      ],
+      "status": "approved"
+    }
+  ]
+}

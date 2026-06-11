@@ -1,0 +1,23 @@
+{
+  "_readme": "Auto-managed by the Space Planner.",
+  "exportedAt": "2026-06-09T16:00:00.000Z",
+  "entries": [
+    {
+      "id": "living-aballs-collection-01",
+      "name": { "es": "Living Aballs Collection (auto)", "en": "Living Aballs Collection (auto)" },
+      "tagline": { "es": "Warm residential lighting collection", "en": "Warm residential lighting collection" },
+      "description": {
+        "es": "A warm living setup combining ceiling, wall and decorative lighting in a balanced residential composition.",
+        "en": "A warm living setup combining ceiling, wall and decorative lighting in a balanced residential composition."
+      },
+      "image": "assets/Spaces/Living 01.png",
+      "gallery": ["assets/Spaces/Living 01.png"],
+      "heroProduct": "aballs-a-ceiling",
+      "hotspots": [
+        { "productId": "aballs-a-ceiling", "x": 49.94, "y": 13.97 },
+        { "productId": "aballs-a-wall",    "x": 71.97, "y": 37.95 },
+        { "productId": "aballs-m-table",   "x": 44.99, "y": 69.86 }
+      ]
+    }
+  ]
+}

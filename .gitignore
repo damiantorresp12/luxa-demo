@@ -1,0 +1,23 @@
+# =============================================================================
+# LUXA — .gitignore
+# =============================================================================
+
+# Editor / OS
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+.claude/
+
+# Helpers temporales generados durante desarrollo
+_scroll-preview.html
+*.tmp
+
+# Modelos 3ds Max — apuntados desde el catálogo (assets.model) pero no
+# renderizables en web. ~540 archivos pesados. Eliminá esta línea si en algún
+# momento decidís ofrecerlos como descarga real (mejor: storage aparte).
+assets/models/
+
+# Backups del Space Planner
+space-planner/**/*.bak.json
+space-planner/**/*.pre-cleanup.bak.json

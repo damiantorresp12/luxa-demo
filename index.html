@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LUXA · Lighting Experience</title>
+  <meta name="description" content="LUXA — interactive lighting catalog by TD Lighting Experience." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+
+<div class="app-shell">
+
+  <!-- ===================== SIDEBAR ===================== -->
+  <aside class="sidebar" id="sidebar" aria-label="Primary navigation">
+    <a class="brand" href="#home" data-route="home" aria-label="LUXA home">
+      <span class="brand-mark">L</span>
+      <span class="brand-text">
+        <span class="brand-name">LUXA</span>
+        <span class="brand-by">TD Lighting Experience</span>
+      </span>
+    </a>
+
+    <nav class="nav" id="nav">
+      <button class="nav-item" data-route="home" type="button">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg>
+        <span data-i18n="nav.home">Inicio</span>
+      </button>
+      <button class="nav-item" data-route="products" type="button">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z"/></svg>
+        <span data-i18n="nav.products">Productos</span>
+      </button>
+      <button class="nav-item" data-route="spaces" type="button">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10 12 3l9 7v11H3zM10 21v-6h4v6"/></svg>
+        <span data-i18n="nav.spaces">Ambientes</span>
+      </button>
+      <button class="nav-item" data-route="downloads" type="button">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m0 0 4-4m-4 4-4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>
+        <span data-i18n="nav.downloads">Descargas</span>
+      </button>
+      <button class="nav-item" data-route="favorites" type="button">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-4.5-9.3-9A5.4 5.4 0 0 1 12 6a5.4 5.4 0 0 1 9.3 6C19 16.5 12 21 12 21z"/></svg>
+        <span data-i18n="nav.favorites">Favoritos</span>
+        <span class="nav-badge" id="favBadge" hidden>0</span>
+      </button>
+      <button class="nav-item" data-route="about" type="button">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.01"/></svg>
+        <span data-i18n="nav.about">Acerca</span>
+      </button>
+    </nav>
+
+    <div class="lang-toggle" role="group" aria-label="Language">
+      <button class="lang-btn" data-lang="es" type="button" aria-pressed="true">ES</button>
+      <button class="lang-btn" data-lang="en" type="button" aria-pressed="false">EN</button>
+    </div>
+
+    <div class="sidebar-foot">
+      <span class="dot"></span>
+      <div>
+        <p>Lighting Experience</p>
+        <p class="sidebar-foot-sub">v1.0 · Demo</p>
+      </div>
+    </div>
+  </aside>
+
+  <div class="sidebar-backdrop" id="sidebarBackdrop" hidden></div>
+
+  <!-- ===================== MAIN ===================== -->
+  <main class="main" id="main">
+
+    <header class="topbar">
+      <button class="hamburger" id="hamburger" aria-label="Open menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="topbar-title">
+        <span class="topbar-eyebrow" id="topbarEyebrow">Bienvenido</span>
+        <h1 class="topbar-h1" id="topbarTitle">Inicio</h1>
+      </div>
+      <div class="topbar-actions" id="topbarActions"></div>
+    </header>
+
+    <div class="panels">
+
+      <!-- ============ HOME ============ -->
+      <section class="panel panel-home" id="panel-home" data-screen="home">
+        <div class="home-hero" id="homeHero">
+          <div class="home-hero-veil"></div>
+          <div class="home-hero-text">
+            <p class="eyebrow">TD Lighting Experience</p>
+            <h2 class="home-hero-title"><span class="serif-xl">LUXA</span></h2>
+            <p class="home-hero-tag" data-i18n-html="home.tag">Experiencias de iluminación<br/>para espacios modernos</p>
+            <p class="home-hero-sub" data-i18n="home.sub">Explorá productos, ambientes y recursos técnicos en un catálogo interactivo.</p>
+            <button class="btn btn-primary home-hero-cta" data-route="products" data-i18n="home.cta">Ingresar al catálogo</button>
+          </div>
+          <div class="home-hero-scroll"><span data-i18n="home.scroll">Deslizá para ver más</span></div>
+        </div>
+
+        <!-- Explore by Space — editorial asymmetric layout (1 hero + 2 secondary) -->
+        <section class="home-spaces" id="homeSpaces">
+          <header class="home-spaces-head">
+            <div>
+              <p class="eyebrow" data-i18n="homeSpaces.eyebrow">Explorar por ambiente</p>
+              <h2 class="home-spaces-title" data-i18n="homeSpaces.title">Ambientes en contexto</h2>
+            </div>
+            <a class="home-spaces-all" data-route="spaces" data-i18n="homeSpaces.viewAll" href="#spaces">Ver todos los ambientes →</a>
+          </header>
+          <div class="home-spaces-grid" id="homeSpacesGrid"></div>
+        </section>
+
+        <!-- Bridge: del catálogo al ambiente — narrativa que conecta render aislado ↔ close-up en contexto -->
+        <section class="home-bridge" id="homeBridge"></section>
+
+        <!-- Cierre comercial: CTA WhatsApp + acceso a ambientes -->
+        <section class="home-cta">
+          <div class="home-cta-inner">
+            <p class="eyebrow" data-i18n="homeCta.eyebrow">Hablemos</p>
+            <h2 class="home-cta-title" data-i18n="homeCta.title">Tu próxima reunión comercial sin PDF</h2>
+            <p class="home-cta-sub" data-i18n="homeCta.sub">Mostrale a tu cliente un catálogo vivo, con productos aplicados en ambientes reales. Una URL que reemplaza al PDF en showroom, reuniones y WhatsApp.</p>
+            <div class="home-cta-actions">
+              <a class="btn btn-primary home-cta-wa" id="homeCtaWhatsapp" target="_blank" rel="noopener noreferrer" href="#">
+                <svg viewBox="0 0 24 24" aria-hidden="true" class="ico-wa">
+                  <path d="M20.5 11.5a8.5 8.5 0 1 1-4.1-7.3l4.1-1.1-1.1 4.1a8.5 8.5 0 0 1 1.1 4.3z"/>
+                  <path d="M8.5 11.5h.01M12 11.5h.01M15.5 11.5h.01"/>
+                </svg>
+                <span data-i18n="homeCta.whatsapp">Hablemos por WhatsApp</span>
+              </a>
+              <button class="btn btn-ghost" data-route="spaces" type="button" data-i18n="homeCta.spaces">Ver ambientes</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- Quick links (Products + Favorites) — slim row, secondary -->
+        <section class="home-quicklinks">
+          <button class="home-quicklink" data-route="products">
+            <span class="home-quicklink-icon">◳</span>
+            <span class="home-quicklink-text">
+              <span class="home-quicklink-label" data-i18n="homeQuick.products">Ver catálogo completo</span>
+              <span class="home-quicklink-meta" id="scProductsMeta">—</span>
+            </span>
+            <span class="home-quicklink-arrow">→</span>
+          </button>
+          <button class="home-quicklink" data-route="favorites">
+            <span class="home-quicklink-icon">♥</span>
+            <span class="home-quicklink-text">
+              <span class="home-quicklink-label" data-i18n="homeQuick.favorites">Mis guardados</span>
+              <span class="home-quicklink-meta" id="scFavsMeta">—</span>
+            </span>
+            <span class="home-quicklink-arrow">→</span>
+          </button>
+        </section>
+      </section>
+
+      <!-- ============ PRODUCTS ============ -->
+      <section class="panel" id="panel-products" data-screen="products" hidden>
+        <div class="panel-toolbar">
+          <div class="filters" id="filters" role="tablist" aria-label="Categories"></div>
+          <div class="toolbar-right">
+            <label class="search">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+              <input type="search" id="productSearch" autocomplete="off"
+                     data-i18n-placeholder="products.search.placeholder" placeholder="Buscar luminarias…" />
+              <button type="button" class="search-clear" id="productSearchClear" aria-label="Clear search" hidden>&times;</button>
+            </label>
+            <span class="count-chip" id="productCount">0</span>
+          </div>
+        </div>
+        <div class="product-grid" id="productGrid"></div>
+        <div class="empty-state" id="productsEmpty" hidden>
+          <div class="empty-art">⌕</div>
+          <h3 data-i18n="products.empty.title">Sin coincidencias</h3>
+          <p data-i18n="products.empty.sub">Probá otra categoría o limpiá la búsqueda.</p>
+        </div>
+      </section>
+
+      <!-- ============ SPACES ============ -->
+      <section class="panel" id="panel-spaces" data-screen="spaces" hidden>
+        <div class="catalog-filter" id="catalogFilter" role="group" aria-label="Catalog filter" hidden></div>
+        <div class="space-tabs" id="spaceTabs" role="tablist" aria-label="Spaces"></div>
+        <div class="space-stage-wrap" id="spaceStageWrap"></div>
+      </section>
+
+      <!-- ============ DOWNLOADS ============ -->
+      <section class="panel" id="panel-downloads" data-screen="downloads" hidden>
+        <div class="panel-toolbar">
+          <div class="filters" id="downloadFilters" role="tablist" aria-label="Resource types"></div>
+        </div>
+        <div class="download-grid" id="downloadGrid"></div>
+      </section>
+
+      <!-- ============ FAVORITES ============ -->
+      <section class="panel" id="panel-favorites" data-screen="favorites" hidden>
+        <div class="product-grid" id="favoritesGrid"></div>
+        <div class="empty-state" id="favoritesEmpty" hidden>
+          <div class="empty-art">♡</div>
+          <h3 data-i18n="favorites.empty.title">Tu colección está vacía</h3>
+          <p data-i18n="favorites.empty.sub">Guardá luminarias tocando el corazón en cualquier card.</p>
+          <button class="btn btn-primary" data-route="products" data-i18n="favorites.browse">Ver productos</button>
+        </div>
+      </section>
+
+      <!-- ============ ABOUT ============ -->
+      <section class="panel" id="panel-about" data-screen="about" hidden>
+        <div class="about-wrap">
+          <p class="about-intro" id="aboutIntro"></p>
+          <div class="about-grid" id="aboutGrid"></div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+</div>
+
+<!-- ===================== PRODUCT DETAIL — side panel ===================== -->
+<div class="detail-overlay" id="detailOverlay" hidden>
+  <div class="detail-backdrop" data-close-detail></div>
+  <aside class="detail-panel" id="detailPanel" role="dialog" aria-modal="true" aria-label="Product detail">
+    <button class="detail-close" data-close-detail aria-label="Close">&times;</button>
+    <div class="detail-media">
+      <p class="detail-context" id="detailContext" hidden></p>
+      <img id="detailImg" alt="" />
+      <span class="badge-3d" id="detailBadge3d" hidden>Modelo 3D disponible</span>
+      <div class="detail-thumbs" id="detailThumbs" hidden></div>
+    </div>
+    <div class="detail-body" id="detailBody"></div>
+  </aside>
+</div>
+
+<script src="js/catalog.data.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

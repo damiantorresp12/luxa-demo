@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LUXA Space Planner V2</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark">LUXA</span>
+      <span class="brand-sub">Space Planner · V2.0</span>
+    </div>
+    <div class="top-actions">
+      <label class="catalog-picker-wrap" title="Catálogo activo">
+        <span class="catalog-picker-label">Catálogo</span>
+        <select id="catalog-picker" class="catalog-picker"></select>
+      </label>
+      <button id="btn-generate" class="btn btn-primary">Generate Collection Scenes</button>
+      <button id="btn-manual" class="btn btn-ghost">+ Manual Scene</button>
+      <button id="btn-export" class="btn btn-ghost">Export approved JSON</button>
+      <button id="btn-export-catalog" class="btn btn-ghost">Export catalog spaces JSON</button>
+      <button id="btn-clear-state" class="btn-mini" title="Discard saved planner state for the active catalog">Clear saved state</button>
+    </div>
+  </header>
+
+  <main class="layout">
+
+    <!-- LEFT: Product library + filters -->
+    <section class="panel panel-left">
+      <h2 class="panel-title">Product Library</h2>
+
+      <div class="filters">
+        <label class="filter">
+          <span>Space</span>
+          <select id="filter-space"><option value="">All</option></select>
+        </label>
+        <label class="filter">
+          <span>Collection</span>
+          <select id="filter-collection"><option value="">All</option></select>
+        </label>
+        <label class="filter">
+          <span>Type</span>
+          <select id="filter-type"><option value="">All</option></select>
+        </label>
+        <label class="filter">
+          <span>Style</span>
+          <select id="filter-style"><option value="">All</option></select>
+        </label>
+        <label class="filter filter-search">
+          <span>Search</span>
+          <input id="filter-search" type="text" placeholder="name or id" />
+        </label>
+        <button id="filter-reset" class="btn btn-mini">Reset</button>
+      </div>
+
+      <div id="product-summary" class="muted">Loading products…</div>
+
+      <div id="product-grid" class="product-grid"></div>
+    </section>
+
+    <!-- RIGHT: Suggested scenes + Approved scenes -->
+    <section class="panel panel-right">
+
+      <div class="panel-section">
+        <div class="section-head">
+          <h2 class="panel-title">Suggested Scenes</h2>
+          <span id="suggested-count" class="pill">0</span>
+        </div>
+        <div id="scene-list" class="scene-list">
+          <p class="muted">Click <b>Generate Collection Scenes</b> to build suggestions, or use <b>+ Manual Scene</b>.</p>
+        </div>
+      </div>
+
+      <div class="panel-section">
+        <div class="section-head">
+          <h2 class="panel-title">Approved Scenes</h2>
+          <span id="approved-count" class="pill pill-gold">0</span>
+        </div>
+        <div id="approved-list" class="scene-list approved-list">
+          <p class="muted">No approved scenes yet.</p>
+        </div>
+      </div>
+
+      <div class="panel-section">
+        <div class="section-head">
+          <h2 class="panel-title">Validations</h2>
+        </div>
+        <ul id="validation-list" class="validation-list"></ul>
+      </div>
+
+    </section>
+  </main>
+
+  <!-- Manual / Edit scene modal -->
+  <div id="modal" class="modal hidden">
+    <div class="modal-card">
+      <header class="modal-head">
+        <h3 id="modal-title">Manual Collection Scene</h3>
+        <button class="modal-close" data-close>&times;</button>
+      </header>
+      <div class="modal-body">
+        <div class="form-row">
+          <label>Scene name</label>
+          <input id="m-name" type="text" placeholder="Living Aballs Collection" />
+        </div>
+        <div class="form-row form-row-2">
+          <div>
+            <label>Space</label>
+            <select id="m-space">
+              <option value="living">living</option>
+              <option value="dining">dining</option>
+              <option value="bedroom">bedroom</option>
+              <option value="bathroom">bathroom</option>
+            </select>
+          </div>
+          <div>
+            <label>Commercial intent</label>
+            <input id="m-intent" type="text" placeholder="Warm residential lighting collection" />
+          </div>
+        </div>
+        <div class="form-row">
+          <label>Reason / justification</label>
+          <textarea id="m-reason" rows="2" placeholder="Why does this combination make commercial sense?"></textarea>
+        </div>
+        <div class="form-row">
+          <label>Products <span class="muted">(2 to 4) — click to toggle</span></label>
+          <div id="m-products" class="m-products"></div>
+        </div>
+        <div id="m-validation" class="modal-validation"></div>
+      </div>
+      <footer class="modal-foot">
+        <button class="btn btn-ghost" data-close>Cancel</button>
+        <button id="m-save" class="btn btn-primary">Save as approved scene</button>
+      </footer>
+    </div>
+  </div>
+
+  <!-- AI Brief modal -->
+  <div id="brief-modal" class="modal hidden">
+    <div class="modal-card brief-modal-card">
+      <header class="modal-head">
+        <h3 id="brief-modal-title">AI Brief</h3>
+        <button class="modal-close" data-brief-close>&times;</button>
+      </header>
+      <div class="modal-body brief-body">
+
+        <div class="brief-section">
+          <div class="brief-section-head">
+            <label>AI Image Prompt</label>
+            <button class="btn-mini" id="b-copy-prompt">Copy</button>
+          </div>
+          <textarea id="b-aiPrompt" rows="9" spellcheck="false"></textarea>
+        </div>
+
+        <div class="brief-section">
+          <div class="brief-section-head">
+            <label>Render Brief</label>
+            <button class="btn-mini" id="b-copy-render">Copy</button>
+          </div>
+          <textarea id="b-renderBrief" rows="6" spellcheck="false"></textarea>
+        </div>
+
+        <div class="brief-section">
+          <div class="brief-section-head">
+            <label>App Description</label>
+            <button class="btn-mini" id="b-copy-desc">Copy</button>
+          </div>
+          <textarea id="b-appDescription" rows="3" spellcheck="false"></textarea>
+        </div>
+
+        <div class="brief-section">
+          <label>Product Roles</label>
+          <div id="b-roles" class="brief-rows"></div>
+        </div>
+
+        <div class="brief-section">
+          <label>Hotspot Plan</label>
+          <div id="b-hotspots" class="brief-rows"></div>
+        </div>
+
+      </div>
+      <footer class="modal-foot">
+        <button class="btn btn-ghost" data-brief-close>Cancel</button>
+        <button id="b-regenerate" class="btn btn-ghost">Regenerate all</button>
+        <button id="b-save" class="btn btn-primary">Save brief</button>
+      </footer>
+    </div>
+  </div>
+
+  <!-- Hotspot editor modal -->
+  <div id="hotspot-modal" class="modal hidden">
+    <div class="modal-card hotspot-modal-card">
+      <header class="modal-head">
+        <h3 id="hotspot-modal-title">Place Hotspots</h3>
+        <button class="modal-close" data-hotspot-close>&times;</button>
+      </header>
+
+      <div class="modal-body hotspot-body">
+
+        <div class="hotspot-toolbar">
+          <label class="hotspot-file">
+            <span>Load render</span>
+            <input id="h-file" type="file" accept="image/*" />
+          </label>
+          <label class="hotspot-path">
+            <span>Final image path (for export)</span>
+            <input id="h-path" type="text" placeholder="assets/Spaces/Living-Aballs-01.png" />
+          </label>
+          <button id="h-reset" class="btn-mini">Reset coords</button>
+        </div>
+
+        <div class="hotspot-workspace">
+          <div id="h-canvas" class="hotspot-canvas">
+            <div class="hotspot-empty" id="h-empty">Load a render image to start placing hotspots.</div>
+            <img id="h-img" alt="" hidden />
+            <div id="h-dots" class="hotspot-dots"></div>
+          </div>
+
+          <aside class="hotspot-side">
+            <div class="hotspot-side-head">Products</div>
+            <div id="h-products" class="hotspot-products"></div>
+            <p class="muted small">Select a product, then click on the image where it appears in the render.</p>
+          </aside>
+        </div>
+
+      </div>
+
+      <footer class="modal-foot">
+        <button class="btn btn-ghost" data-hotspot-close>Cancel</button>
+        <button id="h-save" class="btn btn-primary">Save coordinates</button>
+      </footer>
+    </div>
+  </div>
+
+  <datalist id="role-options">
+    <option value="ambient lighting">
+    <option value="accent lighting">
+    <option value="decorative lighting">
+    <option value="task lighting">
+    <option value="wall accent">
+    <option value="ceiling fixture">
+    <option value="table / floor support">
+    <option value="general lighting">
+    <option value="architectural lighting">
+    <option value="support lighting">
+    <option value="ambient lighting / ceiling fixture">
+    <option value="wall accent / accent lighting">
+    <option value="decorative lighting / task lighting">
+    <option value="decorative lighting / support lighting">
+    <option value="general lighting / ceiling support">
+    <option value="architectural lighting / ambient lighting">
+  </datalist>
+
+  <div id="toast" class="toast hidden"></div>
+
+  <script src="js/space-planner.js"></script>
+</body>
+</html>

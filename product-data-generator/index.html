@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LUXA Product Data Generator V1</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark">LUXA</span>
+      <span class="brand-sub">Product Data Generator · V1.0</span>
+    </div>
+
+    <div class="top-actions">
+      <label class="catalog-picker-wrap" title="Catálogo activo">
+        <span class="catalog-picker-label">Catálogo</span>
+        <select id="catalog-picker" class="catalog-picker"></select>
+      </label>
+      <button id="btn-import" class="btn btn-ghost" title="Subir imágenes nuevas a assets/Imagenes/ (también podés arrastrarlas a cualquier parte de la pantalla)">↑ Importar imágenes</button>
+      <input type="file" id="file-input" accept="image/*" multiple hidden />
+      <button id="btn-reload" class="btn btn-ghost" title="Re-leer la carpeta assets/Imagenes y volver a calcular tarjetas">↻ Re-scan</button>
+      <button id="btn-export" class="btn btn-ghost" title="Descargar products.json sin guardar al planner">Export JSON</button>
+      <button id="btn-save" class="btn btn-primary" title="Guardar al planner reemplazando space-planner/catalogs/&lt;id&gt;/products.json (backup automático)">Save to planner</button>
+    </div>
+  </header>
+
+  <!-- Full-page drop overlay shown while dragging files over the window -->
+  <div id="drop-overlay" class="drop-overlay" hidden>
+    <div class="drop-overlay-box">
+      <div class="drop-overlay-icon">↓</div>
+      <p class="drop-overlay-title">Soltá las imágenes para importarlas</p>
+      <p class="drop-overlay-sub">Se van a guardar en <code>assets/Imagenes/</code></p>
+    </div>
+  </div>
+
+  <div class="filters-bar">
+    <label class="filter">
+      <span>Buscar</span>
+      <input id="f-search" type="text" placeholder="nombre o id" />
+    </label>
+    <label class="filter">
+      <span>Estado</span>
+      <select id="f-status">
+        <option value="">Todos</option>
+        <option value="complete">✓ Completos</option>
+        <option value="partial">⚠ Parciales</option>
+        <option value="empty">○ Vacíos</option>
+      </select>
+    </label>
+    <label class="filter">
+      <span>Type</span>
+      <select id="f-type"><option value="">Todos</option></select>
+    </label>
+    <label class="filter">
+      <span>Colección</span>
+      <select id="f-collection"><option value="">Todas</option></select>
+    </label>
+    <button id="f-reset" class="btn-mini">Reset</button>
+    <div class="summary-pill">
+      <span id="summary-text">Cargando…</span>
+    </div>
+  </div>
+
+  <main class="workspace">
+    <section class="grid-panel">
+      <div id="card-grid" class="card-grid"></div>
+      <div id="empty-state" class="empty-state" hidden>
+        <p>No hay tarjetas que coincidan con los filtros.</p>
+      </div>
+    </section>
+
+    <aside class="side-panel" id="side-panel">
+      <div class="side-empty" id="side-empty">
+        <p class="side-empty-icon">◇</p>
+        <p>Seleccioná una tarjeta de la izquierda para editar sus datos.</p>
+        <p class="muted small">Los cambios se autoguardan en este navegador. Cuando termines, "Save to planner" los publica al planner.</p>
+      </div>
+
+      <form class="side-form" id="side-form" hidden>
+        <div class="side-form-head">
+          <div class="side-thumb-wrap">
+            <div class="side-thumb" id="side-thumb"></div>
+            <span class="status-badge" id="side-status"></span>
+          </div>
+          <div>
+            <h2 id="side-title" class="side-title">—</h2>
+            <p class="muted small" id="side-image-name">—</p>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <label>Name (display)</label>
+          <input type="text" id="fld-name" />
+        </div>
+
+        <div class="form-row form-row-2">
+          <div>
+            <label>ID interno (planner)</label>
+            <input type="text" id="fld-id" />
+          </div>
+          <div>
+            <label>catalogId (vínculo con app)</label>
+            <input type="text" id="fld-catalogId" placeholder="(vacío = fuera de catálogo)" />
+          </div>
+        </div>
+
+        <div class="form-row form-row-2">
+          <div>
+            <label>Category (app)</label>
+            <input type="text" id="fld-category" />
+          </div>
+          <div>
+            <label>Type</label>
+            <select id="fld-type">
+              <option value="">—</option>
+              <option value="pendant">pendant</option>
+              <option value="ceiling_light">ceiling_light</option>
+              <option value="wall_light">wall_light</option>
+              <option value="table_lamp">table_lamp</option>
+              <option value="floor_lamp">floor_lamp</option>
+              <option value="downlight">downlight</option>
+              <option value="spotlight">spotlight</option>
+              <option value="linear_light">linear_light</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row form-row-2">
+          <div>
+            <label>Collection</label>
+            <input type="text" id="fld-collection" placeholder="ej. Aballs, Lighto, Arum" />
+          </div>
+          <div>
+            <label>Style</label>
+            <select id="fld-style">
+              <option value="">—</option>
+              <option value="decorative">decorative</option>
+              <option value="minimal">minimal</option>
+              <option value="architectural">architectural</option>
+              <option value="industrial">industrial</option>
+              <option value="sculptural">sculptural</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <label>Spaces (donde puede ir esta luminaria)</label>
+          <div class="spaces-chips" id="fld-spaces">
+            <label class="space-chip"><input type="checkbox" value="living" /> living</label>
+            <label class="space-chip"><input type="checkbox" value="dining" /> dining</label>
+            <label class="space-chip"><input type="checkbox" value="bedroom" /> bedroom</label>
+            <label class="space-chip"><input type="checkbox" value="bathroom" /> bathroom</label>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <label>Image path</label>
+          <input type="text" id="fld-image" readonly />
+        </div>
+
+        <div class="side-actions">
+          <button type="button" class="btn-mini btn-revert" id="btn-revert" title="Deshacer cambios locales y volver al estado base">Revertir cambios</button>
+          <button type="button" class="btn-mini btn-remove" id="btn-remove" title="Sacar esta entrada del set de productos">Quitar del catálogo</button>
+        </div>
+      </form>
+    </aside>
+  </main>
+
+  <div id="toast" class="toast hidden"></div>
+
+  <!-- LUXA app's catalog is loaded as a script so the Generator can read window.LUXA.products
+       directly. We only need it for pre-filling the 14 app-only entries on first boot. -->
+  <script src="../js/catalog.data.js"></script>
+  <script src="js/generator.js"></script>
+</body>
+</html>

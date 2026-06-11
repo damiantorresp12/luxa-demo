@@ -1,0 +1,6 @@
+{
+  "_readme": "Indice de catalogos disponibles en el Space Planner. Para agregar uno nuevo: (1) crear carpeta space-planner/catalogs/<id>/ con products.json y meta.json adentro, (2) agregar el <id> al array 'catalogs'. El planner detecta los catalogos al refrescar.",
+  "catalogs": [
+    "luxa-original"
+  ]
+}

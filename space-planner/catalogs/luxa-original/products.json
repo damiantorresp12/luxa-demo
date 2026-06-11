@@ -1,0 +1,439 @@
+[
+  {
+    "id": "DVA-265-Wall-Lamp",
+    "name": "265 Wall",
+    "image": "../assets/Imagenes/DVA-265 Wall Lamp_corona.jpg",
+    "catalogId": "265-wall",
+    "category": "Wall Lights",
+    "type": "wall_light",
+    "collection": "265",
+    "spaces": [
+      "living",
+      "dining"
+    ]
+  },
+  {
+    "id": "DVA-5756",
+    "name": "DVA-5756 Tempo Wall Lamp",
+    "image": "../assets/Imagenes/DVA-5756 Tempo Wall Lamp_corona.jpg",
+    "catalogId": "tempo-wall",
+    "category": "Wall Lights",
+    "type": "wall_light",
+    "collection": "Tempo",
+    "style": "modern",
+    "spaces": [
+      "living",
+      "dining",
+      "bedroom",
+      "bathroom"
+    ]
+  },
+  {
+    "id": "DVA-5776",
+    "name": "DVA-5776 Tempo Pendant Lamp",
+    "image": "../assets/Imagenes/DVA-5776 Tempo Pendant Lamp_corona.jpg",
+    "catalogId": "tempo-pendant",
+    "category": "Pendants",
+    "type": "pendant",
+    "collection": "Tempo",
+    "style": "modern",
+    "spaces": [
+      "living",
+      "dining"
+    ]
+  },
+  {
+    "id": "DVA-5945",
+    "name": "DVA-5945 Flat Floor Lamp",
+    "image": "../assets/Imagenes/DVA-5945 Flat Floor Lamp_corona.jpg",
+    "catalogId": "flat-floor",
+    "category": "Floor Lamps",
+    "type": "floor_lamp",
+    "collection": "Flat",
+    "style": "minimal",
+    "spaces": [
+      "living",
+      "bedroom"
+    ]
+  },
+  {
+    "id": "DVA-5965",
+    "name": "DVA-5965 Flat Table Lamp",
+    "image": "../assets/Imagenes/DVA-5965 Flat Table Lamp_corona.jpg",
+    "catalogId": "flat-table",
+    "category": "Table Lamps",
+    "type": "table_lamp",
+    "collection": "Flat",
+    "style": "minimal",
+    "spaces": [
+      "living",
+      "bedroom"
+    ]
+  },
+  {
+    "id": "DVA-Aballs-CII",
+    "name": "DVA-Aballs A II Ceiling Light",
+    "image": "../assets/Imagenes/DVA-Aballs A II Ceiling Light_corona.jpg",
+    "catalogId": "aballs-a-ceiling",
+    "category": "Ceiling Lights",
+    "type": "ceiling_light",
+    "collection": "Aballs",
+    "style": "decorative",
+    "spaces": [
+      "living",
+      "bedroom",
+      "dining"
+    ]
+  },
+  {
+    "id": "DVA-Aballs-W",
+    "name": "DVA-Aballs A Wall Light",
+    "image": "../assets/Imagenes/DVA-Aballs A Wall Light_corona.jpg",
+    "catalogId": "aballs-a-wall",
+    "category": "Wall Lights",
+    "type": "wall_light",
+    "collection": "Aballs",
+    "style": "decorative",
+    "spaces": [
+      "living",
+      "bedroom",
+      "dining"
+    ]
+  },
+  {
+    "id": "DVA-Aballs-CH12",
+    "name": "DVA-Aballs Chandelier 12",
+    "image": "../assets/Imagenes/DVA-Aballs Chandelier 12_corona.jpg",
+    "catalogId": "aballs-chandelier-12",
+    "category": "Chandeliers",
+    "type": "pendant",
+    "collection": "Aballs",
+    "style": "decorative",
+    "spaces": [
+      "living",
+      "dining"
+    ]
+  },
+  {
+    "id": "DVA-Aballs-Chandelier-4",
+    "name": "Aballs Chandelier 4",
+    "image": "../assets/Imagenes/DVA-Aballs Chandelier 4_corona.jpg",
+    "catalogId": "aballs-chandelier-4",
+    "category": "Chandeliers",
+    "type": "pendant",
+    "collection": "Aballs",
+    "style": "decorative",
+    "spaces": [
+      "living"
+    ]
+  },
+  {
+    "id": "DVA-Aballs-Chandelier-8",
+    "name": "Aballs Chandelier 8",
+    "image": "../assets/Imagenes/DVA-Aballs Chandelier 8_corona.jpg",
+    "catalogId": "aballs-chandelier-8",
+    "category": "Chandeliers",
+    "type": "pendant",
+    "collection": "Aballs",
+    "spaces": [
+      "living"
+    ]
+  },
+  {
+    "id": "DVA-Aballs-T",
+    "name": "DVA-Aballs M Table Lamp",
+    "image": "../assets/Imagenes/DVA-Aballs M Table Lamp_corona.jpg",
+    "catalogId": "aballs-m-table",
+    "category": "Table Lamps",
+    "type": "table_lamp",
+    "collection": "Aballs",
+    "style": "decorative",
+    "spaces": [
+      "living",
+      "bedroom"
+    ]
+  },
+  {
+    "id": "DVA-Aim-LED-Pendant-Lamp",
+    "name": "Aim LED Pendant",
+    "image": "../assets/Imagenes/DVA-Aim LED Pendant Lamp_vray.jpg",
+    "catalogId": "aim-led-pendant",
+    "category": "Pendants",
+    "type": "pendant",
+    "collection": "Aim",
+    "spaces": [
+      "living"
+    ]
+  },
+  {
+    "id": "DVA-Albus-T",
+    "name": "DVA-Albus Twisted Table Lamp",
+    "image": "../assets/Imagenes/DVA-Albus Twisted Table Lamp_corona.jpg",
+    "catalogId": "albus-twisted-table",
+    "category": "Table Lamps",
+    "type": "table_lamp",
+    "collection": "Albus",
+    "style": "decorative",
+    "spaces": [
+      "living",
+      "bedroom"
+    ]
+  },
+  {
+    "id": "DVA-Aplomb-Suspension-Light",
+    "name": "Aplomb Suspension",
+    "image": "../assets/Imagenes/DVA-Aplomb Suspension Light_corona.jpg",
+    "catalogId": "aplomb-suspension",
+    "category": "Pendants",
+    "type": "pendant",
+    "collection": "Aplomb",
+    "spaces": [
+      "living",
+      "bedroom"
+    ]
+  },
+  {
+    "id": "DVA-Apollo-Floor-Lamp",
+    "name": "Apollo Floor",
+    "image": "../assets/Imagenes/DVA-Apollo Floor Lamp_corona.jpg",
+    "catalogId": "apollo-floor",
+    "category": "Floor Lamps",
+    "type": "floor_lamp",
+    "collection": "Apollo",
+    "spaces": [
+      "living"
+    ]
+  },
+  {
+    "id": "DVA-Arco-Floor-Lamp",
+    "name": "Arco Floor",
+    "image": "../assets/Imagenes/DVA-Arco Floor Lamp_corona.jpg",
+    "catalogId": "arco-floor",
+    "category": "Floor Lamps",
+    "type": "floor_lamp",
+    "collection": "Arco",
+    "spaces": [
+      "living"
+    ]
+  },
+  {
+    "id": "DVA-Arena-Suspension-Lamp-150",
+    "name": "Arena Suspension 150",
+    "image": "../assets/Imagenes/DVA-Arena Suspension Lamp 150_corona.jpg",
+    "catalogId": "arena-suspension",
+    "category": "Pendants",
+    "type": "pendant",
+    "collection": "Arena",
+    "spaces": [
+      "living"
+    ]
+  },
+  {
+    "id": "DVA-Arum-Floor-Lamp-by-Ferm-Living",
+    "name": "DVA-Arum Floor Lamp by Ferm Living",
+    "image": "../assets/Imagenes/DVA-Arum Floor Lamp by Ferm Living.jpg",
+    "catalogId": "arum floor",
+    "category": "Floor lamp",
+    "type": "floor_lamp",
+    "collection": "Arum",
+    "style": "decorative",
+    "spaces": [
+      "living"
+    ]
+  },
+  {
+    "id": "DVA-Arum-T",
+    "name": "DVA-Arum Table Lamp",
+    "image": "../assets/Imagenes/DVA-Arum Table Lamp_corona.jpg",
+    "catalogId": "arum-table",
+    "category": "Table Lamps",
+    "type": "table_lamp",
+    "collection": "Arum",
+    "style": "decorative",
+    "spaces": [
+      "living",
+      "bedroom"
+    ]
+  },
+  {
+    "id": "DVA-Arum-Wall-Lamp-Tall",
+    "name": "DVA-Arum Wall Lamp Tall",
+    "image": "../assets/Imagenes/DVA-Arum Wall Lamp Tall_corona.jpg",
+    "catalogId": "arum-wall",
+    "category": "Wall Lights",
+    "type": "wall_light",
+    "collection": "Arum",
+    "style": "decorative",
+    "spaces": [
+      "living",
+      "dining",
+      "bedroom"
+    ]
+  },
+  {
+    "id": "DVA-Arum-W",
+    "name": "DVA-Arum Wall Lamp",
+    "image": "../assets/Imagenes/DVA-Arum Wall Lamp_corona.jpg",
+    "catalogId": "arum-wall",
+    "category": "Wall Lights",
+    "type": "wall_light",
+    "collection": "Arum",
+    "style": "decorative",
+    "spaces": [
+      "living",
+      "bedroom"
+    ]
+  },
+  {
+    "id": "DVA-Atollo-Table-Lamp",
+    "name": "Atollo Table",
+    "image": "../assets/Imagenes/DVA-Atollo Table Lamp_corona.jpg",
+    "catalogId": "atollo-table",
+    "category": "Table Lamps",
+    "type": "table_lamp",
+    "collection": "Atollo",
+    "style": "decorative",
+    "spaces": [
+      "bedroom"
+    ]
+  },
+  {
+    "id": "DVA-Awa-Large-Suspended-Light",
+    "name": "Awa Suspended",
+    "image": "../assets/Imagenes/DVA-Awa Large Suspended Light_corona.jpg",
+    "catalogId": "awa-suspended",
+    "category": "Pendants",
+    "type": "pendant",
+    "collection": "Awa",
+    "spaces": [
+      "living"
+    ]
+  },
+  {
+    "id": "DVA-Ayno-Large-Floor-Lamp",
+    "name": "Ayno Floor",
+    "image": "../assets/Imagenes/DVA-Ayno Large Floor Lamp_corona.jpg",
+    "catalogId": "ayno-floor",
+    "category": "Floor Lamps",
+    "type": "floor_lamp",
+    "collection": "Ayno",
+    "spaces": [
+      "living"
+    ]
+  },
+  {
+    "id": "DVA-Bitpop-22",
+    "name": "DVA-Bitpop C 2.2 Recessed Downlight",
+    "image": "../assets/Imagenes/DVA-Bitpop C 2.2 Recessed Downlight_corona.jpg",
+    "catalogId": "bitpop-downlight",
+    "category": "Downlights",
+    "type": "downlight",
+    "collection": "Bitpop",
+    "style": "technical",
+    "spaces": [
+      "dining",
+      "bathroom",
+      "living"
+    ]
+  },
+  {
+    "id": "DVA-BO-32-Surface-Ceiling-Light",
+    "name": "BO 32 Surface Ceiling",
+    "image": "../assets/Imagenes/DVA-BO 32 Surface Ceiling Light_corona.jpg",
+    "catalogId": "bo32-ceiling",
+    "category": "Ceiling Lights",
+    "type": "ceiling_light",
+    "collection": "BO",
+    "style": "architectural",
+    "spaces": [
+      "living",
+      "dining"
+    ]
+  },
+  {
+    "id": "DVA-Bolle-Orizzontale-Hanging-Lamp",
+    "name": "Bolle Orizzontale",
+    "image": "../assets/Imagenes/DVA-Bolle Orizzontale Hanging Lamp_corona.jpg",
+    "catalogId": "bolle-orizzontale",
+    "category": "Pendants",
+    "type": "pendant",
+    "collection": "Bolle",
+    "spaces": [
+      "dining"
+    ]
+  },
+  {
+    "id": "DVA-Came-26-Recessed-Downlight",
+    "name": "Came 2.6 Downlight",
+    "image": "../assets/Imagenes/DVA-Came 2.6 Recessed Downlight_corona.jpg",
+    "catalogId": "came-downlight",
+    "category": "Downlights",
+    "type": "downlight",
+    "collection": "Came",
+    "spaces": [
+      "living",
+      "dining",
+      "bedroom",
+      "bathroom"
+    ]
+  },
+  {
+    "id": "DVA-Lighto-W",
+    "name": "DVA-Lighto A Wall Light",
+    "image": "../assets/Imagenes/DVA-Lighto A Wall Light_corona.jpg",
+    "catalogId": "lighto-a-wall",
+    "category": "Wall Lights",
+    "type": "wall_light",
+    "collection": "Lighto",
+    "style": "minimal",
+    "spaces": [
+      "living",
+      "bedroom",
+      "bathroom"
+    ]
+  },
+  {
+    "id": "DVA-Lighto-C",
+    "name": "DVA-Lighto C Ceiling Light",
+    "image": "../assets/Imagenes/DVA-Lighto C Ceiling Light_corona.jpg",
+    "catalogId": "lighto-c-ceiling",
+    "category": "Ceiling Lights",
+    "type": "ceiling_light",
+    "collection": "Lighto",
+    "style": "minimal",
+    "spaces": [
+      "living",
+      "bedroom",
+      "bathroom"
+    ]
+  },
+  {
+    "id": "DVA-Lighto-T",
+    "name": "DVA-Lighto T Suspension Lamp",
+    "image": "../assets/Imagenes/DVA-Lighto T Suspension Lamp_corona.jpg",
+    "catalogId": "lighto-t-suspension",
+    "category": "Pendants",
+    "type": "pendant",
+    "collection": "Lighto",
+    "style": "minimal",
+    "spaces": [
+      "living",
+      "dining",
+      "bedroom"
+    ]
+  },
+  {
+    "id": "DVA-Lightolight-F",
+    "name": "DVA-Lightolight P Floor Lamp",
+    "image": "../assets/Imagenes/DVA-Lightolight P Floor Lamp_corona.jpg",
+    "catalogId": "lightolight-p-floor",
+    "category": "Floor Lamps",
+    "type": "floor_lamp",
+    "collection": "Lighto",
+    "style": "minimal",
+    "spaces": [
+      "living",
+      "bedroom"
+    ]
+  }
+]
