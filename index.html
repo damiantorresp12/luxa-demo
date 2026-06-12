@@ -228,6 +228,24 @@
   </aside>
 </div>
 
+<!-- ===================== HOTSPOT TRANSITION — video + info card ===================== -->
+<div class="transition-overlay" id="transitionOverlay" hidden>
+  <div class="transition-stage">
+    <video class="transition-video" id="transitionVideo" playsinline preload="auto"></video>
+    <button class="transition-skip" id="transitionSkip" type="button" aria-label="Skip">&times;</button>
+    <aside class="transition-card" id="transitionCard" hidden role="dialog" aria-label="Product info">
+      <p class="transition-card-eyebrow" id="transitionCardEyebrow"></p>
+      <h3 class="transition-card-name" id="transitionCardName"></h3>
+      <p class="transition-card-code" id="transitionCardCode"></p>
+      <p class="transition-card-desc" id="transitionCardDesc"></p>
+      <div class="transition-card-actions">
+        <button class="btn btn-primary transition-card-detail" id="transitionCardDetail" type="button">Ver detalle completo</button>
+        <button class="btn btn-ghost transition-card-close" id="transitionCardClose" type="button">Volver al ambiente</button>
+      </div>
+    </aside>
+  </div>
+</div>
+
 <script src="js/catalog.data.js"></script>
 <script src="js/app.js"></script>
 </body>

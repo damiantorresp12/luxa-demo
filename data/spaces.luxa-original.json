@@ -26,11 +26,14 @@
       "heroProduct": "aballs-a-ceiling",
       "hotspots": [
         { "productId": "aballs-a-ceiling", "x": 49.8,  "y": 16.84,
-          "closeUpImage": "assets/Spaces/Living 04 close up 2.jpeg" },
+          "closeUpImage": "assets/Spaces/Living 04 close up 2.jpeg",
+          "transitionVideo": "assets/Transiciones/Living 01  tran 03.mp4" },
         { "productId": "aballs-a-wall",    "x": 76.98, "y": 46.66,
-          "closeUpImage": "assets/Spaces/Living 04 close up 3.jpeg" },
+          "closeUpImage": "assets/Spaces/Living 04 close up 3.jpeg",
+          "transitionVideo": "assets/Transiciones/Living 01  tran 02.mp4" },
         { "productId": "aballs-m-table",   "x": 18.10, "y": 68.80,
-          "closeUpImage": "assets/Spaces/Living 04 close up 01.jpeg" }
+          "closeUpImage": "assets/Spaces/Living 04 close up 01.jpeg",
+          "transitionVideo": "assets/Transiciones/Living 01  tran 01.mp4" }
       ]
     },
     {

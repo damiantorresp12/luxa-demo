@@ -679,9 +679,100 @@
         var opts = (h && h.closeUpImage)
           ? { closeUpImage: h.closeUpImage, contextLabel: tx(sp.name) }
           : null;
-        openDetail(pid, opts);
+        // Hotspot path only: clicking a thumbnail in the side list skips the cinematic.
+        var isHotspot = node.classList.contains('hotspot');
+        if (isHotspot && h && h.transitionVideo) {
+          playHotspotTransition(pid, h, sp);
+        } else {
+          openDetail(pid, opts);
+        }
       });
     });
+  }
+
+  /* =============================================================================
+     HOTSPOT TRANSITION — fullscreen video that lands on the product, then
+     reveals a small info card over the frozen last frame.
+     ========================================================================== */
+  function playHotspotTransition(pid, h, sp) {
+    var prod = productById(pid);
+    if (!prod) return;
+
+    var overlay = $('#transitionOverlay');
+    var video   = $('#transitionVideo');
+    var card    = $('#transitionCard');
+    var skipBtn = $('#transitionSkip');
+    var btnDetail = $('#transitionCardDetail');
+    var btnClose  = $('#transitionCardClose');
+    if (!overlay || !video || !card) return;
+
+    // Fill the card with product info (rendered hidden until the video ends).
+    $('#transitionCardEyebrow').textContent = t('category.' + prod.category);
+    $('#transitionCardName').textContent    = prod.name;
+    $('#transitionCardCode').textContent    = prod.code || '';
+    $('#transitionCardDesc').textContent    = tx(prod.description);
+    card.hidden = true;
+
+    // Reset and load the video.
+    video.pause();
+    video.removeAttribute('loop');
+    video.muted = true;
+    video.src = uri(h.transitionVideo);
+    video.currentTime = 0;
+
+    overlay.hidden = false;
+    document.body.style.overflow = 'hidden';
+
+    function revealCard() {
+      // Freeze on the last frame and fade the card in.
+      try {
+        video.pause();
+        if (video.duration && isFinite(video.duration)) {
+          // Some browsers reset currentTime after `ended`; nudge back to the last frame.
+          video.currentTime = Math.max(0, video.duration - 0.05);
+        }
+      } catch (e) {}
+      card.hidden = false;
+    }
+
+    function cleanup() {
+      video.removeEventListener('ended', revealCard);
+      skipBtn.removeEventListener('click', revealCard);
+      btnDetail.removeEventListener('click', onDetail);
+      btnClose.removeEventListener('click', closeOverlay);
+      document.removeEventListener('keydown', onKey);
+    }
+    function closeOverlay() {
+      cleanup();
+      try { video.pause(); } catch (e) {}
+      video.removeAttribute('src');
+      video.load();
+      overlay.hidden = true;
+      card.hidden = true;
+      document.body.style.overflow = '';
+    }
+    function onDetail() {
+      var opts = h.closeUpImage
+        ? { closeUpImage: h.closeUpImage, contextLabel: tx(sp.name) }
+        : null;
+      closeOverlay();
+      openDetail(pid, opts);
+    }
+    function onKey(e) {
+      if (e.key === 'Escape') closeOverlay();
+    }
+
+    video.addEventListener('ended', revealCard);
+    skipBtn.addEventListener('click', revealCard);
+    btnDetail.addEventListener('click', onDetail);
+    btnClose.addEventListener('click', closeOverlay);
+    document.addEventListener('keydown', onKey);
+
+    // Start playback. Some browsers block autoplay unless muted (already set).
+    var p = video.play();
+    if (p && typeof p.catch === 'function') {
+      p.catch(function () { revealCard(); });
+    }
   }
 
   function findSpaceFor(productId) {

@@ -1370,3 +1370,110 @@ svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width:
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
 }
+
+/* =============================================================================
+   HOTSPOT TRANSITION — fullscreen video + product info card
+   ========================================================================== */
+.transition-overlay {
+  position: fixed; inset: 0; z-index: 250;
+  background: #000;
+  animation: fadeIn 0.25s var(--ease);
+}
+.transition-overlay[hidden] { display: none; }
+.transition-stage { position: absolute; inset: 0; overflow: hidden; }
+.transition-video {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+  background: #000;
+}
+.transition-skip {
+  position: absolute; top: 22px; right: 22px; z-index: 3;
+  width: 42px; height: 42px; border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.25);
+  background: rgba(10,10,11,0.55);
+  color: var(--ink); font-size: 1.5rem; line-height: 1;
+  cursor: pointer;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  transition: all 0.3s var(--ease);
+}
+.transition-skip:hover { border-color: var(--brass); color: var(--brass); transform: rotate(90deg); }
+
+.transition-card {
+  position: absolute;
+  right: 38px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: min(380px, calc(100% - 76px));
+  padding: 28px 30px 26px;
+  background: radial-gradient(120% 120% at 50% 18%, rgba(38,38,44,0.92), rgba(12,12,14,0.94) 78%);
+  border: 1px solid rgba(201, 162, 75, 0.35);
+  border-radius: 14px;
+  box-shadow: 0 30px 80px rgba(0,0,0,0.55), 0 0 0 1px rgba(201,162,75,0.08);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: var(--ink);
+  animation: transitionCardIn 0.55s var(--ease);
+  z-index: 2;
+}
+.transition-card[hidden] { display: none; }
+.transition-card::before {
+  content: '';
+  position: absolute;
+  inset: 6px;
+  border-radius: 10px;
+  border: 1px solid rgba(201, 162, 75, 0.12);
+  pointer-events: none;
+}
+.transition-card-eyebrow {
+  font-size: 0.62rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--brass);
+  margin: 0 0 10px;
+}
+.transition-card-name {
+  font-family: var(--serif);
+  font-size: 1.7rem;
+  font-weight: 500;
+  line-height: 1.1;
+  margin: 0 0 4px;
+}
+.transition-card-code {
+  font-size: 0.72rem;
+  color: var(--ink-faint);
+  letter-spacing: 0.1em;
+  margin: 0 0 14px;
+}
+.transition-card-desc {
+  color: var(--ink-dim);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  margin: 0 0 22px;
+}
+.transition-card-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.transition-card-actions .btn { width: 100%; justify-content: center; }
+
+@keyframes transitionCardIn {
+  from { opacity: 0; transform: translate(20px, -50%); }
+  to   { opacity: 1; transform: translate(0, -50%); }
+}
+
+@media (max-width: 720px) {
+  .transition-card {
+    right: 16px; left: 16px;
+    top: auto; bottom: 24px;
+    transform: none;
+    width: auto;
+    padding: 22px 22px 20px;
+  }
+  @keyframes transitionCardIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+}
