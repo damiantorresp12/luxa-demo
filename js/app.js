@@ -938,7 +938,11 @@
 
     function revealCard() {
       try { video.pause(); } catch (e) {}
-      if (still.src) still.hidden = false;
+      if (still.src) {
+        still.hidden = false;
+        // Hide the video underneath so nothing ghosts through the close-up.
+        video.style.visibility = 'hidden';
+      }
       card.hidden = false;
     }
 
@@ -954,6 +958,7 @@
       try { video.pause(); } catch (e) {}
       video.removeAttribute('src');
       video.load();
+      video.style.visibility = '';
       still.hidden = true;
       still.removeAttribute('src');
       overlay.hidden = true;
