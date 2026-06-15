@@ -122,6 +122,19 @@
         'category.Ceiling Lights': 'Plafones',
         'category.Downlights':     'Empotrados',
 
+        // Filter sidebar (filtro lateral)
+        'filters.categories':  'Categorías',
+        'filters.spaces':      'Espacios',
+        'filters.collections': 'Colecciones',
+        'filters.clear':       'Limpiar filtros',
+        'filters.toggle':      'Filtros',
+        'filters.close':       'Cerrar filtros',
+        'space.living':        'Living',
+        'space.dining':        'Comedor',
+        'space.bedroom':       'Dormitorio',
+        'space.bathroom':      'Baño',
+        'space.kitchen':       'Cocina',
+
         // Detail panel
         'detail.code':         'Código',
         'detail.category':     'Categoría',
@@ -140,12 +153,13 @@
         'detail.viewClose':    'En contexto',
         'detail.viewCatalog':  'Catálogo',
         'detail.saved':        '♥ Guardado',
-        'detail.badge3d':      'Modelo 3D disponible',
 
         // Spaces panel
         'space.label':       'En contexto',
         'space.featuredIn':  'Destacados en este ambiente',
         'spaces.filter.all': 'Todos',
+        'spaces.list.title': 'Ambientes',
+        'spaces.list.empty': 'No hay ambientes que coincidan con esos filtros.',
 
         // Downloads
         'downloads.download':       'Descargar PDF',
@@ -263,11 +277,25 @@
         'detail.viewClose':    'In context',
         'detail.viewCatalog':  'Catalog',
         'detail.saved':        '♥ Saved',
-        'detail.badge3d':      '3D model available',
 
         'space.label':       'In context',
         'space.featuredIn':  'Featured in this space',
         'spaces.filter.all': 'All',
+        'spaces.list.title': 'Spaces',
+        'spaces.list.empty': 'No spaces match those filters.',
+
+        // Filter sidebar
+        'filters.categories':  'Categories',
+        'filters.spaces':      'Spaces',
+        'filters.collections': 'Collections',
+        'filters.clear':       'Clear filters',
+        'filters.toggle':      'Filters',
+        'filters.close':       'Close filters',
+        'space.living':        'Living room',
+        'space.dining':        'Dining room',
+        'space.bedroom':       'Bedroom',
+        'space.bathroom':      'Bathroom',
+        'space.kitchen':       'Kitchen',
 
         'downloads.download':       'Download PDF',
         'dl.kind.Catalog':          'Catalog',
@@ -297,7 +325,7 @@
        Cambia productId/closeUpImage para rotar la pieza del bridge sin tocar código. */
     homeBridge: {
       productId: 'aballs-m-table',
-      closeUpImage: 'assets/Spaces/Living 04 close up 01.jpeg'
+      closeUpImage: 'assets/Spaces/Living 01/Living 01 close up 01.jpeg'
     },
 
     categories: [
@@ -305,7 +333,7 @@
       'Wall Lights', 'Ceiling Lights', 'Downlights'
     ],
 
-    homeHeroImage: 'assets/Spaces/Living 04.jpeg',
+    homeHeroImage: 'assets/Spaces/Living 01/Living 01.jpeg',
 
     /* ----------------------------------------------------------------------- */
     /* PRODUCTS — names/codes/designer/specs en inglés (universales).
@@ -865,6 +893,84 @@
           return { id: r.id, name: r.name, description: r.description, count: r.entries.length };
         });
         applyMerge(allEntries, catalogList);
+      });
+    });
+  })();
+
+  /* =============================================================================
+     Dynamic products — Product Data Generator pipeline
+     -----------------------------------------------------------------------------
+     Mirrors the spaces pipeline above. Per-catalog sidecar JSON at
+     data/products.<catalogId>.json is fetched and merged into
+     window.LUXA.products. Same id → replace curated entry; new id → append.
+     ========================================================================== */
+  (function mergeDynamicProducts() {
+    if (typeof fetch !== 'function') return;
+
+    function safeFetchJSON(path) {
+      return fetch(path, { cache: 'no-store' })
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .catch(function () { return null; });
+    }
+
+    function entriesOf(json) {
+      if (!json) return [];
+      if (Array.isArray(json.entries))  return json.entries;
+      if (Array.isArray(json.products)) return json.products;
+      if (Array.isArray(json))          return json;
+      return [];
+    }
+
+    function removedOf(json) {
+      if (!json) return [];
+      return Array.isArray(json.removed) ? json.removed : [];
+    }
+
+    function applyMerge(allEntries, allRemoved) {
+      var products = window.LUXA.products || [];
+      var byId = {};
+      products.forEach(function (p, i) { byId[p.id] = i; });
+      // Add/replace: per-id, the sidecar entry wins over the curated entry.
+      allEntries.forEach(function (e) {
+        if (!e || !e.id) return;
+        if (byId[e.id] != null) products[byId[e.id]] = e;
+        else { products.push(e); byId[e.id] = products.length - 1; }
+      });
+      // Subtract: every catalogId in the sidecar's `removed` list disappears,
+      // even if it came from the static catalog.data.js block. Without this,
+      // a removed curated product would still show up in the app.
+      if (allRemoved && allRemoved.length) {
+        var removedSet = Object.create(null);
+        allRemoved.forEach(function (id) { if (id) removedSet[id] = true; });
+        products = products.filter(function (p) { return !removedSet[p.id]; });
+      }
+      window.LUXA.products = products;
+      if (window.LUXA_App && typeof window.LUXA_App.refreshProducts === 'function') {
+        window.LUXA_App.refreshProducts();
+      }
+    }
+
+    safeFetchJSON('space-planner/catalogs.json').then(function (idx) {
+      var ids = idx && Array.isArray(idx.catalogs) ? idx.catalogs : null;
+      if (!ids || !ids.length) return;
+
+      var jobs = ids.map(function (id) {
+        return safeFetchJSON('data/products.' + id + '.json').then(function (json) {
+          var entries = entriesOf(json).map(function (e) {
+            return Object.assign({}, e, { _catalog: id });
+          });
+          return { entries: entries, removed: removedOf(json) };
+        });
+      });
+
+      return Promise.all(jobs).then(function (results) {
+        var allEntries = [];
+        var allRemoved = [];
+        results.forEach(function (r) {
+          allEntries = allEntries.concat(r.entries);
+          allRemoved = allRemoved.concat(r.removed);
+        });
+        if (allEntries.length || allRemoved.length) applyMerge(allEntries, allRemoved);
       });
     });
   })();

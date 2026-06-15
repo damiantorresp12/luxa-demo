@@ -68,10 +68,10 @@
     fileInput: $('#file-input'),
     dropOverlay: $('#drop-overlay'),
     btnReload: $('#btn-reload'),
-    btnExport: $('#btn-export'),
-    btnSave: $('#btn-save'),
+    btnPublish: $('#btn-publish'),
     btnRevert: $('#btn-revert'),
     btnRemove: $('#btn-remove'),
+    btnDelete: $('#btn-delete'),
     fSearch: $('#f-search'),
     fStatus: $('#f-status'),
     fType: $('#f-type'),
@@ -96,6 +96,20 @@
     fldStyle: $('#fld-style'),
     fldSpaces: $('#fld-spaces'),
     fldImage: $('#fld-image'),
+    fldCode: $('#fld-code'),
+    fldDesigner: $('#fld-designer'),
+    fldPower: $('#fld-power'),
+    fldLumens: $('#fld-lumens'),
+    fldTemperature: $('#fld-temperature'),
+    fldCri: $('#fld-cri'),
+    fldIp: $('#fld-ip'),
+    fldDimensions: $('#fld-dimensions'),
+    fldFinish: $('#fld-finish'),
+    fldApplicationEs: $('#fld-application-es'),
+    fldApplicationEn: $('#fld-application-en'),
+    fldDescriptionEs: $('#fld-description-es'),
+    fldDescriptionEn: $('#fld-description-en'),
+    fldFeatured: $('#fld-featured'),
     toast: $('#toast')
   };
 
@@ -129,6 +143,43 @@
     return CATEGORY_TO_TYPE[category] || '';
   }
 
+  // Reverse of mapCategoryToType, restricted to the 7 categories the LUXA app
+  // actually publishes (see window.LUXA.categories). Used to back-fill the
+  // category when only the planner-side `type` is set — same shape as
+  // deriveCatalogIdFromName: a sensible default the user can override.
+  const TYPE_TO_CATEGORY = {
+    pendant: 'Pendants',
+    ceiling_light: 'Ceiling Lights',
+    wall_light: 'Wall Lights',
+    table_lamp: 'Table Lamps',
+    floor_lamp: 'Floor Lamps',
+    downlight: 'Downlights'
+    // spotlight and linear_light have no app-side category — left out on purpose
+  };
+
+  function mapTypeToCategory(type) {
+    if (!type) return '';
+    return TYPE_TO_CATEGORY[type] || '';
+  }
+
+  // Best-effort type guess from the product name. Covers the words that show
+  // up in the catalog: "pendant", "chandelier", "suspended", "hanging", "wall",
+  // "table", "floor", "ceiling", "downlight", "recessed". Returns '' for names
+  // that don't match anything obvious (e.g. abstract model codes like "IC F"),
+  // so the user can still pick from the select. Order matters — more specific
+  // patterns first so e.g. "Suspended" beats a generic "Lamp".
+  function deriveTypeFromName(name) {
+    if (!name) return '';
+    const n = String(name).toLowerCase();
+    if (/\bpendant|chandelier|suspended|suspension|hanging\b/.test(n)) return 'pendant';
+    if (/\bceiling|flush|surface ceiling\b/.test(n)) return 'ceiling_light';
+    if (/\bwall|sconce|aplique\b/.test(n)) return 'wall_light';
+    if (/\btable|desk|bedside\b/.test(n)) return 'table_lamp';
+    if (/\bfloor|standing\b/.test(n)) return 'floor_lamp';
+    if (/\bdownlight|recessed\b/.test(n)) return 'downlight';
+    return '';
+  }
+
   // Strip "_corona" / "_vray" / "_render" suffixes from an image basename to get
   // a cleaner display name. e.g. "DVA-Aballs A Wall Light_corona" → "DVA-Aballs A Wall Light"
   function cleanName(base) {
@@ -140,6 +191,19 @@
   function deriveIdFromFilename(filename) {
     const base = filename.replace(/\.[^.]+$/, '');
     return cleanName(base).replace(/\s+/g, '-').replace(/[^A-Za-z0-9_-]/g, '');
+  }
+
+  // Derive a lowercase slug-style catalogId from the product's display name.
+  // Strips the "DVA-" prefix so the resulting id matches the curated app-product
+  // style (e.g. "aballs-a-wall" rather than "dva-aballs-a-wall"). Used as the
+  // automatic default when the user hasn't provided one explicitly.
+  function deriveCatalogIdFromName(name) {
+    if (!name) return '';
+    return String(name)
+      .replace(/^DVA[-\s]?/i, '')
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '');
   }
 
   function imageRelPath(filename) {
@@ -165,6 +229,18 @@
         collection: it.collection,
         style: it.style,
         spaces: it.spaces,
+        code: it.code,
+        designer: it.designer,
+        power: it.power,
+        lumens: it.lumens,
+        temperature: it.temperature,
+        cri: it.cri,
+        ip: it.ip,
+        dimensions: it.dimensions,
+        finish: it.finish,
+        application: it.application,
+        description: it.description,
+        featured: it.featured,
         removed: it.removed
       }));
       localStorage.setItem(storageKey(), JSON.stringify({
@@ -281,6 +357,13 @@
           style: fromPlanner.style || '',
           spaces: Array.isArray(fromPlanner.spaces) ? fromPlanner.spaces.slice() : []
         };
+        // Rich fields may live in the planner draft (if the user filled them
+        // here and "Save to planner"ed). They're persisted in the planner JSON
+        // alongside the simple fields.
+        Object.assign(item, pickRichFields(fromPlanner));
+        // If the app also publishes this product, the app's rich content wins
+        // when planner's is empty — that way pre-fill is always best-effort.
+        if (fromApp) mergeRichFromApp(item, fromApp);
       } else if (fromApp) {
         // Map app schema → planner schema. Collection/style/spaces are blank.
         item = {
@@ -295,6 +378,7 @@
           style: '',
           spaces: []
         };
+        mergeRichFromApp(item, fromApp);
       } else {
         // Brand new image (e.g. the 2 Arum) — minimal skeleton.
         item = {
@@ -309,6 +393,8 @@
           style: '',
           spaces: []
         };
+        // Empty rich-field skeleton so the form always has stable shape
+        Object.assign(item, emptyRichFields());
       }
       item.removed = false;
       // baseline = the "official" state from disk; used by Revert
@@ -319,6 +405,61 @@
     });
 
     return items;
+  }
+
+  // Rich-field helpers: the app's product schema is wider than the planner's,
+  // and a publish-to-app payload needs all of it.
+
+  function emptyRichFields() {
+    return {
+      code: '',
+      designer: '',
+      power: '',
+      lumens: '',
+      temperature: '',
+      cri: '',
+      ip: '',
+      dimensions: '',
+      finish: '',
+      application: { es: '', en: '' },
+      description: { es: '', en: '' },
+      featured: false
+    };
+  }
+
+  // Pick rich fields out of a planner product (which may or may not have them).
+  function pickRichFields(src) {
+    const out = emptyRichFields();
+    if (!src) return out;
+    ['code','designer','power','lumens','temperature','cri','ip','dimensions','finish']
+      .forEach(k => { if (src[k]) out[k] = String(src[k]); });
+    if (src.application && typeof src.application === 'object') {
+      out.application = { es: src.application.es || '', en: src.application.en || '' };
+    }
+    if (src.description && typeof src.description === 'object') {
+      out.description = { es: src.description.es || '', en: src.description.en || '' };
+    }
+    out.featured = !!src.featured;
+    return out;
+  }
+
+  // Merge rich fields from an app product (window.LUXA.products entry) onto an
+  // item, only filling empty slots so user edits in the planner aren't clobbered.
+  function mergeRichFromApp(item, appProd) {
+    if (!appProd) return;
+    ['code','designer','power','lumens','temperature','cri','ip','dimensions','finish']
+      .forEach(k => { if (!item[k] && appProd[k]) item[k] = String(appProd[k]); });
+    item.application = item.application || { es: '', en: '' };
+    if (appProd.application && typeof appProd.application === 'object') {
+      if (!item.application.es) item.application.es = appProd.application.es || '';
+      if (!item.application.en) item.application.en = appProd.application.en || '';
+    }
+    item.description = item.description || { es: '', en: '' };
+    if (appProd.description && typeof appProd.description === 'object') {
+      if (!item.description.es) item.description.es = appProd.description.es || '';
+      if (!item.description.en) item.description.en = appProd.description.en || '';
+    }
+    if (item.featured == null) item.featured = !!appProd.featured;
   }
 
   function computeStatus(item) {
@@ -349,6 +490,22 @@
         collection: d.collection ?? item.collection,
         style: d.style ?? item.style,
         spaces: Array.isArray(d.spaces) ? d.spaces.slice() : item.spaces,
+        code: d.code ?? item.code,
+        designer: d.designer ?? item.designer,
+        power: d.power ?? item.power,
+        lumens: d.lumens ?? item.lumens,
+        temperature: d.temperature ?? item.temperature,
+        cri: d.cri ?? item.cri,
+        ip: d.ip ?? item.ip,
+        dimensions: d.dimensions ?? item.dimensions,
+        finish: d.finish ?? item.finish,
+        application: d.application && typeof d.application === 'object'
+          ? { es: d.application.es || '', en: d.application.en || '' }
+          : item.application,
+        description: d.description && typeof d.description === 'object'
+          ? { es: d.description.es || '', en: d.description.en || '' }
+          : item.description,
+        featured: typeof d.featured === 'boolean' ? d.featured : item.featured,
         removed: !!d.removed
       });
       item.status = computeStatus(item);
@@ -482,6 +639,24 @@
     els.fldSpaces.querySelectorAll('input[type="checkbox"]').forEach(cb => {
       cb.checked = (it.spaces || []).includes(cb.value);
     });
+
+    // Rich publishing fields
+    els.fldCode.value = it.code || '';
+    els.fldDesigner.value = it.designer || '';
+    els.fldPower.value = it.power || '';
+    els.fldLumens.value = it.lumens || '';
+    els.fldTemperature.value = it.temperature || '';
+    els.fldCri.value = it.cri || '';
+    els.fldIp.value = it.ip || '';
+    els.fldDimensions.value = it.dimensions || '';
+    els.fldFinish.value = it.finish || '';
+    const app = it.application || { es: '', en: '' };
+    const desc = it.description || { es: '', en: '' };
+    els.fldApplicationEs.value = app.es || '';
+    els.fldApplicationEn.value = app.en || '';
+    els.fldDescriptionEs.value = desc.es || '';
+    els.fldDescriptionEn.value = desc.en || '';
+    els.fldFeatured.checked = !!it.featured;
   }
 
   function readFormIntoItem(it) {
@@ -493,6 +668,27 @@
     it.collection = els.fldCollection.value.trim();
     it.style = els.fldStyle.value.trim();
     it.spaces = Array.from(els.fldSpaces.querySelectorAll('input[type="checkbox"]:checked')).map(c => c.value);
+
+    // Rich publishing fields
+    it.code = els.fldCode.value.trim();
+    it.designer = els.fldDesigner.value.trim();
+    it.power = els.fldPower.value.trim();
+    it.lumens = els.fldLumens.value.trim();
+    it.temperature = els.fldTemperature.value.trim();
+    it.cri = els.fldCri.value.trim();
+    it.ip = els.fldIp.value.trim();
+    it.dimensions = els.fldDimensions.value.trim();
+    it.finish = els.fldFinish.value.trim();
+    it.application = {
+      es: els.fldApplicationEs.value.trim(),
+      en: els.fldApplicationEn.value.trim()
+    };
+    it.description = {
+      es: els.fldDescriptionEs.value.trim(),
+      en: els.fldDescriptionEn.value.trim()
+    };
+    it.featured = !!els.fldFeatured.checked;
+
     it.status = computeStatus(it);
   }
 
@@ -525,31 +721,177 @@
         if (it.collection) out.collection = it.collection;
         if (it.style) out.style = it.style;
         if (Array.isArray(it.spaces) && it.spaces.length) out.spaces = it.spaces.slice();
+        // Rich app-publishing fields persist alongside the planner data so
+        // they survive across reloads and feed buildAppPublishPayload().
+        ['code','designer','power','lumens','temperature','cri','ip','dimensions','finish']
+          .forEach(k => { if (it[k]) out[k] = it[k]; });
+        if (it.application && (it.application.es || it.application.en)) {
+          out.application = { es: it.application.es || '', en: it.application.en || '' };
+        }
+        if (it.description && (it.description.es || it.description.en)) {
+          out.description = { es: it.description.es || '', en: it.description.en || '' };
+        }
+        if (it.featured) out.featured = true;
         return out;
       });
   }
 
-  async function saveToPlanner() {
-    const catalogId = state.activeCatalog || DEFAULT_CATALOG_ID;
-    const payload = buildExportPayload();
-    const ok = window.confirm(
-      `Esto va a reemplazar el products.json del planner para "${catalogId}".\n\n` +
-      `Productos a guardar: ${payload.length}\n` +
-      `Backup automático: products.json.bak.json (en el mismo folder)\n\n` +
-      `Continuar?`
+  // App publishing: build the per-catalog products sidecar that catalog.data.js
+  // fetches and merges into window.LUXA.products.
+  //
+  // Schema must match the app's product shape (see js/catalog.data.js): every
+  // entry includes the full `assets` object so the app's `productCard()` can
+  // do `p.assets.image` without null-checks. Empty rich fields are tolerated —
+  // the app's detail panel filters empty spec rows.
+  function buildAppPublishPayload() {
+    const VALID_CATEGORIES = [
+      'Pendants','Chandeliers','Floor Lamps','Table Lamps',
+      'Wall Lights','Ceiling Lights','Downlights'
+    ];
+    const items = state.items.filter(it =>
+      !it.removed &&
+      it.catalogId &&
+      it.name &&
+      it.category && VALID_CATEGORIES.includes(it.category)
     );
-    if (!ok) return;
+    return items.map(it => {
+      // The planner stores image paths relative to the planner folder
+      // ("../assets/Imagenes/X.jpg"). The app reads them relative to the
+      // project root ("assets/Imagenes/X.jpg"). Reroot now.
+      const rootImage = (it.image || '').replace(/^\.\.\//, '');
+      return {
+        id: it.catalogId,
+        code: it.code || '',
+        name: it.name,
+        category: it.category,
+        collection: it.collection || '',
+        spaces: Array.isArray(it.spaces) ? it.spaces.slice() : [],
+        designer: it.designer || '',
+        power: it.power || '',
+        lumens: it.lumens || '',
+        temperature: it.temperature || '',
+        cri: it.cri || '',
+        ip: it.ip || '',
+        dimensions: it.dimensions || '',
+        finish: it.finish || '',
+        application: {
+          es: (it.application && it.application.es) || '',
+          en: (it.application && it.application.en) || ''
+        },
+        description: {
+          es: (it.description && it.description.es) || '',
+          en: (it.description && it.description.en) || ''
+        },
+        featured: !!it.featured,
+        assets: {
+          image: rootImage,
+          model: null,
+          gallery: [],
+          pdfs: [],
+          glb: null, fbx: null, ies: null, dwg: null, bim: null
+        }
+      };
+    });
+  }
 
-    const path = `space-planner/catalogs/${catalogId}/products.json`;
+  // List of catalogIds the user marked as "Quitar del catálogo". The app's
+  // merge subtracts these from window.LUXA.products so that products which
+  // also exist in the static js/catalog.data.js disappear too — without this,
+  // a removed curated product would still show up in the app.
+  function buildRemovedIdList() {
+    return state.items
+      .filter(it => it.removed && it.catalogId)
+      .map(it => it.catalogId);
+  }
+
+  // Items the user *intended* to publish (catalogId filled) but that miss
+  // a required field. Used to warn before publishing.
+  function findIncompletePublishItems() {
+    const VALID_CATEGORIES = [
+      'Pendants','Chandeliers','Floor Lamps','Table Lamps',
+      'Wall Lights','Ceiling Lights','Downlights'
+    ];
+    return state.items.filter(it => {
+      if (it.removed) return false;
+      if (!it.catalogId) return false;
+      if (!it.name) return true;
+      if (!it.category || !VALID_CATEGORIES.includes(it.category)) return true;
+      return false;
+    });
+  }
+
+  async function publishToApp() {
+    const catalogId = state.activeCatalog || DEFAULT_CATALOG_ID;
+    const plannerPayload = buildExportPayload();
+    const appPayload = buildAppPublishPayload();
+    const incomplete = findIncompletePublishItems();
+
+    if (!appPayload.length) {
+      toast('No hay productos listos para publicar. Asegurate de llenar catalogId, name y category.', 'error');
+      return;
+    }
+
+    const removedPreview = buildRemovedIdList();
+    let confirmMsg =
+      `Voy a hacer DOS cosas:\n\n` +
+      `1) Guardar al planner: ${plannerPayload.length} productos.\n` +
+      `2) Publicar a la app: ${appPayload.length} productos (los que tienen catalogId + name + category).\n\n` +
+      `Archivos:\n` +
+      `  • space-planner/catalogs/${catalogId}/products.json\n` +
+      `  • data/products.${catalogId}.json\n` +
+      `Backup automático en ambos.\n\n`;
+    if (removedPreview.length) {
+      confirmMsg +=
+        `🗑 ${removedPreview.length} producto${removedPreview.length === 1 ? '' : 's'} marcado${removedPreview.length === 1 ? '' : 's'} ` +
+        `para borrar de la app (van en la lista "removed" del sidecar).\n\n`;
+    }
+    if (incomplete.length) {
+      const names = incomplete.map(it => `  • ${it.name || it.id || it.key}`).join('\n');
+      confirmMsg +=
+        `⚠ ${incomplete.length} producto${incomplete.length === 1 ? '' : 's'} con catalogId pero datos incompletos ` +
+        `(falta name o category válida) — NO se van a publicar:\n${names}\n\n`;
+    }
+    confirmMsg += `Continuar?`;
+    if (!window.confirm(confirmMsg)) return;
+
+    // 1) Save to planner first. If this fails we abort — no point in
+    //    publishing an out-of-sync sidecar.
+    const plannerPath = `space-planner/catalogs/${catalogId}/products.json`;
     try {
-      const res = await fetch(`/__save?path=${encodeURIComponent(path)}`, {
+      const res = await fetch(`/__save?path=${encodeURIComponent(plannerPath)}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload, null, 2)
+        body: JSON.stringify(plannerPayload, null, 2)
       });
       const out = await res.json().catch(() => ({}));
       if (!res.ok || !out.ok) {
-        toast(`Error al guardar: ${out.error || res.status}`, 'error');
+        toast(`Error guardando al planner: ${out.error || res.status}`, 'error');
+        return;
+      }
+    } catch (err) {
+      toast(`Error de red al guardar al planner: ${err.message}`, 'error');
+      return;
+    }
+
+    // 2) Publish to app sidecar.
+    const appPath = `data/products.${catalogId}.json`;
+    const removedIds = buildRemovedIdList();
+    const appJson = {
+      _readme: 'Producto sidecar para la app LUXA. Generado por el Product Data Generator. Editar a mano sólo si sabés lo que hacés. La lista "removed" indica catalogIds que la app debe filtrar del catálogo estático.',
+      catalogId: catalogId,
+      exportedAt: new Date().toISOString(),
+      products: appPayload,
+      removed: removedIds
+    };
+    try {
+      const res = await fetch(`/__save?path=${encodeURIComponent(appPath)}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(appJson, null, 2)
+      });
+      const out = await res.json().catch(() => ({}));
+      if (!res.ok || !out.ok) {
+        toast(`Planner guardado, pero falló publicar a la app: ${out.error || res.status}`, 'error');
         return;
       }
       // Update baseline so future "Revert" returns here
@@ -557,11 +899,10 @@
         it._baseline = Object.assign({}, it);
         delete it._baseline._baseline;
       });
-      // Clear draft since we just persisted
       clearDraft();
-      toast(`Guardado en planner: ${payload.length} productos.`, 'success');
+      toast(`Publicado: ${appPayload.length} en la app · ${plannerPayload.length} en el planner.`, 'success');
     } catch (err) {
-      toast(`Error de red al guardar: ${err.message}`, 'error');
+      toast(`Planner guardado, pero error de red publicando a la app: ${err.message}`, 'error');
     }
   }
 
@@ -668,20 +1009,6 @@
     });
   }
 
-  function exportJSON() {
-    const payload = buildExportPayload();
-    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `products.${state.activeCatalog || DEFAULT_CATALOG_ID}.json`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    toast(`Descargado ${payload.length} productos.`, 'success');
-  }
-
   function revertSelected() {
     const it = state.items.find(i => i.key === state.selectedKey);
     if (!it || !it._baseline) return;
@@ -702,6 +1029,39 @@
     renderGrid();
     renderSidePanel();
     toast(it.removed ? 'Item removido del catálogo (se va a omitir al guardar).' : 'Item restaurado.', '');
+  }
+
+  async function deleteImageSelected() {
+    const it = state.items.find(i => i.key === state.selectedKey);
+    if (!it || !it.image) return;
+    const rootImage = (it.image || '').replace(/^\.\.\//, '');
+    const fileName = rootImage.split('/').pop();
+    const ok = window.confirm(
+      `¿Borrar la imagen "${fileName}"?\n\n` +
+      `La imagen se mueve a una carpeta de papelera (_trash/) dentro de la misma carpeta — la podés recuperar a mano si te arrepentís.\n\n` +
+      `Esta acción también saca el producto de la grilla.`
+    );
+    if (!ok) return;
+    els.btnDelete.disabled = true;
+    try {
+      const res = await fetch(`/__delete?path=${encodeURIComponent(rootImage)}`, { method: 'POST' });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data.ok) {
+        toast('No se pudo borrar: ' + (data.error || res.statusText), 'err');
+        return;
+      }
+      const idx = state.items.findIndex(i => i.key === state.selectedKey);
+      if (idx !== -1) state.items.splice(idx, 1);
+      state.selectedKey = null;
+      persistDraft();
+      renderGrid();
+      renderSidePanel();
+      toast(`Imagen movida a papelera: ${data.trashedAs}`, '');
+    } catch (e) {
+      toast('Error de red al borrar: ' + e.message, 'err');
+    } finally {
+      els.btnDelete.disabled = false;
+    }
   }
 
   // ---------- Active catalog resolution + switching ----------
@@ -744,6 +1104,33 @@
     if (draft) {
       applyDraftOverlay(state.items, draft);
     }
+    // Auto-fill empty fields after the draft overlay. The user's explicit
+    // edits win because the overlay already ran; we only fill what is still
+    // blank — except for `category`, which we also replace when the planner
+    // JSON has a non-app value (e.g. "pendant" used as a category instead of
+    // the proper "Pendants"). Three chained derivations:
+    //   • type       ← name keywords ("pendant", "table", "floor", …)
+    //   • category   ← TYPE_TO_CATEGORY[type] (when empty or non-app)
+    //   • catalogId  ← slug(name)
+    // Together they collapse the typical "new image needs N fields" friction
+    // for the common case (product name describes what it is).
+    const VALID_APP_CATEGORIES = new Set([
+      'Pendants','Chandeliers','Floor Lamps','Table Lamps',
+      'Wall Lights','Ceiling Lights','Downlights'
+    ]);
+    state.items.forEach(it => {
+      if (!it.type && it.name) {
+        it.type = deriveTypeFromName(it.name);
+      }
+      if (!VALID_APP_CATEGORIES.has(it.category) && it.type) {
+        const cat = mapTypeToCategory(it.type);
+        if (cat) it.category = cat;
+      }
+      if (!it.catalogId && it.name) {
+        it.catalogId = deriveCatalogIdFromName(it.name);
+      }
+      it.status = computeStatus(it);
+    });
     // Keep selection if it still exists
     if (state.selectedKey && !state.items.some(i => i.key === state.selectedKey)) {
       state.selectedKey = null;
@@ -758,10 +1145,10 @@
   function wireEvents() {
     els.picker.addEventListener('change', (e) => setActiveCatalog(e.target.value));
     els.btnReload.addEventListener('click', () => reloadAll());
-    els.btnExport.addEventListener('click', exportJSON);
-    els.btnSave.addEventListener('click', saveToPlanner);
+    if (els.btnPublish) els.btnPublish.addEventListener('click', publishToApp);
     els.btnRevert.addEventListener('click', revertSelected);
     els.btnRemove.addEventListener('click', toggleRemoveSelected);
+    els.btnDelete.addEventListener('click', deleteImageSelected);
 
     els.fSearch.addEventListener('input', () => { state.filters.search = els.fSearch.value; renderGrid(); });
     els.fStatus.addEventListener('change', () => { state.filters.status = els.fStatus.value; renderGrid(); });
@@ -777,9 +1164,14 @@
     });
 
     // Auto-save form fields on any change
-    ['fldName','fldId','fldCatalogId','fldCategory','fldType','fldCollection','fldStyle','fldImage']
-      .forEach(k => els[k].addEventListener('input', onFormChange));
+    [
+      'fldName','fldId','fldCatalogId','fldCategory','fldType','fldCollection','fldStyle','fldImage',
+      'fldCode','fldDesigner','fldPower','fldLumens','fldTemperature','fldCri','fldIp',
+      'fldDimensions','fldFinish',
+      'fldApplicationEs','fldApplicationEn','fldDescriptionEs','fldDescriptionEn'
+    ].forEach(k => els[k].addEventListener('input', onFormChange));
     els.fldSpaces.addEventListener('change', onFormChange);
+    els.fldFeatured.addEventListener('change', onFormChange);
   }
 
   // ---------- Boot ----------

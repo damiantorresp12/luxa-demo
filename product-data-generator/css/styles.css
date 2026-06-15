@@ -129,6 +129,9 @@ button { font-family: inherit; }
 .btn-revert { color: var(--text-dim); }
 .btn-remove { color: var(--red); border-color: rgba(226,101,101,.3); }
 .btn-remove:hover { color: var(--red); border-color: rgba(226,101,101,.6); background: rgba(226,101,101,.08); }
+.btn-delete { color: #fff; background: var(--red); border-color: var(--red); }
+.btn-delete:hover { background: #c44a4a; border-color: #c44a4a; }
+.btn-delete:disabled { opacity: 0.4; cursor: not-allowed; }
 
 /* ---------- Filters bar ---------- */
 .filters-bar {
@@ -423,6 +426,81 @@ button { font-family: inherit; }
   border-radius: 4px;
   color: var(--gold);
 }
+
+/* ---------- Publish-to-app button (green, distinct from gold "Save to planner") ---------- */
+.btn-publish {
+  background: linear-gradient(180deg, #6cc28e, #4a9a6a);
+  color: #0a1f12;
+  border-color: var(--green);
+  font-weight: 600;
+}
+.btn-publish:hover { color: #0a1f12; filter: brightness(1.08); }
+
+/* ---------- Publish-to-app collapsible section in side panel ---------- */
+.app-publish-section {
+  margin-top: 4px;
+  padding: 12px 12px 14px;
+  background: var(--bg-1);
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius);
+}
+.app-publish-section > summary {
+  cursor: pointer;
+  list-style: none;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 2px 0;
+  user-select: none;
+}
+.app-publish-section > summary::-webkit-details-marker { display: none; }
+.app-publish-section > summary::before {
+  content: '▸';
+  display: inline-block;
+  margin-right: 8px;
+  color: var(--text-dim);
+  transition: transform .15s ease;
+}
+.app-publish-section[open] > summary::before { transform: rotate(90deg); }
+.app-publish-title {
+  font-size: 12px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--green);
+  font-weight: 600;
+  flex: 1;
+}
+.app-publish-hint {
+  font-size: 11px;
+  color: var(--muted);
+}
+.app-publish-section > .form-row { margin-top: 12px; }
+.form-row textarea {
+  background: var(--bg-2);
+  border: 1px solid var(--line);
+  color: var(--text);
+  padding: 7px 10px;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 13px;
+  resize: vertical;
+  min-height: 36px;
+}
+.form-row textarea:focus { outline: 1px solid var(--gold-dim); }
+.featured-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--text-dim);
+  cursor: pointer;
+  user-select: none;
+  text-transform: none;
+  letter-spacing: 0;
+}
+.featured-toggle input { margin: 0; cursor: pointer; }
+.featured-toggle:has(input:checked) { color: var(--gold); }
 
 /* ---------- Responsive ---------- */
 @media (max-width: 1100px) {

@@ -1,48 +1,5 @@
 [
   {
-    "id": "DVA-265-Wall-Lamp",
-    "name": "265 Wall",
-    "image": "../assets/Imagenes/DVA-265 Wall Lamp_corona.jpg",
-    "catalogId": "265-wall",
-    "category": "Wall Lights",
-    "type": "wall_light",
-    "collection": "265",
-    "spaces": [
-      "living",
-      "dining"
-    ]
-  },
-  {
-    "id": "DVA-5756",
-    "name": "DVA-5756 Tempo Wall Lamp",
-    "image": "../assets/Imagenes/DVA-5756 Tempo Wall Lamp_corona.jpg",
-    "catalogId": "tempo-wall",
-    "category": "Wall Lights",
-    "type": "wall_light",
-    "collection": "Tempo",
-    "style": "modern",
-    "spaces": [
-      "living",
-      "dining",
-      "bedroom",
-      "bathroom"
-    ]
-  },
-  {
-    "id": "DVA-5776",
-    "name": "DVA-5776 Tempo Pendant Lamp",
-    "image": "../assets/Imagenes/DVA-5776 Tempo Pendant Lamp_corona.jpg",
-    "catalogId": "tempo-pendant",
-    "category": "Pendants",
-    "type": "pendant",
-    "collection": "Tempo",
-    "style": "modern",
-    "spaces": [
-      "living",
-      "dining"
-    ]
-  },
-  {
     "id": "DVA-5945",
     "name": "DVA-5945 Flat Floor Lamp",
     "image": "../assets/Imagenes/DVA-5945 Flat Floor Lamp_corona.jpg",
@@ -54,7 +11,24 @@
     "spaces": [
       "living",
       "bedroom"
-    ]
+    ],
+    "code": "DVA-5945",
+    "designer": "LUXA Studio",
+    "power": "19 W",
+    "lumens": "1400 lm",
+    "temperature": "3000 K",
+    "cri": "≥ 90",
+    "ip": "IP20",
+    "dimensions": "Ø 200 × H 1800 mm",
+    "finish": "Slim aluminium · Matte black",
+    "application": {
+      "es": "Salas contemporáneas",
+      "en": "Contemporary living spaces"
+    },
+    "description": {
+      "es": "Un disco de luz sobre un vástago casi invisible. Huella mínima, calma máxima — luz reducida a su geometría esencial.",
+      "en": "A disc of light on a near-invisible stem. Minimal footprint, maximal calm — light reduced to its essential geometry."
+    }
   },
   {
     "id": "DVA-5965",
@@ -68,7 +42,24 @@
     "spaces": [
       "living",
       "bedroom"
-    ]
+    ],
+    "code": "DVA-5965",
+    "designer": "LUXA Studio",
+    "power": "10 W",
+    "lumens": "720 lm",
+    "temperature": "3000 K",
+    "cri": "≥ 90",
+    "ip": "IP20",
+    "dimensions": "Ø 180 × H 380 mm",
+    "finish": "Slim aluminium · Matte black",
+    "application": {
+      "es": "Escritorios y espacios de trabajo",
+      "en": "Desks and workspaces"
+    },
+    "description": {
+      "es": "El lenguaje Flat a escala de escritorio: un disco luminoso sobre un vástago fino, regulable según la tarea o el estado de ánimo.",
+      "en": "The Flat language scaled to the desktop: a luminous disc on a fine stem, dimmable to suit the task or the mood."
+    }
   },
   {
     "id": "DVA-Aballs-CII",
@@ -83,7 +74,24 @@
       "living",
       "bedroom",
       "dining"
-    ]
+    ],
+    "code": "DVA-ABC",
+    "designer": "LUXA Studio",
+    "power": "12 W",
+    "lumens": "900 lm",
+    "temperature": "2700 K",
+    "cri": "≥ 90",
+    "ip": "IP44",
+    "dimensions": "Ø 250 × D 250 mm",
+    "finish": "Opal sphere · Brushed brass",
+    "application": {
+      "es": "Techos bajos, halls y baños",
+      "en": "Low ceilings, halls and bathrooms"
+    },
+    "description": {
+      "es": "Un globo opal de superficie que abraza el techo. La suavidad Aballs allí donde un colgante quedaría demasiado bajo.",
+      "en": "A surface-mounted opal globe that hugs the ceiling. The Aballs softness where a pendant would hang too low."
+    }
   },
   {
     "id": "DVA-Aballs-W",
@@ -98,7 +106,24 @@
       "living",
       "bedroom",
       "dining"
-    ]
+    ],
+    "code": "DVA-ABW",
+    "designer": "LUXA Studio",
+    "power": "8 W",
+    "lumens": "560 lm",
+    "temperature": "2700 K",
+    "cri": "≥ 90",
+    "ip": "IP44",
+    "dimensions": "Ø 200 × D 230 mm",
+    "finish": "Opal sphere · Brushed brass",
+    "application": {
+      "es": "Baños y tocadores",
+      "en": "Bathrooms and vanities"
+    },
+    "description": {
+      "es": "Un globo opal sobre una placa de latón — luz pareja y favorecedora para espejos y tocadores, apto para zonas húmedas.",
+      "en": "An opal globe on a brass plate — flattering, even light for mirrors and vanities, rated for damp rooms."
+    }
   },
   {
     "id": "DVA-Aballs-CH12",
@@ -112,32 +137,24 @@
     "spaces": [
       "living",
       "dining"
-    ]
-  },
-  {
-    "id": "DVA-Aballs-Chandelier-4",
-    "name": "Aballs Chandelier 4",
-    "image": "../assets/Imagenes/DVA-Aballs Chandelier 4_corona.jpg",
-    "catalogId": "aballs-chandelier-4",
-    "category": "Chandeliers",
-    "type": "pendant",
-    "collection": "Aballs",
-    "style": "decorative",
-    "spaces": [
-      "living"
-    ]
-  },
-  {
-    "id": "DVA-Aballs-Chandelier-8",
-    "name": "Aballs Chandelier 8",
-    "image": "../assets/Imagenes/DVA-Aballs Chandelier 8_corona.jpg",
-    "catalogId": "aballs-chandelier-8",
-    "category": "Chandeliers",
-    "type": "pendant",
-    "collection": "Aballs",
-    "spaces": [
-      "living"
-    ]
+    ],
+    "code": "DVA-AB12",
+    "designer": "LUXA Studio",
+    "power": "12 × 6 W",
+    "lumens": "6000 lm",
+    "temperature": "2700 K",
+    "cri": "≥ 90",
+    "ip": "IP20",
+    "dimensions": "Ø 1200 × H 850 mm",
+    "finish": "Opal spheres · Matte black frame",
+    "application": {
+      "es": "Lobbies e interiores de gran escala",
+      "en": "Lobbies and grand interiors"
+    },
+    "description": {
+      "es": "La hermana mayor de la familia. Doce globos llenan un volumen con luz suave y pareja, a la altura de una doble altura.",
+      "en": "The larger sibling of the family. Twelve globes fill a volume with soft, even light worthy of a double-height room."
+    }
   },
   {
     "id": "DVA-Aballs-T",
@@ -151,95 +168,54 @@
     "spaces": [
       "living",
       "bedroom"
-    ]
-  },
-  {
-    "id": "DVA-Aim-LED-Pendant-Lamp",
-    "name": "Aim LED Pendant",
-    "image": "../assets/Imagenes/DVA-Aim LED Pendant Lamp_vray.jpg",
-    "catalogId": "aim-led-pendant",
-    "category": "Pendants",
-    "type": "pendant",
-    "collection": "Aim",
-    "spaces": [
-      "living"
-    ]
-  },
-  {
-    "id": "DVA-Albus-T",
-    "name": "DVA-Albus Twisted Table Lamp",
-    "image": "../assets/Imagenes/DVA-Albus Twisted Table Lamp_corona.jpg",
-    "catalogId": "albus-twisted-table",
-    "category": "Table Lamps",
-    "type": "table_lamp",
-    "collection": "Albus",
-    "style": "decorative",
-    "spaces": [
-      "living",
-      "bedroom"
-    ]
-  },
-  {
-    "id": "DVA-Aplomb-Suspension-Light",
-    "name": "Aplomb Suspension",
-    "image": "../assets/Imagenes/DVA-Aplomb Suspension Light_corona.jpg",
-    "catalogId": "aplomb-suspension",
-    "category": "Pendants",
-    "type": "pendant",
-    "collection": "Aplomb",
-    "spaces": [
-      "living",
-      "bedroom"
-    ]
-  },
-  {
-    "id": "DVA-Apollo-Floor-Lamp",
-    "name": "Apollo Floor",
-    "image": "../assets/Imagenes/DVA-Apollo Floor Lamp_corona.jpg",
-    "catalogId": "apollo-floor",
-    "category": "Floor Lamps",
-    "type": "floor_lamp",
-    "collection": "Apollo",
-    "spaces": [
-      "living"
-    ]
-  },
-  {
-    "id": "DVA-Arco-Floor-Lamp",
-    "name": "Arco Floor",
-    "image": "../assets/Imagenes/DVA-Arco Floor Lamp_corona.jpg",
-    "catalogId": "arco-floor",
-    "category": "Floor Lamps",
-    "type": "floor_lamp",
-    "collection": "Arco",
-    "spaces": [
-      "living"
-    ]
-  },
-  {
-    "id": "DVA-Arena-Suspension-Lamp-150",
-    "name": "Arena Suspension 150",
-    "image": "../assets/Imagenes/DVA-Arena Suspension Lamp 150_corona.jpg",
-    "catalogId": "arena-suspension",
-    "category": "Pendants",
-    "type": "pendant",
-    "collection": "Arena",
-    "spaces": [
-      "living"
-    ]
+    ],
+    "code": "DVA-ABM",
+    "designer": "LUXA Studio",
+    "power": "8 W",
+    "lumens": "600 lm",
+    "temperature": "2700 K",
+    "cri": "≥ 90",
+    "ip": "IP20",
+    "dimensions": "Ø 250 × H 450 mm",
+    "finish": "Opal sphere · Matte black stem",
+    "application": {
+      "es": "Dormitorios y livings",
+      "en": "Bedrooms and lounges"
+    },
+    "description": {
+      "es": "Un único globo opal sostenido por un brazo fino. La pieza de escritorio de la familia Aballs — suave, redonda y tranquilizadora.",
+      "en": "A single opal globe held by a slim arm. The desk-scale member of the Aballs family — soft, round and reassuring."
+    }
   },
   {
     "id": "DVA-Arum-Floor-Lamp-by-Ferm-Living",
-    "name": "DVA-Arum Floor Lamp by Ferm Living",
+    "name": "Arum Floor",
     "image": "../assets/Imagenes/DVA-Arum Floor Lamp by Ferm Living.jpg",
     "catalogId": "arum floor",
-    "category": "Floor lamp",
+    "category": "Floor Lamps",
     "type": "floor_lamp",
     "collection": "Arum",
     "style": "decorative",
     "spaces": [
       "living"
-    ]
+    ],
+    "code": "DVA-ARF",
+    "designer": "LUXA Studio",
+    "power": "18 W",
+    "lumens": "1300 lm",
+    "temperature": "2700 K",
+    "cri": "≥ 90",
+    "ip": "IP20",
+    "dimensions": "Ø 350 × H 1650 mm",
+    "finish": "Pleated metal · Brass",
+    "application": {
+      "es": "Esquinas de living y rincones de lectura",
+      "en": "Living corners and reading nooks"
+    },
+    "description": {
+      "es": "Una flor plisada montada sobre un pie esbelto — el lenguaje Arum llevado al piso, derramando luz cálida hacia arriba.",
+      "en": "A pleated flower mounted on a slender stem — the Arum language at floor height, casting warm light upward."
+    }
   },
   {
     "id": "DVA-Arum-T",
@@ -253,22 +229,55 @@
     "spaces": [
       "living",
       "bedroom"
-    ]
+    ],
+    "code": "DVA-ART",
+    "designer": "LUXA Studio",
+    "power": "7 W",
+    "lumens": "500 lm",
+    "temperature": "2700 K",
+    "cri": "≥ 90",
+    "ip": "IP20",
+    "dimensions": "Ø 300 × H 420 mm",
+    "finish": "Pleated metal · Brass",
+    "application": {
+      "es": "Mesas de luz y superficies de acento",
+      "en": "Bedsides and accent surfaces"
+    },
+    "description": {
+      "es": "Una pantalla plisada se abre como una flor, derramando un resplandor cálido y escultórico sobre la superficie que la sostiene.",
+      "en": "A pleated shade unfolds like a flower, throwing a warm, sculpted glow across the surface it sits on."
+    }
   },
   {
     "id": "DVA-Arum-Wall-Lamp-Tall",
-    "name": "DVA-Arum Wall Lamp Tall",
+    "name": "Arum Wall Tall",
     "image": "../assets/Imagenes/DVA-Arum Wall Lamp Tall_corona.jpg",
-    "catalogId": "arum-wall",
+    "catalogId": "arum-wall-lamp-tall",
     "category": "Wall Lights",
     "type": "wall_light",
     "collection": "Arum",
     "style": "decorative",
     "spaces": [
       "living",
-      "dining",
-      "bedroom"
-    ]
+      "dining"
+    ],
+    "code": "DVA-ARW-T",
+    "designer": "LUXA Studio",
+    "power": "11 W",
+    "lumens": "750 lm",
+    "temperature": "2700 K",
+    "cri": "≥ 90",
+    "ip": "IP20",
+    "dimensions": "Ø 220 × H 600 mm",
+    "finish": "Pleated metal · Brass",
+    "application": {
+      "es": "Pasillos y entradas",
+      "en": "Corridors and entryways"
+    },
+    "description": {
+      "es": "Una flor plisada estirada en vertical sobre la pared, lavando la superficie con un haz cálido y suave.",
+      "en": "A pleated flower stretched vertically on the wall, washing the surface with a warm, soft beam."
+    }
   },
   {
     "id": "DVA-Arum-W",
@@ -282,73 +291,24 @@
     "spaces": [
       "living",
       "bedroom"
-    ]
-  },
-  {
-    "id": "DVA-Atollo-Table-Lamp",
-    "name": "Atollo Table",
-    "image": "../assets/Imagenes/DVA-Atollo Table Lamp_corona.jpg",
-    "catalogId": "atollo-table",
-    "category": "Table Lamps",
-    "type": "table_lamp",
-    "collection": "Atollo",
-    "style": "decorative",
-    "spaces": [
-      "bedroom"
-    ]
-  },
-  {
-    "id": "DVA-Awa-Large-Suspended-Light",
-    "name": "Awa Suspended",
-    "image": "../assets/Imagenes/DVA-Awa Large Suspended Light_corona.jpg",
-    "catalogId": "awa-suspended",
-    "category": "Pendants",
-    "type": "pendant",
-    "collection": "Awa",
-    "spaces": [
-      "living"
-    ]
-  },
-  {
-    "id": "DVA-Ayno-Large-Floor-Lamp",
-    "name": "Ayno Floor",
-    "image": "../assets/Imagenes/DVA-Ayno Large Floor Lamp_corona.jpg",
-    "catalogId": "ayno-floor",
-    "category": "Floor Lamps",
-    "type": "floor_lamp",
-    "collection": "Ayno",
-    "spaces": [
-      "living"
-    ]
-  },
-  {
-    "id": "DVA-Bitpop-22",
-    "name": "DVA-Bitpop C 2.2 Recessed Downlight",
-    "image": "../assets/Imagenes/DVA-Bitpop C 2.2 Recessed Downlight_corona.jpg",
-    "catalogId": "bitpop-downlight",
-    "category": "Downlights",
-    "type": "downlight",
-    "collection": "Bitpop",
-    "style": "technical",
-    "spaces": [
-      "dining",
-      "bathroom",
-      "living"
-    ]
-  },
-  {
-    "id": "DVA-BO-32-Surface-Ceiling-Light",
-    "name": "BO 32 Surface Ceiling",
-    "image": "../assets/Imagenes/DVA-BO 32 Surface Ceiling Light_corona.jpg",
-    "catalogId": "bo32-ceiling",
-    "category": "Ceiling Lights",
-    "type": "ceiling_light",
-    "collection": "BO",
-    "style": "architectural",
-    "spaces": [
-      "living",
-      "dining"
-    ]
+    ],
+    "code": "DVA-ARW",
+    "designer": "LUXA Studio",
+    "power": "9 W",
+    "lumens": "620 lm",
+    "temperature": "2700 K",
+    "cri": "≥ 90",
+    "ip": "IP20",
+    "dimensions": "Ø 220 × D 130 mm",
+    "finish": "Pleated metal · Brass",
+    "application": {
+      "es": "Livings y pasillos",
+      "en": "Living rooms and corridors"
+    },
+    "description": {
+      "es": "El plisado Arum como flor de pared, proyectando un abanico de luz cálida sobre la superficie en la que apoya.",
+      "en": "The Arum pleat as a wall flower, casting a fan of warm light up the surface it rests against."
+    }
   },
   {
     "id": "DVA-Bolle-Orizzontale-Hanging-Lamp",
@@ -358,24 +318,350 @@
     "category": "Pendants",
     "type": "pendant",
     "collection": "Bolle",
+    "style": "decorative",
     "spaces": [
+      "living",
       "dining"
-    ]
+    ],
+    "code": "DVA-BOL",
+    "designer": "LUXA Studio",
+    "power": "36 W",
+    "lumens": "2400 lm",
+    "temperature": "2700 K",
+    "cri": "≥ 95",
+    "ip": "IP20",
+    "dimensions": "L 900 × H 450 mm",
+    "finish": "Hand-blown glass · Brushed brass",
+    "application": {
+      "es": "Cajas de escalera y dobles alturas",
+      "en": "Stairwells and double-height voids"
+    },
+    "description": {
+      "es": "Esferas sopladas a mano suspendidas en aparente ingravidez. Un racimo escultórico que se lee como luz hecha materia.",
+      "en": "Hand-blown spheres suspended in apparent weightlessness. A sculptural cluster that reads as light made tangible."
+    }
   },
   {
-    "id": "DVA-Came-26-Recessed-Downlight",
-    "name": "Came 2.6 Downlight",
-    "image": "../assets/Imagenes/DVA-Came 2.6 Recessed Downlight_corona.jpg",
-    "catalogId": "came-downlight",
-    "category": "Downlights",
-    "type": "downlight",
-    "collection": "Came",
+    "id": "DVA-Cellar-7634-Pendant-Lamp",
+    "name": "Cellar 7634 Pendant",
+    "image": "../assets/Imagenes/DVA-Cellar 7634 Pendant Lamp_corona.jpg",
+    "catalogId": "cellar-7634-pendant",
+    "category": "Pendants",
+    "type": "pendant",
+    "collection": "Cellar",
+    "style": "decorative",
     "spaces": [
       "living",
       "dining",
       "bedroom",
       "bathroom"
-    ]
+    ],
+    "code": "DVA-Cellar-7634",
+    "designer": "LUXA Studio",
+    "power": "18 W",
+    "lumens": "1300 lm",
+    "temperature": "2700 K",
+    "cri": "≥ 90",
+    "ip": "IP20",
+    "dimensions": "Ø 220 × H 280 mm",
+    "finish": "Spun copper · Polished interior",
+    "application": {
+      "es": "Mesas de comedor y barras",
+      "en": "Dining tables and bars"
+    },
+    "description": {
+      "es": "Una campana de cobre hilada a mano — la luz se contiene dentro del cono y cae directa sobre la mesa, abrazando lo que ilumina.",
+      "en": "A spun-copper bell — light is held inside the cone and falls directly onto the table, hugging what it lights."
+    }
+  },
+  {
+    "id": "DVA-Cellar-7635-Wall-Light",
+    "name": "Cellar 7635 Wall",
+    "image": "../assets/Imagenes/DVA-Cellar 7635 Wall Light_corona.jpg",
+    "catalogId": "cellar-7635-wall",
+    "category": "Wall Lights",
+    "type": "wall_light",
+    "collection": "Cellar",
+    "style": "decorative",
+    "spaces": [
+      "living",
+      "dining",
+      "bedroom"
+    ],
+    "code": "DVA-Cellar-7635",
+    "designer": "LUXA Studio",
+    "power": "10 W",
+    "lumens": "700 lm",
+    "temperature": "3000 K",
+    "cri": "≥ 90",
+    "ip": "IP44",
+    "dimensions": "Ø 160 × D 220 mm",
+    "finish": "Spun copper · Polished interior",
+    "application": {
+      "es": "Pasillos y zonas de servicio",
+      "en": "Corridors and service areas"
+    },
+    "description": {
+      "es": "La misma campana Cellar montada al ras de la pared — luz dirigida hacia abajo con calidez industrial.",
+      "en": "The same Cellar bell mounted flush to the wall — directional downlight with industrial warmth."
+    }
+  },
+  {
+    "id": "DVA-Cellar-7637-Table-Lamp",
+    "name": "Cellar 7637 Table",
+    "image": "../assets/Imagenes/DVA-Cellar 7637 Table Lamp_corona.jpg",
+    "catalogId": "cellar-7637-table",
+    "category": "Table Lamps",
+    "type": "table_lamp",
+    "collection": "Cellar",
+    "style": "decorative",
+    "spaces": [
+      "living",
+      "dining",
+      "bedroom"
+    ],
+    "code": "DVA-Cellar-7637",
+    "designer": "LUXA Studio",
+    "power": "8 W",
+    "lumens": "560 lm",
+    "temperature": "2700 K",
+    "cri": "≥ 90",
+    "ip": "IP20",
+    "dimensions": "Ø 200 × H 380 mm",
+    "finish": "Spun copper · Polished interior",
+    "application": {
+      "es": "Mesas auxiliares y escritorios",
+      "en": "Side tables and desks"
+    },
+    "description": {
+      "es": "El gesto Cellar a escala de mesa: una campana de cobre que concentra la luz sobre la superficie de trabajo.",
+      "en": "The Cellar gesture at table scale: a copper bell focusing light onto the working surface."
+    }
+  },
+  {
+    "id": "DVA-Grashoppa-Floor-Lamp",
+    "name": "Grashoppa Floor",
+    "image": "../assets/Imagenes/DVA-Grashoppa Floor Lamp_corona.jpg",
+    "catalogId": "grashoppa-floor-lamp",
+    "category": "Floor Lamps",
+    "type": "floor_lamp",
+    "collection": "Grashoppa",
+    "style": "decorative",
+    "spaces": [
+      "living",
+      "dining",
+      "bedroom"
+    ],
+    "code": "DVA-GRH-F",
+    "designer": "LUXA Studio",
+    "power": "12 W",
+    "lumens": "850 lm",
+    "temperature": "3000 K",
+    "cri": "≥ 90",
+    "ip": "IP20",
+    "dimensions": "H 1320 × pantalla Ø 150 mm",
+    "finish": "Lacquered steel · Tripod base",
+    "application": {
+      "es": "Rincones de lectura y livings",
+      "en": "Reading corners and living rooms"
+    },
+    "description": {
+      "es": "Un trípode esbelto sostiene una pantalla cónica inclinada — la silueta saltarina que define el lenguaje Grashoppa.",
+      "en": "A slender tripod cradles an angled conical shade — the springing silhouette that defines the Grashoppa language."
+    }
+  },
+  {
+    "id": "DVA-Grashoppa-Pendant-Light",
+    "name": "Grashoppa Pendant",
+    "image": "../assets/Imagenes/DVA-Grashoppa Pendant Light_corona.jpg",
+    "catalogId": "grashoppa-pendant-light",
+    "category": "Pendants",
+    "type": "pendant",
+    "collection": "Grashoppa",
+    "style": "decorative",
+    "spaces": [
+      "living",
+      "dining",
+      "bedroom",
+      "bathroom"
+    ],
+    "code": "DVA-GRH-P",
+    "designer": "LUXA Studio",
+    "power": "14 W",
+    "lumens": "950 lm",
+    "temperature": "2700 K",
+    "cri": "≥ 90",
+    "ip": "IP20",
+    "dimensions": "Ø 175 × H 220 mm",
+    "finish": "Lacquered metal",
+    "application": {
+      "es": "Mesas de comedor y cocinas",
+      "en": "Dining tables and kitchens"
+    },
+    "description": {
+      "es": "La pantalla Grashoppa suspendida, manteniendo el ángulo inclinado característico — luz dirigida con personalidad.",
+      "en": "The Grashoppa shade suspended, keeping its signature tilt — directional light with character."
+    }
+  },
+  {
+    "id": "DVA-Grashoppa-Task-Table-Lamp",
+    "name": "Grashoppa Task Table",
+    "image": "../assets/Imagenes/DVA-Grashoppa Task Table Lamp_corona.jpg",
+    "catalogId": "grashoppa-task-table-lamp",
+    "category": "Table Lamps",
+    "type": "table_lamp",
+    "collection": "Grashoppa",
+    "style": "decorative",
+    "spaces": [
+      "living",
+      "dining",
+      "bedroom"
+    ],
+    "code": "DVA-GRH-T",
+    "designer": "LUXA Studio",
+    "power": "8 W",
+    "lumens": "520 lm",
+    "temperature": "3000 K",
+    "cri": "≥ 90",
+    "ip": "IP20",
+    "dimensions": "brazo 380 × pantalla Ø 120 mm",
+    "finish": "Lacquered steel",
+    "application": {
+      "es": "Escritorios y espacios de trabajo",
+      "en": "Desks and workspaces"
+    },
+    "description": {
+      "es": "La versión de escritorio del Grashoppa — pantalla orientable sobre brazo articulado, lista para enfocar la tarea.",
+      "en": "The desk version of the Grashoppa — adjustable shade on an articulated arm, ready to focus on the task at hand."
+    }
+  },
+  {
+    "id": "DVA-IC-Light-CW",
+    "name": "IC Light C/W",
+    "image": "../assets/Imagenes/DVA-IC Light CW_vray.jpg",
+    "catalogId": "IC",
+    "category": "Wall Lights",
+    "type": "wall_light",
+    "collection": "IC",
+    "style": "decorative",
+    "spaces": [
+      "living",
+      "dining",
+      "bedroom",
+      "bathroom"
+    ],
+    "code": "DVA-IC-CW",
+    "designer": "LUXA Studio",
+    "power": "7 W",
+    "lumens": "480 lm",
+    "temperature": "2700 K",
+    "cri": "≥ 90",
+    "ip": "IP44",
+    "dimensions": "Ø 200 × varilla 200 mm",
+    "finish": "Mouthblown opal · Brushed brass",
+    "application": {
+      "es": "Baños, pasillos y rincones técnicos",
+      "en": "Bathrooms, corridors and utility corners"
+    },
+    "description": {
+      "es": "Un globo opal en equilibrio sobre una varilla de latón — gesto puramente geométrico, instalable en pared o techo.",
+      "en": "An opal globe poised on a brass rod — a purely geometric gesture, installable on wall or ceiling."
+    }
+  },
+  {
+    "id": "DVA-IC-Light-F",
+    "name": "IC Light Floor",
+    "image": "../assets/Imagenes/DVA-IC Light F_vray.jpg",
+    "catalogId": "ic-light-f",
+    "category": "Floor Lamps",
+    "type": "floor_lamp",
+    "collection": "IC",
+    "style": "decorative",
+    "spaces": [
+      "living",
+      "dining",
+      "bedroom"
+    ],
+    "code": "DVA-IC-F",
+    "designer": "LUXA Studio",
+    "power": "17 W",
+    "lumens": "1200 lm",
+    "temperature": "2700 K",
+    "cri": "≥ 90",
+    "ip": "IP20",
+    "dimensions": "Ø 320 × H 1850 mm",
+    "finish": "Mouthblown opal · Brushed brass",
+    "application": {
+      "es": "Livings y rincones de lectura",
+      "en": "Living rooms and reading corners"
+    },
+    "description": {
+      "es": "Un globo opal sobre una pértiga delgada — luz suave a altura humana, equilibrada en el aire.",
+      "en": "An opal globe on a slender pole — soft light at human scale, balanced in the air."
+    }
+  },
+  {
+    "id": "DVA-IC-Light-S",
+    "name": "IC Light Suspension",
+    "image": "../assets/Imagenes/DVA-IC Light S_vray.jpg",
+    "catalogId": "ic-light-s",
+    "category": "Pendants",
+    "type": "pendant",
+    "collection": "IC",
+    "style": "decorative",
+    "spaces": [
+      "living",
+      "dining",
+      "bedroom"
+    ],
+    "code": "DVA-IC-S",
+    "designer": "LUXA Studio",
+    "power": "11 W",
+    "lumens": "800 lm",
+    "temperature": "2700 K",
+    "cri": "≥ 90",
+    "ip": "IP20",
+    "dimensions": "Ø 200 × cable 2000 mm",
+    "finish": "Mouthblown opal · Brushed brass",
+    "application": {
+      "es": "Mesas de comedor y zonas de estar",
+      "en": "Dining tables and seating areas"
+    },
+    "description": {
+      "es": "Un globo opal en suspensión — pura geometría flotando sobre la mesa, luz difusa y serena.",
+      "en": "An opal globe in suspension — pure geometry hovering over the table, soft and serene."
+    }
+  },
+  {
+    "id": "DVA-IC-Light-T1-Low",
+    "name": "IC Light T1",
+    "image": "../assets/Imagenes/DVA-IC Light T1 Low_vray.jpg",
+    "catalogId": "ic-light-t1-low",
+    "category": "Table Lamps",
+    "type": "table_lamp",
+    "collection": "IC",
+    "style": "decorative",
+    "spaces": [
+      "dining",
+      "bedroom"
+    ],
+    "code": "DVA-IC-T1",
+    "designer": "LUXA Studio",
+    "power": "7 W",
+    "lumens": "480 lm",
+    "temperature": "2700 K",
+    "cri": "≥ 90",
+    "ip": "IP20",
+    "dimensions": "Ø 200 × H 380 mm",
+    "finish": "Mouthblown opal · Brushed brass",
+    "application": {
+      "es": "Mesas de luz y aparadores",
+      "en": "Bedsides and sideboards"
+    },
+    "description": {
+      "es": "La versión más baja del lenguaje IC — globo opal sobre base de latón, luz cálida a la altura de la almohada.",
+      "en": "The lowest variant of the IC language — opal globe on a brass base, warm light at pillow height."
+    }
   },
   {
     "id": "DVA-Lighto-W",
@@ -390,7 +676,24 @@
       "living",
       "bedroom",
       "bathroom"
-    ]
+    ],
+    "code": "DVA-LTW",
+    "designer": "LUXA Studio",
+    "power": "7 W",
+    "lumens": "500 lm",
+    "temperature": "2700 K",
+    "cri": "≥ 90",
+    "ip": "IP44",
+    "dimensions": "Ø 180 × D 200 mm",
+    "finish": "Opal sphere · Brushed brass",
+    "application": {
+      "es": "Baños y zonas húmedas",
+      "en": "Bathrooms and damp areas"
+    },
+    "description": {
+      "es": "Un globo opal sobre una pieza de latón cepillado — luz pareja y suave para el espejo, apto para baño.",
+      "en": "An opal globe on brushed brass — even, flattering light for the mirror, damp-rated for bathrooms."
+    }
   },
   {
     "id": "DVA-Lighto-C",
@@ -405,35 +708,478 @@
       "living",
       "bedroom",
       "bathroom"
-    ]
+    ],
+    "code": "DVA-LTC",
+    "designer": "LUXA Studio",
+    "power": "11 W",
+    "lumens": "850 lm",
+    "temperature": "2700 K",
+    "cri": "≥ 90",
+    "ip": "IP44",
+    "dimensions": "Ø 230 × D 230 mm",
+    "finish": "Opal sphere · Brushed brass",
+    "application": {
+      "es": "Baños, halls y techos bajos",
+      "en": "Bathrooms, halls and low ceilings"
+    },
+    "description": {
+      "es": "Un globo opal de superficie con base de latón — luz general suave y atmosférica, calmando el ambiente desde arriba.",
+      "en": "A surface-mounted opal globe with a brass base — soft, atmospheric ambient light from above."
+    }
   },
   {
-    "id": "DVA-Lighto-T",
-    "name": "DVA-Lighto T Suspension Lamp",
+    "id": "DVA-Lighto-T-Suspension-Lamp",
+    "name": "Lighto T Suspension",
     "image": "../assets/Imagenes/DVA-Lighto T Suspension Lamp_corona.jpg",
     "catalogId": "lighto-t-suspension",
     "category": "Pendants",
     "type": "pendant",
     "collection": "Lighto",
-    "style": "minimal",
+    "style": "decorative",
     "spaces": [
       "living",
       "dining",
-      "bedroom"
-    ]
+      "bedroom",
+      "bathroom"
+    ],
+    "code": "DVA-LTS",
+    "designer": "LUXA Studio",
+    "power": "10 W",
+    "lumens": "720 lm",
+    "temperature": "2700 K",
+    "cri": "≥ 90",
+    "ip": "IP20",
+    "dimensions": "Ø 250 × cable 1500 mm",
+    "finish": "Opal sphere · Brushed brass cap",
+    "application": {
+      "es": "Mesas y zonas de estar",
+      "en": "Tables and seating areas"
+    },
+    "description": {
+      "es": "Un globo opal suspendido de un cabezal de latón — la versión colgante del lenguaje Lighto: limpia, atemporal y suave.",
+      "en": "An opal globe suspended from a brushed brass cap — the hanging form of the Lighto language: clean, timeless and soft."
+    }
   },
   {
-    "id": "DVA-Lightolight-F",
-    "name": "DVA-Lightolight P Floor Lamp",
+    "id": "DVA-Lightolight-P-Floor-Lamp",
+    "name": "Lightolight P Floor",
     "image": "../assets/Imagenes/DVA-Lightolight P Floor Lamp_corona.jpg",
     "catalogId": "lightolight-p-floor",
     "category": "Floor Lamps",
     "type": "floor_lamp",
-    "collection": "Lighto",
-    "style": "minimal",
+    "collection": "Lightolight",
+    "style": "decorative",
     "spaces": [
       "living",
+      "dining",
       "bedroom"
-    ]
+    ],
+    "code": "DVA-LTF",
+    "designer": "LUXA Studio",
+    "power": "12 W",
+    "lumens": "900 lm",
+    "temperature": "2700 K",
+    "cri": "≥ 90",
+    "ip": "IP20",
+    "dimensions": "Ø 300 × H 1700 mm",
+    "finish": "Opal sphere · Brushed brass stem",
+    "application": {
+      "es": "Rincones de lectura y livings",
+      "en": "Reading nooks and living rooms"
+    },
+    "description": {
+      "es": "Un pie alto rematado por un globo opal — la familia Lighto llevada al piso, marcando un punto de luz suave junto al sofá.",
+      "en": "A tall stem topped with an opal globe — the Lighto family taken to the floor, planting a soft pool of light next to the sofa."
+    }
+  },
+  {
+    "id": "DVA-Orb-Floor-Lamp",
+    "name": "Orb Floor",
+    "image": "../assets/Imagenes/DVA-Orb Floor Lamp_vray.jpg",
+    "catalogId": "orb-floor-lamp",
+    "category": "Floor Lamps",
+    "type": "floor_lamp",
+    "collection": "Orb",
+    "style": "decorative",
+    "spaces": [
+      "living",
+      "dining",
+      "bedroom"
+    ],
+    "code": "DVA-ORB-F",
+    "designer": "LUXA Studio",
+    "power": "16 W",
+    "lumens": "1100 lm",
+    "temperature": "2700 K",
+    "cri": "≥ 90",
+    "ip": "IP20",
+    "dimensions": "Ø 250 × H 1500 mm",
+    "finish": "Smoked glass · Brushed brass",
+    "application": {
+      "es": "Esquinas de living y dormitorios",
+      "en": "Living corners and bedrooms"
+    },
+    "description": {
+      "es": "Una esfera de vidrio ahumado en lo alto de un pie de latón — una bola de luz suave que ancla el rincón.",
+      "en": "A smoked-glass sphere atop a brass stem — a globe of soft light anchoring the corner."
+    }
+  },
+  {
+    "id": "DVA-Orb-Pendant",
+    "name": "Orb Pendant",
+    "image": "../assets/Imagenes/DVA-Orb Pendant_vray.jpg",
+    "catalogId": "orb-pendant",
+    "category": "Pendants",
+    "type": "pendant",
+    "collection": "Orb",
+    "style": "decorative",
+    "spaces": [
+      "living",
+      "dining",
+      "bedroom"
+    ],
+    "code": "DVA-ORB-P",
+    "designer": "LUXA Studio",
+    "power": "14 W",
+    "lumens": "950 lm",
+    "temperature": "2700 K",
+    "cri": "≥ 90",
+    "ip": "IP20",
+    "dimensions": "Ø 250 × cable 1500 mm",
+    "finish": "Smoked glass · Brushed brass",
+    "application": {
+      "es": "Mesas de comedor y entradas",
+      "en": "Dining tables and entries"
+    },
+    "description": {
+      "es": "Una esfera suspendida que actúa como punto focal — luz tamizada por el vidrio ahumado, materia y atmósfera.",
+      "en": "A suspended sphere that becomes the focal point — light filtered by smoked glass, material and atmosphere."
+    }
+  },
+  {
+    "id": "DVA-Orb-Table-Lamp",
+    "name": "Orb Table",
+    "image": "../assets/Imagenes/DVA-Orb Table Lamp_vray.jpg",
+    "catalogId": "orb-table-lamp",
+    "category": "Table Lamps",
+    "type": "table_lamp",
+    "collection": "Orb",
+    "style": "decorative",
+    "spaces": [
+      "living",
+      "dining",
+      "bedroom"
+    ],
+    "code": "DVA-ORB-T",
+    "designer": "LUXA Studio",
+    "power": "8 W",
+    "lumens": "560 lm",
+    "temperature": "2700 K",
+    "cri": "≥ 90",
+    "ip": "IP20",
+    "dimensions": "Ø 200 × H 320 mm",
+    "finish": "Smoked glass · Brushed brass",
+    "application": {
+      "es": "Mesas de luz y consolas",
+      "en": "Bedsides and consoles"
+    },
+    "description": {
+      "es": "Una esfera ahumada apoyada sobre un disco de latón — escala de mesa para el lenguaje Orb, íntimo y escultural.",
+      "en": "A smoked sphere resting on a brass disc — the Orb language at table scale, intimate and sculptural."
+    }
+  },
+  {
+    "id": "DVA-Pendulum-Floor-Lamp",
+    "name": "Pendulum Floor",
+    "image": "../assets/Imagenes/DVA-Pendulum Floor Lamp_corona.jpg",
+    "catalogId": "pendulum-floor-lamp",
+    "category": "Floor Lamps",
+    "type": "floor_lamp",
+    "collection": "Pendulum",
+    "style": "decorative",
+    "spaces": [
+      "living",
+      "dining",
+      "bedroom",
+      "bathroom"
+    ],
+    "code": "DVA-PND-F",
+    "designer": "LUXA Studio",
+    "power": "18 W",
+    "lumens": "1300 lm",
+    "temperature": "3000 K",
+    "cri": "≥ 90",
+    "ip": "IP20",
+    "dimensions": "Ø 120 × H 1700 mm",
+    "finish": "Powder-coated steel · Matte black",
+    "application": {
+      "es": "Livings minimalistas y oficinas",
+      "en": "Minimalist living rooms and offices"
+    },
+    "description": {
+      "es": "Un cilindro vertical contenido y exacto — la cinética del péndulo congelada en una silueta esbelta.",
+      "en": "A contained, exact vertical cylinder — the kinetics of a pendulum frozen into a slim silhouette."
+    }
+  },
+  {
+    "id": "DVA-Pendulum-Pendant-Light",
+    "name": "Pendulum Pendant",
+    "image": "../assets/Imagenes/DVA-Pendulum Pendant Light_corona.jpg",
+    "catalogId": "pendulum-pendant-light",
+    "category": "Pendants",
+    "type": "pendant",
+    "collection": "Pendulum",
+    "style": "decorative",
+    "spaces": [
+      "living",
+      "dining",
+      "bedroom",
+      "bathroom"
+    ],
+    "code": "DVA-PND-P",
+    "designer": "LUXA Studio",
+    "power": "12 W",
+    "lumens": "850 lm",
+    "temperature": "3000 K",
+    "cri": "≥ 90",
+    "ip": "IP20",
+    "dimensions": "Ø 90 × H 280 mm",
+    "finish": "Powder-coated steel · Matte black",
+    "application": {
+      "es": "Islas de cocina y barras",
+      "en": "Kitchen islands and bars"
+    },
+    "description": {
+      "es": "Un cilindro suspendido como un péndulo en reposo — luz directa, geometría discreta.",
+      "en": "A cylinder suspended like a pendulum at rest — direct light, quiet geometry."
+    }
+  },
+  {
+    "id": "DVA-Pendulum-Wall-and-Ceiling-Light",
+    "name": "Pendulum Wall & Ceiling",
+    "image": "../assets/Imagenes/DVA-Pendulum Wall and Ceiling Light_corona.jpg",
+    "catalogId": "pendulum-wall-and-ceiling-light",
+    "category": "Wall Lights",
+    "type": "wall_light",
+    "collection": "Pendulum",
+    "style": "decorative",
+    "spaces": [
+      "living",
+      "dining",
+      "bedroom",
+      "bathroom"
+    ],
+    "code": "DVA-PND-WC",
+    "designer": "LUXA Studio",
+    "power": "9 W",
+    "lumens": "620 lm",
+    "temperature": "3000 K",
+    "cri": "≥ 90",
+    "ip": "IP44",
+    "dimensions": "Ø 90 × D 100 mm",
+    "finish": "Powder-coated steel · Matte black",
+    "application": {
+      "es": "Baños, pasillos y exteriores cubiertos",
+      "en": "Bathrooms, corridors and covered exteriors"
+    },
+    "description": {
+      "es": "El mismo cilindro Pendulum montado al ras de pared o techo — luz aplomada, sin gesto sobrante.",
+      "en": "The same Pendulum cylinder flush-mounted to wall or ceiling — plumb light, no excess gesture."
+    }
+  },
+  {
+    "id": "DVA-Roomor-1-Suspended-Light-2481E0B00",
+    "name": "Roomor 1 Suspended",
+    "image": "../assets/Imagenes/DVA-Roomor 1 Suspended Light 2481E0B00_corona.jpg",
+    "catalogId": "roomor-1-suspended-light-2481e0b00",
+    "category": "Pendants",
+    "type": "pendant",
+    "collection": "Roomor",
+    "style": "decorative",
+    "spaces": [
+      "living",
+      "dining",
+      "bedroom"
+    ],
+    "code": "DVA-Roomor-1-2481E0B00",
+    "designer": "LUXA Studio",
+    "power": "8 W",
+    "lumens": "520 lm",
+    "temperature": "2700 K",
+    "cri": "≥ 90",
+    "ip": "IP20",
+    "dimensions": "Ø 80 × cable 2000 mm",
+    "finish": "Aluminium · Black with brass detail",
+    "application": {
+      "es": "Mesas de comedor y barras",
+      "en": "Dining tables and bars"
+    },
+    "description": {
+      "es": "Un tubo discreto suspendido sobre cable fino — la familia Roomor en su forma más pura, luz directa y precisa.",
+      "en": "A discreet tube suspended on a fine cable — the Roomor family in its purest form, direct and precise."
+    }
+  },
+  {
+    "id": "DVA-Roomor-1-Table-Lamp-637120B00",
+    "name": "Roomor 1 Table",
+    "image": "../assets/Imagenes/DVA-Roomor 1 Table Lamp 637120B00_corona.jpg",
+    "catalogId": "roomor-1-table-lamp-637120b00",
+    "category": "Table Lamps",
+    "type": "table_lamp",
+    "collection": "Roomor",
+    "style": "decorative",
+    "spaces": [
+      "living",
+      "dining",
+      "bedroom"
+    ],
+    "code": "DVA-Roomor-1-637120B00",
+    "designer": "LUXA Studio",
+    "power": "8 W",
+    "lumens": "520 lm",
+    "temperature": "2700 K",
+    "cri": "≥ 90",
+    "ip": "IP20",
+    "dimensions": "base Ø 220 × H 480 mm",
+    "finish": "Aluminium · Beige with brass detail",
+    "application": {
+      "es": "Mesas de luz y escritorios",
+      "en": "Bedsides and desks"
+    },
+    "description": {
+      "es": "El tubo Roomor sobre una base mínima — luz orientable a escala de mesa, foco preciso para la lectura.",
+      "en": "The Roomor tube on a minimal base — directional light at table scale, precise focus for reading."
+    }
+  },
+  {
+    "id": "DVA-Roomor-1-Table-Lamp-637120BK1",
+    "name": "Roomor 1 Table Black",
+    "image": "../assets/Imagenes/DVA-Roomor 1 Table Lamp 637120BK1_corona.jpg",
+    "catalogId": "roomor-1-table-lamp-637120bk1",
+    "category": "Table Lamps",
+    "type": "table_lamp",
+    "collection": "Roomor",
+    "style": "decorative",
+    "spaces": [
+      "living",
+      "dining",
+      "bedroom",
+      "bathroom"
+    ],
+    "code": "DVA-Roomor-1-637120BK1",
+    "designer": "LUXA Studio",
+    "power": "8 W",
+    "lumens": "520 lm",
+    "temperature": "2700 K",
+    "cri": "≥ 90",
+    "ip": "IP20",
+    "dimensions": "base Ø 220 × H 480 mm",
+    "finish": "Aluminium · Matte black",
+    "application": {
+      "es": "Mesas de luz y escritorios contemporáneos",
+      "en": "Bedsides and contemporary desks"
+    },
+    "description": {
+      "es": "Misma silueta Roomor en acabado negro mate — luz precisa con presencia más gráfica.",
+      "en": "The same Roomor silhouette in matte black — precise light with a more graphic presence."
+    }
+  },
+  {
+    "id": "DVA-Soffio-Pendant-Light",
+    "name": "Soffio Pendant",
+    "image": "../assets/Imagenes/DVA-Soffio Pendant Light_corona.jpg",
+    "catalogId": "soffio-pendant-light",
+    "category": "Pendants",
+    "type": "pendant",
+    "collection": "Soffio",
+    "style": "decorative",
+    "spaces": [
+      "living",
+      "dining",
+      "bedroom",
+      "bathroom"
+    ],
+    "code": "DVA-SOF-P",
+    "designer": "LUXA Studio",
+    "power": "16 W",
+    "lumens": "1150 lm",
+    "temperature": "2700 K",
+    "cri": "≥ 95",
+    "ip": "IP20",
+    "dimensions": "Ø 350 × cable 1500 mm",
+    "finish": "Hand-blown glass · Brass cap",
+    "application": {
+      "es": "Mesas de comedor y entradas",
+      "en": "Dining tables and entries"
+    },
+    "description": {
+      "es": "Una nube de vidrio soplado a mano suspendida en el aire — luz como un suspiro, suave y atmosférica.",
+      "en": "A cloud of hand-blown glass suspended in mid-air — light like a breath, soft and atmospheric."
+    }
+  },
+  {
+    "id": "DVA-Soffio-Table-Lamp",
+    "name": "Soffio Table",
+    "image": "../assets/Imagenes/DVA-Soffio Table Lamp_corona.jpg",
+    "catalogId": "soffio-table-lamp",
+    "category": "Table Lamps",
+    "type": "table_lamp",
+    "collection": "Soffio",
+    "style": "decorative",
+    "spaces": [
+      "living",
+      "dining",
+      "bedroom",
+      "bathroom"
+    ],
+    "code": "DVA-SOF-T",
+    "designer": "LUXA Studio",
+    "power": "10 W",
+    "lumens": "720 lm",
+    "temperature": "2700 K",
+    "cri": "≥ 95",
+    "ip": "IP20",
+    "dimensions": "Ø 250 × H 360 mm",
+    "finish": "Hand-blown glass · Brass base",
+    "application": {
+      "es": "Mesas de luz y consolas",
+      "en": "Bedsides and consoles"
+    },
+    "description": {
+      "es": "El gesto Soffio a escala de mesa — vidrio soplado contenido sobre una base de latón, luz íntima y artesanal.",
+      "en": "The Soffio gesture at table scale — contained blown glass on a brass base, intimate and crafted light."
+    }
+  },
+  {
+    "id": "DVA-Soffio-Wall-Vertical-Lamp",
+    "name": "Soffio Wall Vertical",
+    "image": "../assets/Imagenes/DVA-Soffio Wall Vertical Lamp_corona.jpg",
+    "catalogId": "soffio-wall-vertical-lamp",
+    "category": "Wall Lights",
+    "type": "wall_light",
+    "collection": "Soffio",
+    "style": "decorative",
+    "spaces": [
+      "living",
+      "dining",
+      "bathroom"
+    ],
+    "code": "DVA-SOF-WV",
+    "designer": "LUXA Studio",
+    "power": "8 W",
+    "lumens": "560 lm",
+    "temperature": "2700 K",
+    "cri": "≥ 95",
+    "ip": "IP44",
+    "dimensions": "Ø 180 × H 420 mm",
+    "finish": "Hand-blown glass · Brass plate",
+    "application": {
+      "es": "Espejos de baño y dormitorios",
+      "en": "Bathroom mirrors and bedrooms"
+    },
+    "description": {
+      "es": "Una pieza vertical de vidrio soplado pegada a la pared — luz suspendida en la pared como una respiración.",
+      "en": "A vertical piece of blown glass against the wall — light suspended on the surface like a breath."
+    }
   }
 ]

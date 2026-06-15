@@ -22,8 +22,7 @@
       <button id="btn-import" class="btn btn-ghost" title="Subir imágenes nuevas a assets/Imagenes/ (también podés arrastrarlas a cualquier parte de la pantalla)">↑ Importar imágenes</button>
       <input type="file" id="file-input" accept="image/*" multiple hidden />
       <button id="btn-reload" class="btn btn-ghost" title="Re-leer la carpeta assets/Imagenes y volver a calcular tarjetas">↻ Re-scan</button>
-      <button id="btn-export" class="btn btn-ghost" title="Descargar products.json sin guardar al planner">Export JSON</button>
-      <button id="btn-save" class="btn btn-primary" title="Guardar al planner reemplazando space-planner/catalogs/&lt;id&gt;/products.json (backup automático)">Save to planner</button>
+      <button id="btn-publish" class="btn btn-publish" title="Guarda al planner Y publica a la app: escribe data/products.&lt;id&gt;.json con todos los items que tengan catalogId, nombre y categoría. La app los muestra en Productos y el planner los marca como 'en catálogo'.">↑ Publicar productos a la app</button>
     </div>
   </header>
 
@@ -103,14 +102,23 @@
           </div>
           <div>
             <label>catalogId (vínculo con app)</label>
-            <input type="text" id="fld-catalogId" placeholder="(vacío = fuera de catálogo)" />
+            <input type="text" id="fld-catalogId" placeholder="se auto-deriva del nombre si lo dejás vacío" title="Si lo dejás vacío, al cargar el Generator se auto-deriva un slug a partir del nombre (ej. 'DVA-Grashoppa Floor Lamp' → 'grashoppa-floor-lamp'). Podés sobrescribirlo." />
           </div>
         </div>
 
         <div class="form-row form-row-2">
           <div>
             <label>Category (app)</label>
-            <input type="text" id="fld-category" />
+            <select id="fld-category">
+              <option value="">—</option>
+              <option value="Pendants">Pendants</option>
+              <option value="Chandeliers">Chandeliers</option>
+              <option value="Floor Lamps">Floor Lamps</option>
+              <option value="Table Lamps">Table Lamps</option>
+              <option value="Wall Lights">Wall Lights</option>
+              <option value="Ceiling Lights">Ceiling Lights</option>
+              <option value="Downlights">Downlights</option>
+            </select>
           </div>
           <div>
             <label>Type</label>
@@ -161,9 +169,95 @@
           <input type="text" id="fld-image" readonly />
         </div>
 
+        <details class="app-publish-section" id="app-publish-section">
+          <summary>
+            <span class="app-publish-title">Publicar a la app</span>
+            <span class="app-publish-hint">code, specs, descripciones — todo opcional</span>
+          </summary>
+
+          <div class="form-row form-row-2">
+            <div>
+              <label>Code</label>
+              <input type="text" id="fld-code" placeholder="ej. DVA-AIM" />
+            </div>
+            <div>
+              <label>Designer</label>
+              <input type="text" id="fld-designer" placeholder="ej. LUXA Studio" />
+            </div>
+          </div>
+
+          <div class="form-row form-row-2">
+            <div>
+              <label>Power</label>
+              <input type="text" id="fld-power" placeholder="ej. 18 W" />
+            </div>
+            <div>
+              <label>Lumens</label>
+              <input type="text" id="fld-lumens" placeholder="ej. 1280 lm" />
+            </div>
+          </div>
+
+          <div class="form-row form-row-2">
+            <div>
+              <label>Color temp.</label>
+              <input type="text" id="fld-temperature" placeholder="ej. 2700 K" />
+            </div>
+            <div>
+              <label>CRI</label>
+              <input type="text" id="fld-cri" placeholder="ej. ≥ 90" />
+            </div>
+          </div>
+
+          <div class="form-row form-row-2">
+            <div>
+              <label>IP rating</label>
+              <input type="text" id="fld-ip" placeholder="ej. IP20" />
+            </div>
+            <div>
+              <label>Dimensions</label>
+              <input type="text" id="fld-dimensions" placeholder="ej. Ø 320 × H 280 mm" />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <label>Finish</label>
+            <input type="text" id="fld-finish" placeholder="ej. Spun aluminium · Matte black" />
+          </div>
+
+          <div class="form-row form-row-2">
+            <div>
+              <label>Application · ES</label>
+              <textarea id="fld-application-es" rows="2" placeholder="Mesas de comedor e islas de cocina"></textarea>
+            </div>
+            <div>
+              <label>Application · EN</label>
+              <textarea id="fld-application-en" rows="2" placeholder="Dining tables and kitchen islands"></textarea>
+            </div>
+          </div>
+
+          <div class="form-row form-row-2">
+            <div>
+              <label>Description · ES</label>
+              <textarea id="fld-description-es" rows="4" placeholder="Texto editorial en español…"></textarea>
+            </div>
+            <div>
+              <label>Description · EN</label>
+              <textarea id="fld-description-en" rows="4" placeholder="Editorial copy in English…"></textarea>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <label class="featured-toggle">
+              <input type="checkbox" id="fld-featured" />
+              <span>Featured · destacarlo en el home de la app</span>
+            </label>
+          </div>
+        </details>
+
         <div class="side-actions">
           <button type="button" class="btn-mini btn-revert" id="btn-revert" title="Deshacer cambios locales y volver al estado base">Revertir cambios</button>
           <button type="button" class="btn-mini btn-remove" id="btn-remove" title="Sacar esta entrada del set de productos">Quitar del catálogo</button>
+          <button type="button" class="btn-mini btn-delete" id="btn-delete" title="Mover la imagen a una carpeta de papelera (recuperable)">Borrar imagen</button>
         </div>
       </form>
     </aside>

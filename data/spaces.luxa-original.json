@@ -1,95 +1,271 @@
 {
-  "_readme": "Converted from planner's 'Export approved JSON' into the entries-shape that the LUXA app's catalog.data.js loader consumes. Bathroom uses the original Lighto products (now in catalog.data.js). Each hotspot can carry an optional closeUpImage — the LUXA app shows it as the main image in product detail when entered via that hotspot, with a 'In context'/'Catalog' thumb switcher.",
-  "exportedAt": "2026-06-09T19:23:00.050Z",
+  "_readme": "Auto-managed by the Space Planner. Save this file as data/spaces.luxa-original.json in the LUXA project root — the app fetches all data/spaces.*.json files at boot and merges them into window.LUXA.spaces. Same id → planner entry replaces curated entry. Product IDs use catalogId from products.json when present.",
+  "catalog": "luxa-original",
+  "exportedAt": "2026-06-15T19:41:19.511Z",
   "entries": [
     {
       "id": "living-aballs-collection-01",
       "name": {
-        "es": "Living · Colección Aballs",
-        "en": "Living · Aballs Collection"
+        "es": "Living Aballs Collection",
+        "en": "Living Aballs Collection"
       },
       "tagline": {
-        "es": "Colección cálida de iluminación residencial",
+        "es": "Warm residential lighting collection",
         "en": "Warm residential lighting collection"
       },
       "description": {
-        "es": "Combina iluminación ambiente, de pared y decorativa de la familia Aballs para un living completo y equilibrado donde cada pieza tiene protagonismo.",
+        "es": "A warm living setup combining ceiling, wall and decorative lighting in a balanced residential composition.",
         "en": "A warm living setup combining ceiling, wall and decorative lighting in a balanced residential composition."
       },
-      "image": "assets/Spaces/Living 04.jpeg",
+      "image": "assets/Spaces/Living 01/Living 01.jpeg",
       "gallery": [
-        "assets/Spaces/Living 04.jpeg",
-        "assets/Spaces/Living 04 close up 01.jpeg",
-        "assets/Spaces/Living 04 close up 2.jpeg",
-        "assets/Spaces/Living 04 close up 3.jpeg"
+        "assets/Spaces/Living 01/Living 01.jpeg"
       ],
       "heroProduct": "aballs-a-ceiling",
       "hotspots": [
-        { "productId": "aballs-a-ceiling", "x": 49.8,  "y": 16.84,
-          "closeUpImage": "assets/Spaces/Living 04 close up 2.jpeg",
-          "transitionVideo": "assets/Transiciones/Living 01  tran 03.mp4" },
-        { "productId": "aballs-a-wall",    "x": 76.98, "y": 46.66,
-          "closeUpImage": "assets/Spaces/Living 04 close up 3.jpeg",
-          "transitionVideo": "assets/Transiciones/Living 01  tran 02.mp4" },
-        { "productId": "aballs-m-table",   "x": 18.10, "y": 68.80,
-          "closeUpImage": "assets/Spaces/Living 04 close up 01.jpeg",
-          "transitionVideo": "assets/Transiciones/Living 01  tran 01.mp4" }
+        {
+          "productId": "aballs-a-ceiling",
+          "x": 49.74,
+          "y": 16.27,
+          "closeUpImage": "assets/Spaces/Living 01/Living 01 close up 03.jpeg",
+          "transitionVideo": "assets/Transiciones/Living 01/Living 01  tran 03.mp4"
+        },
+        {
+          "productId": "aballs-a-wall",
+          "x": 76.86,
+          "y": 46.78,
+          "closeUpImage": "assets/Spaces/Living 01/Living 01 close up 02.jpeg",
+          "transitionVideo": "assets/Transiciones/Living 01/Living 01  tran 02.mp4"
+        },
+        {
+          "productId": "aballs-m-table",
+          "x": 18,
+          "y": 68.3,
+          "closeUpImage": "assets/Spaces/Living 01/Living 01 close up 01.jpeg",
+          "transitionVideo": "assets/Transiciones/Living 01/Living 01  tran 01.mp4"
+        }
       ]
     },
     {
-      "id": "bathroom-lighto-collection-22",
+      "id": "dining-aballs-collection-10",
       "name": {
-        "es": "Baño · Colección Lighto",
-        "en": "Bathroom · Lighto Collection"
+        "es": "Dining Aballs Collection",
+        "en": "Dining Aballs Collection"
       },
       "tagline": {
-        "es": "Iluminación funcional y limpia para el baño",
-        "en": "Clean functional bathroom lighting collection"
-      },
-      "description": {
-        "es": "Combina la luz general del techo Lighto con un acento de pared Lighto al lado del espejo — un baño funcional y elegante donde la colección entera dialoga visualmente.",
-        "en": "Pairs a Lighto ceiling globe for ambient fill with a Lighto wall light at the mirror — a clean, functional bathroom where the whole family speaks the same visual language."
-      },
-      "image": "assets/Spaces/bathroom 05.jpeg",
-      "gallery": [
-        "assets/Spaces/bathroom 05.jpeg",
-        "assets/Spaces/bathroom 05 close up 01.jpeg",
-        "assets/Spaces/Bathroom 05 close up 02.jpeg"
-      ],
-      "heroProduct": "lighto-c-ceiling",
-      "hotspots": [
-        { "productId": "lighto-c-ceiling", "x": 50.34, "y": 20.68,
-          "closeUpImage": "assets/Spaces/Bathroom 05 close up 02.jpeg" },
-        { "productId": "lighto-a-wall",    "x": 14.69, "y": 51.97,
-          "closeUpImage": "assets/Spaces/bathroom 05 close up 01.jpeg" }
-      ]
-    },
-    {
-      "id": "dining-aballs-collection-11",
-      "name": {
-        "es": "Comedor · Colección Aballs",
-        "en": "Dining · Aballs Collection"
-      },
-      "tagline": {
-        "es": "Iluminación enfocada para el comedor",
+        "es": "Dining focused lighting collection",
         "en": "Dining focused lighting collection"
       },
       "description": {
-        "es": "Un colgante Aballs centrado sobre la mesa con luz de pared de apoyo para que la mesa sea protagonista mientras el resto del ambiente queda bien iluminado.",
+        "es": "A focused dining lighting setup with a centered pendant and supporting wall and accent lights.",
         "en": "A focused dining lighting setup with a centered pendant and supporting wall and accent lights."
       },
-      "image": "assets/Spaces/Dining 01.jpeg",
+      "image": "assets/Spaces/Dining 01/Dining 01.jpeg",
       "gallery": [
-        "assets/Spaces/Dining 01.jpeg",
-        "assets/Spaces/Dining 01 close up 01.jpeg",
-        "assets/Spaces/Dining 01 close up 02.jpeg"
+        "assets/Spaces/Dining 01/Dining 01.jpeg"
       ],
       "heroProduct": "aballs-chandelier-12",
       "hotspots": [
-        { "productId": "aballs-chandelier-12", "x": 49.93, "y": 45.01,
-          "closeUpImage": "assets/Spaces/Dining 01 close up 02.jpeg" },
-        { "productId": "aballs-a-wall",        "x": 91.73, "y": 51.60,
-          "closeUpImage": "assets/Spaces/Dining 01 close up 01.jpeg" }
+        {
+          "productId": "aballs-chandelier-12",
+          "x": 50.13,
+          "y": 42.9,
+          "closeUpImage": "assets/Spaces/Dining 01/Dining 01 close up 02.jpeg"
+        },
+        {
+          "productId": "aballs-a-wall",
+          "x": 91.09,
+          "y": 50.31,
+          "closeUpImage": "assets/Spaces/Dining 01/Dining 01 close up 01.jpeg"
+        }
+      ]
+    },
+    {
+      "id": "living-cellar-collection-03",
+      "name": {
+        "es": "Living Cellar Collection",
+        "en": "Living Cellar Collection"
+      },
+      "tagline": {
+        "es": "Warm residential lighting collection",
+        "en": "Warm residential lighting collection"
+      },
+      "description": {
+        "es": "A warm living setup combining ceiling, wall and decorative lighting in a balanced residential composition.",
+        "en": "A warm living setup combining ceiling, wall and decorative lighting in a balanced residential composition."
+      },
+      "image": "assets/Spaces/Living 02/Living 02.jpeg",
+      "gallery": [
+        "assets/Spaces/Living 02/Living 02.jpeg"
+      ],
+      "heroProduct": "cellar-7634-pendant",
+      "hotspots": [
+        {
+          "productId": "cellar-7634-pendant",
+          "x": 44.73,
+          "y": 36.9,
+          "closeUpImage": "assets/Spaces/Living 02/Living 02 close up 03.jpeg"
+        },
+        {
+          "productId": "cellar-7635-wall",
+          "x": 15.89,
+          "y": 46.96,
+          "closeUpImage": "assets/Spaces/Living 02/Living 02 close up 01.jpeg"
+        },
+        {
+          "productId": "cellar-7637-table",
+          "x": 90.43,
+          "y": 76.23,
+          "closeUpImage": "assets/Spaces/Living 02/Living 02 close up 02.jpeg"
+        }
+      ]
+    },
+    {
+      "id": "bathroom-lighto-collection-26",
+      "name": {
+        "es": "Bathroom Lighto Collection",
+        "en": "Bathroom Lighto Collection"
+      },
+      "tagline": {
+        "es": "Clean functional bathroom lighting collection",
+        "en": "Clean functional bathroom lighting collection"
+      },
+      "description": {
+        "es": "A clean bathroom setup combining ceiling, wall and accent lighting for a functional refined composition.",
+        "en": "A clean bathroom setup combining ceiling, wall and accent lighting for a functional refined composition."
+      },
+      "image": "assets/Spaces/Bathroom 01/bathroom 01.jpeg",
+      "gallery": [
+        "assets/Spaces/Bathroom 01/bathroom 01.jpeg"
+      ],
+      "heroProduct": "lighto-c-ceiling",
+      "hotspots": [
+        {
+          "productId": "lighto-c-ceiling",
+          "x": 50,
+          "y": 21.38,
+          "closeUpImage": "assets/Spaces/Bathroom 01/Bathroom 01 close up 02.jpeg"
+        },
+        {
+          "productId": "lighto-a-wall",
+          "x": 13.39,
+          "y": 52.25,
+          "closeUpImage": "assets/Spaces/Bathroom 01/bathroom 01 close up 01.jpeg"
+        }
+      ]
+    },
+    {
+      "id": "bedroom-soffio-collection-25",
+      "name": {
+        "es": "Bedroom Soffio Collection",
+        "en": "Bedroom Soffio Collection"
+      },
+      "tagline": {
+        "es": "Soft and quiet bedroom lighting collection",
+        "en": "Soft and quiet bedroom lighting collection"
+      },
+      "description": {
+        "es": "A soft bedroom setup mixing general, reading and bedside lighting for a quiet residential atmosphere.",
+        "en": "A soft bedroom setup mixing general, reading and bedside lighting for a quiet residential atmosphere."
+      },
+      "image": "assets/Spaces/bedroom 01/bedroom 01.jpeg",
+      "gallery": [
+        "assets/Spaces/bedroom 01/bedroom 01.jpeg"
+      ],
+      "heroProduct": "soffio-pendant-light",
+      "hotspots": [
+        {
+          "productId": "soffio-pendant-light",
+          "x": 50.79,
+          "y": 45.55,
+          "closeUpImage": "assets/Spaces/bedroom 01/bedroom close up 02.jpeg"
+        },
+        {
+          "productId": "soffio-table-lamp",
+          "x": 30.64,
+          "y": 67.24,
+          "closeUpImage": "assets/Spaces/bedroom 01/bedroom close up 01.jpeg"
+        }
+      ]
+    },
+    {
+      "id": "bedroom-pendulum-collection-23",
+      "name": {
+        "es": "Bedroom Pendulum Collection",
+        "en": "Bedroom Pendulum Collection"
+      },
+      "tagline": {
+        "es": "Soft and quiet bedroom lighting collection",
+        "en": "Soft and quiet bedroom lighting collection"
+      },
+      "description": {
+        "es": "A soft bedroom setup mixing general, reading and bedside lighting for a quiet residential atmosphere.",
+        "en": "A soft bedroom setup mixing general, reading and bedside lighting for a quiet residential atmosphere."
+      },
+      "image": "assets/Spaces/bedroom 02/bedroom 02.jpeg",
+      "gallery": [
+        "assets/Spaces/bedroom 02/bedroom 02.jpeg"
+      ],
+      "heroProduct": "pendulum-floor-lamp",
+      "hotspots": [
+        {
+          "productId": "pendulum-floor-lamp",
+          "x": 85.42,
+          "y": 85.23,
+          "closeUpImage": "assets/Spaces/bedroom 02/bedroom close up 01.jpeg"
+        },
+        {
+          "productId": "pendulum-pendant-light",
+          "x": 72.12,
+          "y": 60.36,
+          "closeUpImage": "assets/Spaces/bedroom 02/bedroom close up 02.jpeg"
+        },
+        {
+          "productId": "pendulum-wall-and-ceiling-light",
+          "x": 6.02,
+          "y": 47.84,
+          "closeUpImage": "assets/Spaces/bedroom 02/bedroom close up 03.jpeg"
+        }
+      ]
+    },
+    {
+      "id": "living-ic-collection-05",
+      "name": {
+        "es": "Dining IC Collection",
+        "en": "Dining IC Collection"
+      },
+      "tagline": {
+        "es": "Dining focused lighting collection",
+        "en": "Dining focused lighting collection"
+      },
+      "description": {
+        "es": "A warm living setup combining ceiling, wall and decorative lighting in a balanced residential composition.",
+        "en": "A warm living setup combining ceiling, wall and decorative lighting in a balanced residential composition."
+      },
+      "image": "assets/Spaces/Dinning 02/Dinning 02.jpeg",
+      "gallery": [
+        "assets/Spaces/Dinning 02/Dinning 02.jpeg"
+      ],
+      "heroProduct": "IC",
+      "hotspots": [
+        {
+          "productId": "ic-light-s",
+          "x": 50.13,
+          "y": 53.48,
+          "closeUpImage": "assets/Spaces/Dinning 02/Dinning 02 close up 03.jpeg"
+        },
+        {
+          "productId": "IC",
+          "x": 93.72,
+          "y": 40.78,
+          "closeUpImage": "assets/Spaces/Dinning 02/Dinning 02 close up 01.jpeg"
+        },
+        {
+          "productId": "ic-light-f",
+          "x": 6.41,
+          "y": 84.35,
+          "closeUpImage": "assets/Spaces/Dinning 02/Dinning 02 close up 02.jpeg"
+        }
       ]
     }
   ]

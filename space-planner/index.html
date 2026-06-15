@@ -20,8 +20,7 @@
       </label>
       <button id="btn-generate" class="btn btn-primary">Generate Collection Scenes</button>
       <button id="btn-manual" class="btn btn-ghost">+ Manual Scene</button>
-      <button id="btn-export" class="btn btn-ghost">Export approved JSON</button>
-      <button id="btn-export-catalog" class="btn btn-ghost">Export catalog spaces JSON</button>
+      <button id="btn-publish" class="btn btn-publish" title="Escribe data/spaces.&lt;catalogo&gt;.json directo en disco. La app levanta esa misma ruta al arrancar, así los ambientes quedan actualizados sin copiar nada a mano.">↑ Publicar escenas a la app</button>
       <button id="btn-clear-state" class="btn-mini" title="Discard saved planner state for the active catalog">Clear saved state</button>
     </div>
   </header>
@@ -201,13 +200,19 @@
       <div class="modal-body hotspot-body">
 
         <div class="hotspot-toolbar">
+          <label class="hotspot-scene">
+            <span>Scene folder</span>
+            <select id="h-scene">
+              <option value="">— pick a scene folder —</option>
+            </select>
+          </label>
           <label class="hotspot-file">
-            <span>Load render</span>
+            <span>Or load a local file</span>
             <input id="h-file" type="file" accept="image/*" />
           </label>
           <label class="hotspot-path">
             <span>Final image path (for export)</span>
-            <input id="h-path" type="text" placeholder="assets/Spaces/Living-Aballs-01.png" />
+            <input id="h-path" type="text" placeholder="assets/Spaces/Living 01/Living 01.jpeg" />
           </label>
           <button id="h-reset" class="btn-mini">Reset coords</button>
         </div>

@@ -37,10 +37,12 @@ $mime = @{
 #   GET  /__list?path=<rel>    → JSON list of files in folder (whitelisted)
 #   POST /__save?path=<rel>    → writes request body to file (whitelisted, auto-backup)
 #   POST /__upload?path=<rel>  → writes raw request body as binary file (whitelisted to assets/)
+#   POST /__delete?path=<rel>  → soft-deletes by moving file into a _trash/ subfolder
 # =============================================================================
 $listAllowedPrefixes   = @('assets/', 'space-planner/catalogs/', 'space-planner/')
-$saveAllowedPrefixes   = @('space-planner/catalogs/')
+$saveAllowedPrefixes   = @('space-planner/catalogs/', 'data/')
 $uploadAllowedPrefixes = @('assets/Imagenes/', 'assets/Spaces/')
+$deleteAllowedPrefixes = @('assets/Imagenes/', 'assets/Spaces/')
 
 function Send-Json {
   param($response, [int]$statusCode, $obj)
@@ -192,6 +194,42 @@ try {
               $status = 500
               Send-Json $res 500 @{ ok = $false; error = ('write failed: ' + $_.Exception.Message) }
             }
+          }
+        }
+      }
+      # ----- API: soft-delete file (move into a sibling _trash/ folder) -----
+      elseif ($absPath -eq '/__delete' -and $req.HttpMethod -eq 'POST') {
+        $qpath = $req.QueryString['path']
+        $safe = Resolve-SafePath $qpath $deleteAllowedPrefixes $rootResolved $root
+        if (-not $safe) {
+          $status = 400
+          Send-Json $res 400 @{ ok = $false; error = 'invalid or not-allowed path'; path = $qpath }
+        } elseif (-not (Test-Path $safe -PathType Leaf)) {
+          $status = 404
+          Send-Json $res 404 @{ ok = $false; error = 'file not found'; path = $qpath }
+        } else {
+          try {
+            $parentDir = Split-Path -Parent $safe
+            $trashDir = Join-Path $parentDir '_trash'
+            if (-not (Test-Path $trashDir)) { New-Item -ItemType Directory -Path $trashDir -Force | Out-Null }
+            $fileName = Split-Path -Leaf $safe
+            $destPath = Join-Path $trashDir $fileName
+            if (Test-Path $destPath -PathType Leaf) {
+              $base = [System.IO.Path]::GetFileNameWithoutExtension($fileName)
+              $ext = [System.IO.Path]::GetExtension($fileName)
+              $n = 2
+              while (Test-Path (Join-Path $trashDir ("{0}_{1}{2}" -f $base, $n, $ext))) { $n++ }
+              $destPath = Join-Path $trashDir ("{0}_{1}{2}" -f $base, $n, $ext)
+            }
+            Move-Item -Path $safe -Destination $destPath -Force
+            Send-Json $res 200 @{
+              ok = $true
+              path = $qpath
+              trashedAs = (Split-Path -Leaf $destPath)
+            }
+          } catch {
+            $status = 500
+            Send-Json $res 500 @{ ok = $false; error = ('delete failed: ' + $_.Exception.Message) }
           }
         }
       }

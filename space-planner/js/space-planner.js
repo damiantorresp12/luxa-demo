@@ -169,7 +169,6 @@
     fReset: $('#filter-reset'),
     btnGenerate: $('#btn-generate'),
     btnManual: $('#btn-manual'),
-    btnExport: $('#btn-export'),
     sceneList: $('#scene-list'),
     approvedList: $('#approved-list'),
     suggestedCount: $('#suggested-count'),
@@ -200,6 +199,7 @@
     // Hotspot editor
     hotspotModal: $('#hotspot-modal'),
     hotspotTitle: $('#hotspot-modal-title'),
+    hScene: $('#h-scene'),
     hFile: $('#h-file'),
     hPath: $('#h-path'),
     hReset: $('#h-reset'),
@@ -209,7 +209,7 @@
     hDots: $('#h-dots'),
     hProducts: $('#h-products'),
     hSave: $('#h-save'),
-    btnExportCatalog: $('#btn-export-catalog'),
+    btnPublish: $('#btn-publish'),
     btnClearState: $('#btn-clear-state'),
     catalogPicker: $('#catalog-picker')
   };
@@ -1217,6 +1217,25 @@
     els.hEmpty.hidden = false;
     els.hDots.innerHTML = '';
 
+    // Refresh the scene-folder dropdown each time so newly added folders show up
+    // without a planner reload. If the scene already has an imagePath that lives
+    // under assets/Spaces/<folder>/..., pre-select that folder in the dropdown.
+    // Also load that folder's close-ups + transitions so the per-hotspot
+    // pickers can be filled.
+    state.hotspotCloseUps = [];
+    state.hotspotTransitions = [];
+    loadScenePicker().then(() => {
+      if (els.hScene && scene.imagePath) {
+        const m = /^assets\/Spaces\/([^/]+)\//.exec(scene.imagePath);
+        if (m && Array.from(els.hScene.options).some(o => o.value === m[1])) {
+          els.hScene.value = m[1];
+        } else {
+          els.hScene.value = '';
+        }
+      }
+      loadCloseUpsForCurrentScene();
+    });
+
     // If scene already has a path, try loading it directly
     if (scene.imagePath) {
       tryLoadImageFromPath(scene.imagePath);
@@ -1256,10 +1275,164 @@
     tryNext();
   }
 
+  // ---------- Scene folder picker ----------
+  // Reads assets/Spaces/ via the server's /__list endpoint and offers each
+  // sub-folder as a "scene". Picking one tries to find the folder's main
+  // image (the file without "close up" in the name) and load it. Falls back
+  // silently if the API isn't reachable — the file input + path input keep
+  // working manually.
+
+  // Same root-resolution trick as tryLoadImageFromPath: the planner is
+  // typically served at /space-planner/, while the API lives at /__list.
+  // Try absolute first, then relative-to-planner.
+  async function listFolder(relPath) {
+    const candidates = [`/__list?path=${encodeURIComponent(relPath)}`,
+                        `../__list?path=${encodeURIComponent(relPath)}`];
+    for (const url of candidates) {
+      try {
+        const res = await fetch(url, { cache: 'no-store' });
+        if (!res.ok) continue;
+        const json = await res.json();
+        if (json && json.ok) return json;
+      } catch (e) { /* try next */ }
+    }
+    return null;
+  }
+
+  function isImageFile(name) {
+    return /\.(jpe?g|png|webp|gif)$/i.test(name);
+  }
+  function isVideoFile(name) {
+    return /\.(mp4|webm|mov)$/i.test(name);
+  }
+  function isCloseUp(name) {
+    return /close\s*up/i.test(name);
+  }
+
+  // Best-effort main image: the only non-close-up image in the folder.
+  // Tolerates case/typo mismatches between folder name and file name
+  // (e.g. folder "Bathroom 01" with file "bathroom 01.jpeg").
+  function pickMainImage(files) {
+    const imgs = files.filter(isImageFile);
+    if (!imgs.length) return null;
+    return imgs.find(f => !isCloseUp(f)) || imgs[0];
+  }
+
+  async function loadScenePicker() {
+    if (!els.hScene) return;
+    const idx = await listFolder('assets/Spaces');
+    // Reset to the prompt option
+    els.hScene.innerHTML = '<option value="">— pick a scene folder —</option>';
+    if (!idx || !Array.isArray(idx.folders) || !idx.folders.length) {
+      els.hScene.disabled = true;
+      return;
+    }
+    els.hScene.disabled = false;
+    // Cache the folder list so the change handler doesn't re-fetch it
+    state.hSceneFolders = idx.folders.slice();
+    idx.folders.forEach(name => {
+      const opt = document.createElement('option');
+      opt.value = name;
+      opt.textContent = name;
+      els.hScene.appendChild(opt);
+    });
+  }
+
+  async function onScenePicked(folder) {
+    if (!folder) return;
+    const listing = await listFolder(`assets/Spaces/${folder}`);
+    if (!listing || !Array.isArray(listing.files)) {
+      toast(`No pude leer la carpeta "${folder}".`, true);
+      return;
+    }
+    const main = pickMainImage(listing.files);
+    if (!main) {
+      toast(`La carpeta "${folder}" está vacía o no tiene imágenes.`, true);
+      return;
+    }
+    const fullPath = `assets/Spaces/${folder}/${main}`;
+    els.hPath.value = fullPath;
+    // Reflect on the scene model immediately so save preserves it even if
+    // the user closes without re-triggering onHotspotPathChange.
+    const scene = findSceneById(state.hotspotSceneId);
+    if (scene) scene.imagePath = fullPath;
+    // Cache the folder's close-ups so each hotspot row can render a picker.
+    // Paths are stored fully-qualified (assets/Spaces/<folder>/<file>) so they
+    // can be saved as-is to hotspot.closeUpImage and published unchanged.
+    state.hotspotCloseUps = listing.files
+      .filter(f => isImageFile(f) && isCloseUp(f))
+      .map(f => `assets/Spaces/${folder}/${f}`);
+    // Same idea for the cinematic transition videos that live in a parallel
+    // assets/Transiciones/<folder>/ tree. Same folder name is assumed.
+    const transListing = await listFolder(`assets/Transiciones/${folder}`);
+    state.hotspotTransitions = (transListing && Array.isArray(transListing.files))
+      ? transListing.files.filter(isVideoFile).map(f => `assets/Transiciones/${folder}/${f}`)
+      : [];
+    renderHotspotProducts();
+    tryLoadImageFromPath(fullPath);
+  }
+
+  // Same logic as onScenePicked but only fills the close-ups + transitions
+  // caches — used when re-opening the modal on a scene whose imagePath is
+  // already set (we need both lists to populate the per-hotspot dropdowns).
+  async function loadCloseUpsForCurrentScene() {
+    const scene = findSceneById(state.hotspotSceneId);
+    if (!scene || !scene.imagePath) {
+      state.hotspotCloseUps = [];
+      state.hotspotTransitions = [];
+      return;
+    }
+    const m = /^assets\/Spaces\/([^/]+)\//.exec(scene.imagePath);
+    if (!m) {
+      state.hotspotCloseUps = [];
+      state.hotspotTransitions = [];
+      return;
+    }
+    const folder = m[1];
+    const listing = await listFolder(`assets/Spaces/${folder}`);
+    state.hotspotCloseUps = (listing && Array.isArray(listing.files))
+      ? listing.files.filter(f => isImageFile(f) && isCloseUp(f)).map(f => `assets/Spaces/${folder}/${f}`)
+      : [];
+    const transListing = await listFolder(`assets/Transiciones/${folder}`);
+    state.hotspotTransitions = (transListing && Array.isArray(transListing.files))
+      ? transListing.files.filter(isVideoFile).map(f => `assets/Transiciones/${folder}/${f}`)
+      : [];
+    renderHotspotProducts();
+  }
+
   function renderHotspotProducts() {
     const scene = findSceneById(state.hotspotSceneId);
     if (!scene) return;
     const plan = scene.hotspotPlan || [];
+    const closeUps = state.hotspotCloseUps || [];
+    const transitions = state.hotspotTransitions || [];
+
+    // Reusable <option> lists. We add an orphan option per-row when needed
+    // so the saved value still shows when the underlying folder changes.
+    function buildOptionList(emptyLabel, items) {
+      return [`<option value="">${escapeHtml(emptyLabel)}</option>`]
+        .concat(items.map(p => {
+          const label = p.split('/').pop();
+          return `<option value="${escapeHtml(p)}">${escapeHtml(label)}</option>`;
+        })).join('');
+    }
+    const closeUpOptions = buildOptionList('— no close-up —', closeUps);
+    const transitionOptions = buildOptionList('— no transition —', transitions);
+
+    function pickerHtml(kind, current, allList, allOptionsHtml) {
+      // kind ∈ {'closeup', 'transition'}; current is the currently-saved value
+      const orphan = current && !allList.includes(current)
+        ? `<option value="${escapeHtml(current)}" selected>${escapeHtml(current.split('/').pop())} (orphan)</option>`
+        : '';
+      if (!allList.length && !current) {
+        return `<span class="hs-prod-picker-empty">—</span>`;
+      }
+      const selected = current
+        ? allOptionsHtml.replace(`value="${escapeHtml(current)}"`, `value="${escapeHtml(current)}" selected`)
+        : allOptionsHtml;
+      return `<select class="hs-prod-${kind}" data-idx="__IDX__">${orphan}${selected}</select>`;
+    }
+
     els.hProducts.innerHTML = plan.map((h, i) => {
       const product = (scene.productObjects || []).find(p => p.name === h.product) || {};
       const thumb = product.image
@@ -1267,20 +1440,52 @@
         : `<div class="hs-prod-thumb"></div>`;
       const placed = (typeof h.x === 'number' && typeof h.y === 'number');
       const active = (i === state.hotspotSelectedIdx) ? ' active' : '';
+      const closeUpPicker = pickerHtml('closeup', h.closeUpImage || '', closeUps, closeUpOptions)
+        .replace('__IDX__', String(i));
+      const transitionPicker = pickerHtml('transition', h.transitionVideo || '', transitions, transitionOptions)
+        .replace('__IDX__', String(i));
       return `
         <div class="hs-prod${active}" data-idx="${i}">
-          ${thumb}
-          <span class="hs-prod-name">${escapeHtml(h.product)}</span>
-          <span class="hs-prod-status${placed ? ' placed' : ''}">${placed ? '✓' : '○'}</span>
+          <div class="hs-prod-head">
+            ${thumb}
+            <span class="hs-prod-name">${escapeHtml(h.product)}</span>
+            <span class="hs-prod-status${placed ? ' placed' : ''}">${placed ? '✓' : '○'}</span>
+          </div>
+          <div class="hs-prod-picker-row">
+            <span class="hs-prod-picker-label">Close-up</span>
+            ${closeUpPicker}
+          </div>
+          <div class="hs-prod-picker-row">
+            <span class="hs-prod-picker-label">Transition</span>
+            ${transitionPicker}
+          </div>
         </div>`;
     }).join('');
+
     els.hProducts.querySelectorAll('.hs-prod').forEach(node => {
-      node.addEventListener('click', () => {
+      node.addEventListener('click', (e) => {
+        // Don't change selection when the user is interacting with a picker
+        if (e.target.closest('.hs-prod-closeup, .hs-prod-transition')) return;
         state.hotspotSelectedIdx = Number(node.dataset.idx);
         renderHotspotProducts();
         renderHotspotDots();
       });
     });
+    function wirePicker(selector, fieldName) {
+      els.hProducts.querySelectorAll(selector).forEach(sel => {
+        sel.addEventListener('change', () => {
+          const idx = Number(sel.dataset.idx);
+          const target = (scene.hotspotPlan || [])[idx];
+          if (!target) return;
+          target[fieldName] = sel.value || '';
+          // Persist immediately so picks survive a modal cancel.
+          saveState();
+        });
+      });
+    }
+    wirePicker('.hs-prod-closeup', 'closeUpImage');
+    wirePicker('.hs-prod-transition', 'transitionVideo');
+
     renderHotspotDots();
   }
 
@@ -1378,59 +1583,14 @@
     }
   }
 
-  // ---------- Export ----------
+  // ---------- Publish ----------
 
-  function exportApproved() {
-    if (!state.approved.length) {
-      toast('No approved scenes to export.', true);
-      return;
-    }
-    const cleanScenes = state.approved.map(s => ({
-      sceneId: s.sceneId,
-      sceneName: s.sceneName,
-      sceneMode: 'collection-scene',
-      space: s.space,
-      products: s.products,
-      commercialIntent: s.commercialIntent,
-      reason: s.reason,
-      productRoles: s.productRoles || [],
-      aiPrompt: s.aiPrompt || '',
-      renderBrief: s.renderBrief || '',
-      appDescription: s.appDescription || '',
-      imagePath: s.imagePath || '',
-      hotspotPlan: (s.hotspotPlan || []).map(h => ({
-        product: h.product,
-        suggestedArea: h.suggestedArea,
-        ...(typeof h.x === 'number' ? { x: h.x } : {}),
-        ...(typeof h.y === 'number' ? { y: h.y } : {})
-      })),
-      status: 'approved'
-    }));
-    const payload = {
-      exportedAt: new Date().toISOString(),
-      scenes: cleanScenes
-    };
-    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'scene_suggestions.json';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    toast(`Exported ${cleanScenes.length} scene${cleanScenes.length === 1 ? '' : 's'}.`);
-  }
-
-  // Generates a spaces[] array entry per approved scene shaped for js/catalog.data.js.
-  // Product IDs come from the product's optional `catalogId` field; fall back to the
-  // planner's own id if not mapped yet.
-  function exportCatalogShape() {
-    if (!state.approved.length) {
-      toast('No approved scenes to export.', true);
-      return;
-    }
-    const productById = id => state.products.find(p => p.id === id);
+  // Builds the spaces sidecar payload for the LUXA app from the approved scenes.
+  // Same shape that catalog.data.js merges into window.LUXA.spaces. Shared by
+  // exportCatalogShape() (download) and publishScenesToApp() (write to disk).
+  function buildCatalogScenesPayload() {
+    const catalogId = state.activeCatalog || DEFAULT_CATALOG_ID;
+    const filename = `spaces.${catalogId}.json`;
 
     const entries = state.approved.map(s => {
       const objs = s.productObjects || [];
@@ -1440,7 +1600,10 @@
         .map(h => {
           const product = objs.find(p => p.name === h.product);
           const productId = product ? (product.catalogId || product.id) : h.product;
-          return { productId, x: h.x, y: h.y };
+          const out = { productId, x: h.x, y: h.y };
+          if (h.closeUpImage) out.closeUpImage = h.closeUpImage;
+          if (h.transitionVideo) out.transitionVideo = h.transitionVideo;
+          return out;
         });
 
       const slug = s.sceneId; // already kebab-ish but uses underscores
@@ -1460,12 +1623,6 @@
 
     const placedTotal = entries.reduce((a, e) => a + e.hotspots.length, 0);
     const totalExpected = state.approved.reduce((a, s) => a + (s.hotspotPlan || []).length, 0);
-
-    const catalogId = state.activeCatalog || DEFAULT_CATALOG_ID;
-    const filename = `spaces.${catalogId}.json`;
-
-    // Count scenes containing at least one product missing catalogId — those
-    // won't render hotspots in the main LUXA app.
     const scenesOutOfCatalog = state.approved.reduce((n, s) => {
       const hasMissing = (s.productObjects || []).some(p => !p.catalogId);
       return n + (hasMissing ? 1 : 0);
@@ -1478,23 +1635,87 @@
       entries
     };
 
-    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+    return { payload, entries, filename, catalogId, placedTotal, totalExpected, scenesOutOfCatalog };
+  }
 
-    const warnSuffix = scenesOutOfCatalog
-      ? ` · ⚠ ${scenesOutOfCatalog} con productos fuera de catálogo`
-      : '';
-    if (placedTotal < totalExpected) {
-      toast(`Exported ${filename} — ${placedTotal}/${totalExpected} hotspots placed${warnSuffix}.`);
-    } else {
-      toast(`Exported ${filename} (${entries.length} ${entries.length === 1 ? 'scene' : 'scenes'})${warnSuffix}.`);
+  // Scans assets/Spaces/ once and rewrites any flat scene.imagePath
+  // (e.g. "assets/Spaces/bedroom 01.jpeg") to its real nested location
+  // (e.g. "assets/Spaces/bedroom 01/bedroom 01.jpeg"). Tolerates case and
+  // typo differences between folder name and filename. Without this step,
+  // scenes whose path was set via the "Load a local file" picker (which
+  // doesn't know the folder) end up as broken 404s in the app.
+  async function resolveSceneFolderPaths() {
+    const top = await listFolder('assets/Spaces');
+    if (!top || !Array.isArray(top.folders) || !top.folders.length) return;
+    const fileToLocation = Object.create(null);
+    for (const folder of top.folders) {
+      const sub = await listFolder(`assets/Spaces/${folder}`);
+      if (!sub || !Array.isArray(sub.files)) continue;
+      sub.files.forEach(f => {
+        if (!isImageFile(f)) return;
+        // Index by lowercase filename so casing differences still match.
+        // First occurrence wins — if the same filename existed in two
+        // folders we couldn't disambiguate anyway.
+        const key = f.toLowerCase();
+        if (!fileToLocation[key]) fileToLocation[key] = { folder, file: f };
+      });
+    }
+    state.approved.forEach(scene => {
+      if (!scene.imagePath) return;
+      // Already nested? Skip — leave the planner's choice alone.
+      if (/^assets\/Spaces\/[^/]+\/[^/]+$/.test(scene.imagePath)) return;
+      const basename = scene.imagePath.split('/').pop();
+      const hit = fileToLocation[(basename || '').toLowerCase()];
+      if (!hit) return;
+      scene.imagePath = `assets/Spaces/${hit.folder}/${hit.file}`;
+    });
+  }
+
+  // Writes data/spaces.<catalog>.json directly via the server's /__save endpoint.
+  // Symmetric to the Product Data Generator's "Publicar a la app" button.
+  async function publishScenesToApp() {
+    if (!state.approved.length) {
+      toast('No hay escenas approved para publicar.', true);
+      return;
+    }
+    // Resolve any flat paths to their real nested locations BEFORE building
+    // the payload so the app gets working URLs no matter how the user loaded
+    // the image (scene picker, file input, or typed path).
+    await resolveSceneFolderPaths();
+    const { payload, entries, filename, catalogId, placedTotal, totalExpected, scenesOutOfCatalog } =
+      buildCatalogScenesPayload();
+
+    let confirmMsg =
+      `Voy a escribir directo en data/${filename}.\n\n` +
+      `Escenas: ${entries.length}\n` +
+      `Hotspots colocados: ${placedTotal}/${totalExpected}\n` +
+      `Backup automático en data/${filename}.bak.json\n\n`;
+    if (scenesOutOfCatalog) {
+      confirmMsg += `⚠ ${scenesOutOfCatalog} escena${scenesOutOfCatalog === 1 ? '' : 's'} ` +
+                    `con productos sin catalogId — sus hotspots no van a aparecer en la app ` +
+                    `(publicalos antes desde el Product Data Generator).\n\n`;
+    }
+    confirmMsg += 'Continuar?';
+    if (!window.confirm(confirmMsg)) return;
+
+    const path = `data/${filename}`;
+    try {
+      const res = await fetch(`/__save?path=${encodeURIComponent(path)}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload, null, 2)
+      });
+      const out = await res.json().catch(() => ({}));
+      if (!res.ok || !out.ok) {
+        toast(`Error al publicar: ${out.error || res.status}`, true);
+        return;
+      }
+      const warnSuffix = scenesOutOfCatalog
+        ? ` · ⚠ ${scenesOutOfCatalog} con productos fuera de catálogo`
+        : '';
+      toast(`Publicado: ${entries.length} ${entries.length === 1 ? 'escena' : 'escenas'} en la app${warnSuffix}.`);
+    } catch (err) {
+      toast(`Error de red al publicar: ${err.message}`, true);
     }
   }
 
@@ -1515,7 +1736,6 @@
 
     els.btnGenerate.addEventListener('click', generateScenes);
     els.btnManual.addEventListener('click', openManualModal);
-    els.btnExport.addEventListener('click', exportApproved);
 
     els.mSave.addEventListener('click', saveModalScene);
     els.mSpace.addEventListener('change', () => {
@@ -1560,6 +1780,9 @@
       if (e.target === els.hotspotModal) closeHotspotModal();
     });
     els.hFile.addEventListener('change', onHotspotFileChange);
+    if (els.hScene) {
+      els.hScene.addEventListener('change', (e) => onScenePicked(e.target.value));
+    }
     els.hCanvas.addEventListener('click', handleCanvasClick);
     els.hReset.addEventListener('click', resetHotspotCoords);
     els.hSave.addEventListener('click', saveHotspots);
@@ -1567,7 +1790,7 @@
       if (!els.hotspotModal.classList.contains('hidden')) renderHotspotDots();
     });
 
-    els.btnExportCatalog.addEventListener('click', exportCatalogShape);
+    if (els.btnPublish) els.btnPublish.addEventListener('click', publishScenesToApp);
 
     els.btnClearState.addEventListener('click', () => {
       const total = state.scenes.length + state.approved.length;

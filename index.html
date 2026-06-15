@@ -155,31 +155,50 @@
 
       <!-- ============ PRODUCTS ============ -->
       <section class="panel" id="panel-products" data-screen="products" hidden>
-        <div class="panel-toolbar">
-          <div class="filters" id="filters" role="tablist" aria-label="Categories"></div>
-          <div class="toolbar-right">
-            <label class="search">
-              <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-              <input type="search" id="productSearch" autocomplete="off"
-                     data-i18n-placeholder="products.search.placeholder" placeholder="Buscar luminarias…" />
-              <button type="button" class="search-clear" id="productSearchClear" aria-label="Clear search" hidden>&times;</button>
-            </label>
-            <span class="count-chip" id="productCount">0</span>
+        <div class="products-layout">
+          <aside class="filters-side" id="filtersSide" aria-label="Filters"></aside>
+          <div class="products-main">
+            <div class="products-toolbar">
+              <button type="button" class="filters-toggle" id="productsFiltersToggle" aria-controls="filtersSide" aria-expanded="false">
+                <svg viewBox="0 0 24 24" aria-hidden="true" width="14" height="14"><path d="M3 6h18M6 12h12M10 18h4" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg>
+                <span data-i18n="filters.toggle">Filtros</span>
+                <span class="filters-toggle-count" id="productsFiltersCount" hidden>0</span>
+              </button>
+              <label class="search">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+                <input type="search" id="productSearch" autocomplete="off"
+                       data-i18n-placeholder="products.search.placeholder" placeholder="Buscar luminarias…" />
+                <button type="button" class="search-clear" id="productSearchClear" aria-label="Clear search" hidden>&times;</button>
+              </label>
+              <span class="count-chip" id="productCount">0</span>
+            </div>
+            <div class="product-grid" id="productGrid"></div>
+            <div class="empty-state" id="productsEmpty" hidden>
+              <div class="empty-art">⌕</div>
+              <h3 data-i18n="products.empty.title">Sin coincidencias</h3>
+              <p data-i18n="products.empty.sub">Probá otra categoría o limpiá la búsqueda.</p>
+            </div>
           </div>
-        </div>
-        <div class="product-grid" id="productGrid"></div>
-        <div class="empty-state" id="productsEmpty" hidden>
-          <div class="empty-art">⌕</div>
-          <h3 data-i18n="products.empty.title">Sin coincidencias</h3>
-          <p data-i18n="products.empty.sub">Probá otra categoría o limpiá la búsqueda.</p>
         </div>
       </section>
 
       <!-- ============ SPACES ============ -->
       <section class="panel" id="panel-spaces" data-screen="spaces" hidden>
         <div class="catalog-filter" id="catalogFilter" role="group" aria-label="Catalog filter" hidden></div>
-        <div class="space-tabs" id="spaceTabs" role="tablist" aria-label="Spaces"></div>
-        <div class="space-stage-wrap" id="spaceStageWrap"></div>
+        <div class="spaces-layout">
+          <aside class="spaces-side" id="spacesSide" aria-label="Space filters"></aside>
+          <div class="spaces-main">
+            <div class="spaces-toolbar">
+              <button type="button" class="filters-toggle" id="spacesFiltersToggle" aria-controls="spacesSide" aria-expanded="false">
+                <svg viewBox="0 0 24 24" aria-hidden="true" width="14" height="14"><path d="M3 6h18M6 12h12M10 18h4" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg>
+                <span data-i18n="filters.toggle">Filtros</span>
+                <span class="filters-toggle-count" id="spacesFiltersCount" hidden>0</span>
+              </button>
+            </div>
+            <div class="space-stage-wrap" id="spaceStageWrap"></div>
+          </div>
+        </div>
+        <div class="filters-backdrop" id="filtersBackdrop" hidden></div>
       </section>
 
       <!-- ============ DOWNLOADS ============ -->
@@ -221,29 +240,36 @@
     <div class="detail-media">
       <p class="detail-context" id="detailContext" hidden></p>
       <img id="detailImg" alt="" />
-      <span class="badge-3d" id="detailBadge3d" hidden>Modelo 3D disponible</span>
       <div class="detail-thumbs" id="detailThumbs" hidden></div>
     </div>
     <div class="detail-body" id="detailBody"></div>
   </aside>
 </div>
 
-<!-- ===================== HOTSPOT TRANSITION — video + info card ===================== -->
+<!-- ===================== HOTSPOT TRANSITION — video + info card =====================
+     Lives outside the stage by default. JS moves it into the active .space-stage
+     while playing, then returns it here on close. -->
 <div class="transition-overlay" id="transitionOverlay" hidden>
-  <div class="transition-stage">
-    <video class="transition-video" id="transitionVideo" playsinline preload="auto"></video>
-    <button class="transition-skip" id="transitionSkip" type="button" aria-label="Skip">&times;</button>
-    <aside class="transition-card" id="transitionCard" hidden role="dialog" aria-label="Product info">
-      <p class="transition-card-eyebrow" id="transitionCardEyebrow"></p>
-      <h3 class="transition-card-name" id="transitionCardName"></h3>
+  <video class="transition-video" id="transitionVideo" playsinline preload="auto"></video>
+  <img class="transition-still" id="transitionStill" alt="" hidden />
+  <button class="transition-skip" id="transitionSkip" type="button" aria-label="Skip">&times;</button>
+  <aside class="transition-card" id="transitionCard" hidden role="dialog" aria-label="Product info">
+    <button class="transition-card-toggle" id="transitionCardToggle" type="button" aria-expanded="false" aria-controls="transitionCardBody">
+      <span class="transition-card-header">
+        <span class="transition-card-eyebrow" id="transitionCardEyebrow"></span>
+        <span class="transition-card-name" id="transitionCardName"></span>
+      </span>
+      <span class="transition-card-chevron" aria-hidden="true">+</span>
+    </button>
+    <div class="transition-card-body" id="transitionCardBody">
       <p class="transition-card-code" id="transitionCardCode"></p>
       <p class="transition-card-desc" id="transitionCardDesc"></p>
       <div class="transition-card-actions">
         <button class="btn btn-primary transition-card-detail" id="transitionCardDetail" type="button">Ver detalle completo</button>
         <button class="btn btn-ghost transition-card-close" id="transitionCardClose" type="button">Volver al ambiente</button>
       </div>
-    </aside>
-  </div>
+    </div>
+  </aside>
 </div>
 
 <script src="js/catalog.data.js"></script>
