@@ -886,11 +886,22 @@
 
     var list = el('div', 'spaces-list');
     matched.forEach(function (sp) {
-      var card = el('button', 'space-list-card' + (sp.id === activeSpace ? ' active' : ''));
+      var card = el('button', 'space-list-card');
       card.type = 'button';
       var thumb = sp.image ? '<span class="space-list-thumb"><img src="' + uri(sp.image) + '" alt="" /></span>' : '<span class="space-list-thumb"></span>';
       card.innerHTML = thumb + '<span class="space-list-name">' + tx(sp.name) + '</span>';
-      card.addEventListener('click', function () { setActiveSpace(sp.id); });
+      card.addEventListener('click', function () {
+        // In magazine view every matched scene is already on screen — just
+        // scroll the lateral list click to the matching section.
+        var section = document.querySelector('[data-space-id="' + sp.id + '"]');
+        if (section) {
+          scrollSectionIntoView(section);
+          var sSide = $('#spacesSide');
+          if (sSide && sSide.classList.contains('is-open')) closeFiltersDrawer();
+        } else {
+          setActiveSpace(sp.id);
+        }
+      });
       list.appendChild(card);
     });
     wrap.appendChild(list);
@@ -901,8 +912,23 @@
 
   function setActiveSpace(id) {
     activeSpace = id;
+    // Magazine view: if no filter is set yet, derive the room type from the
+    // selected scene so the list shows other scenes of the same type instead
+    // of the full catalog. The user can still widen via the side filter.
+    if (!activeSpaceFilters.spaces.length) {
+      var sp = (DATA.spaces || []).filter(function (s) { return s.id === id; })[0];
+      if (sp) {
+        var tag = parseSceneTags(sp).space;
+        if (tag) activeSpaceFilters.spaces = [tag];
+      }
+    }
     renderSpaceSide();
     renderActiveSpace();
+    // Scroll the panels container so the anchor scene starts in view.
+    setTimeout(function () {
+      var section = document.querySelector('[data-space-id="' + id + '"]');
+      if (section) scrollSectionIntoView(section);
+    }, 0);
     // Mobile: close the filters drawer if it's open so the chosen scene is visible.
     var sSide = $('#spacesSide');
     if (sSide && sSide.classList.contains('is-open')) closeFiltersDrawer();
@@ -985,26 +1011,33 @@
     renderActiveSpace();
   }
 
-  function renderActiveSpace() {
-    var wrap = $('#spaceStageWrap');
-    if (!wrap) return;
-    // No scene selected → show the room-type chooser landing instead.
-    if (!activeSpace) {
-      renderSpaceTypeChooser();
-      return;
-    }
-    wrap.classList.remove('is-chooser');
-    var sp = (DATA.spaces || []).filter(function (s) { return s.id === activeSpace; })[0];
-    wrap.innerHTML = '';
-    if (!sp) { renderSpaceTypeChooser(); return; }
+  /* Scroll the `.panels` container so the given section sits near the top of
+     the visible viewport. We avoid Element.scrollIntoView because the parent
+     layout has nested overflow boundaries that swallow the request, and we
+     temporarily override scroll-behavior so the assignment lands reliably
+     even when a CSS smooth-scroll rule is in effect. */
+  function scrollSectionIntoView(section) {
+    if (!section) return;
+    var panels = $('.panels');
+    if (!panels) return;
+    var topbar = $('.topbar');
+    var topbarH = topbar ? topbar.getBoundingClientRect().height : 0;
+    var panelsRect = panels.getBoundingClientRect();
+    var sectionRect = section.getBoundingClientRect();
+    var target = panels.scrollTop + (sectionRect.top - panelsRect.top) - topbarH - 12;
+    if (target < 0) target = 0;
+    var prev = panels.style.scrollBehavior;
+    panels.style.scrollBehavior = 'auto';
+    panels.scrollTop = target;
+    panels.style.scrollBehavior = prev;
+  }
 
-    // Breadcrumb back to the chooser, spans both columns of the stage grid.
-    var back = el('button', 'space-back-link');
-    back.type = 'button';
-    back.innerHTML = '<span class="space-back-arrow" aria-hidden="true">←</span>' +
-                     '<span>' + t('spacesChooser.back') + '</span>';
-    back.addEventListener('click', backToSpaceChooser);
-    wrap.appendChild(back);
+  /* Una "tarjeta" completa de un ambiente: stage con hotspots + sidebar con
+     descripción y "Destacados en este ambiente". Es el bloque que se repite
+     verticalmente cuando hay varias escenas del tipo elegido. */
+  function renderSceneSection(sp) {
+    var section = el('article', 'space-section');
+    section.dataset.spaceId = sp.id;
 
     var hero = productById(sp.heroProduct);
     var bg = sp.image || (hero ? hero.assets.image : '');
@@ -1041,24 +1074,62 @@
       '<p class="space-products-label">' + t('space.featuredIn') + '</p>' +
       '<div class="space-products">' + productsList + '</div>';
 
-    wrap.appendChild(stage);
-    wrap.appendChild(info);
+    section.appendChild(stage);
+    section.appendChild(info);
 
-    $$('.hotspot, .space-product', wrap).forEach(function (node) {
+    // Wire interactions scoped to this section. Each scene owns its own
+    // hotspots and product-list buttons; the closure captures the right `sp`.
+    $$('.hotspot, .space-product', section).forEach(function (node) {
       node.addEventListener('click', function () {
         var pid = node.dataset.id;
         var h = (sp.hotspots || []).filter(function (x) { return x.productId === pid; })[0];
         var opts = (h && h.closeUpImage)
           ? { closeUpImage: h.closeUpImage, contextLabel: tx(sp.name), spaceImage: sp.image }
           : (sp.image ? { spaceImage: sp.image, contextLabel: tx(sp.name) } : null);
-        // Hotspot path only: clicking a thumbnail in the side list skips the cinematic.
         var isHotspot = node.classList.contains('hotspot');
         if (isHotspot && h && h.transitionVideo) {
-          playHotspotTransition(pid, h, sp);
+          // Anchor the cinematic to THIS section's stage (not the first one
+          // on the page), so multi-scene layouts play the video in place.
+          playHotspotTransition(pid, h, sp, stage);
         } else {
           openDetail(pid, opts);
         }
       });
+    });
+
+    return section;
+  }
+
+  function renderActiveSpace() {
+    var wrap = $('#spaceStageWrap');
+    if (!wrap) return;
+    // No scene selected → show the room-type chooser landing instead.
+    if (!activeSpace) {
+      wrap.classList.remove('is-list');
+      renderSpaceTypeChooser();
+      return;
+    }
+    var matched = visibleSpaces();
+    if (!matched.length) {
+      // Filter wiped out everything — fall back to chooser cleanly.
+      activeSpace = null;
+      wrap.classList.remove('is-list');
+      renderSpaceTypeChooser();
+      return;
+    }
+    wrap.classList.remove('is-chooser');
+    wrap.classList.add('is-list');
+    wrap.innerHTML = '';
+
+    var back = el('button', 'space-back-link');
+    back.type = 'button';
+    back.innerHTML = '<span class="space-back-arrow" aria-hidden="true">←</span>' +
+                     '<span>' + t('spacesChooser.back') + '</span>';
+    back.addEventListener('click', backToSpaceChooser);
+    wrap.appendChild(back);
+
+    matched.forEach(function (sp) {
+      wrap.appendChild(renderSceneSection(sp));
     });
   }
 
@@ -1068,7 +1139,7 @@
      video, giving a reliable "frozen on the product" final frame, and a small
      info card appears on top.
      ========================================================================== */
-  function playHotspotTransition(pid, h, sp) {
+  function playHotspotTransition(pid, h, sp, stageEl) {
     var prod = productById(pid);
     if (!prod) return;
 
@@ -1081,8 +1152,10 @@
     var btnClose  = $('#transitionCardClose');
     if (!overlay || !video || !card) return;
 
-    // Anchor the overlay to the active stage so the video stays in-frame.
-    var stage = $('.space-stage');
+    // Anchor the overlay to the stage the user clicked from (each scene has
+    // its own .space-stage in magazine view). Fall back to the first one if
+    // no explicit stage was passed.
+    var stage = stageEl || $('.space-stage');
     if (stage && overlay.parentNode !== stage) stage.appendChild(overlay);
 
     // Use the current scene image as the overlay's backdrop so the user never

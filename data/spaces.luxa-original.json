@@ -1,7 +1,7 @@
 {
   "_readme": "Auto-managed by the Space Planner. Save this file as data/spaces.luxa-original.json in the LUXA project root — the app fetches all data/spaces.*.json files at boot and merges them into window.LUXA.spaces. Same id → planner entry replaces curated entry. Product IDs use catalogId from products.json when present.",
   "catalog": "luxa-original",
-  "exportedAt": "2026-06-15T19:41:19.511Z",
+  "exportedAt": "2026-06-16T15:25:48.642Z",
   "entries": [
     {
       "id": "living-aballs-collection-01",
@@ -178,13 +178,15 @@
           "productId": "soffio-pendant-light",
           "x": 50.79,
           "y": 45.55,
-          "closeUpImage": "assets/Spaces/bedroom 01/bedroom close up 02.jpeg"
+          "closeUpImage": "assets/Spaces/bedroom 01/bedroom close up 02.jpeg",
+          "transitionVideo": "assets/Transiciones/bedroom 01/bedroom 01  tran 02.mp4"
         },
         {
           "productId": "soffio-table-lamp",
           "x": 30.64,
           "y": 67.24,
-          "closeUpImage": "assets/Spaces/bedroom 01/bedroom close up 01.jpeg"
+          "closeUpImage": "assets/Spaces/bedroom 01/bedroom close up 01.jpeg",
+          "transitionVideo": "assets/Transiciones/bedroom 01/bedroom 01  tran 01.mp4"
         }
       ]
     },
@@ -239,8 +241,8 @@
         "en": "Dining focused lighting collection"
       },
       "description": {
-        "es": "Un comedor con luz central de carácter, aplique y luz de pie en una composición balanceada.",
-        "en": "A focused dining setup with a central statement pendant, wall light and floor lamp in a balanced composition."
+        "es": "Un comedor con luz focal sobre la mesa, acompañada de aplique de pared y luz de acento.",
+        "en": "A warm living setup combining ceiling, wall and decorative lighting in a balanced residential composition."
       },
       "image": "assets/Spaces/Dinning 02/Dinning 02.jpeg",
       "gallery": [
