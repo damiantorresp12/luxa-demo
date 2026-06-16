@@ -1502,11 +1502,41 @@
     toggles.forEach(function (b) { b.setAttribute('aria-expanded', 'false'); });
     document.body.style.overflow = '';
   }
+  /* Same toggle button used on desktop and mobile, with different semantics:
+       desktop → collapse/uncollapse the side column of the layout
+       mobile  → open/close the slide-in drawer
+     A single media query check picks the branch at click time. */
+  function isMobileViewport() {
+    return window.matchMedia('(max-width: 900px)').matches;
+  }
+  function toggleFiltersPane(sideSel, layoutSel, toggleEl) {
+    if (isMobileViewport()) {
+      var side = $(sideSel);
+      if (side && side.classList.contains('is-open')) closeFiltersDrawer();
+      else openFiltersDrawer(side, toggleEl);
+      return;
+    }
+    var layout = $(layoutSel);
+    if (!layout) return;
+    var nowCollapsed = layout.classList.toggle('filters-collapsed');
+    if (toggleEl) toggleEl.setAttribute('aria-expanded', nowCollapsed ? 'false' : 'true');
+  }
+
   function bindFilterDrawers() {
     var pToggle = $('#productsFiltersToggle');
-    if (pToggle) pToggle.addEventListener('click', function () { openFiltersDrawer($('#filtersSide'), pToggle); });
+    if (pToggle) {
+      pToggle.setAttribute('aria-expanded', 'true');
+      pToggle.addEventListener('click', function () {
+        toggleFiltersPane('#filtersSide', '.products-layout', pToggle);
+      });
+    }
     var sToggle = $('#spacesFiltersToggle');
-    if (sToggle) sToggle.addEventListener('click', function () { openFiltersDrawer($('#spacesSide'), sToggle); });
+    if (sToggle) {
+      sToggle.setAttribute('aria-expanded', 'true');
+      sToggle.addEventListener('click', function () {
+        toggleFiltersPane('#spacesSide', '.spaces-layout', sToggle);
+      });
+    }
     var bd = $('#filtersBackdrop');
     if (bd) bd.addEventListener('click', closeFiltersDrawer);
     document.addEventListener('keydown', function (e) {
