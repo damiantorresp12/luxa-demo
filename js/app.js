@@ -1523,16 +1523,24 @@
   }
 
   function bindFilterDrawers() {
+    // Default state on desktop: sidebar hidden, main fills the row. The user
+    // opens it explicitly with the "Filtros" button. (On mobile this class
+    // has no effect — the drawer behaviour is independent.)
+    var pLayout = $('.products-layout');
+    if (pLayout) pLayout.classList.add('filters-collapsed');
+    var sLayout = $('.spaces-layout');
+    if (sLayout) sLayout.classList.add('filters-collapsed');
+
     var pToggle = $('#productsFiltersToggle');
     if (pToggle) {
-      pToggle.setAttribute('aria-expanded', 'true');
+      pToggle.setAttribute('aria-expanded', 'false');
       pToggle.addEventListener('click', function () {
         toggleFiltersPane('#filtersSide', '.products-layout', pToggle);
       });
     }
     var sToggle = $('#spacesFiltersToggle');
     if (sToggle) {
-      sToggle.setAttribute('aria-expanded', 'true');
+      sToggle.setAttribute('aria-expanded', 'false');
       sToggle.addEventListener('click', function () {
         toggleFiltersPane('#spacesSide', '.spaces-layout', sToggle);
       });
