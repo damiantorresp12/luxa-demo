@@ -94,6 +94,10 @@
         'homeCta.sub':         'Mostrale a tu cliente un catálogo vivo, con productos aplicados en ambientes reales. Una URL que reemplaza al PDF en showroom, reuniones y WhatsApp.',
         'homeCta.whatsapp':    'Hablemos por WhatsApp',
         'homeCta.whatsappMsg': 'Hola, vi la demo de LUXA y me gustaría conversar sobre el proyecto.',
+        'quote.cta':           'Consultar precio',
+        'quote.ctaShort':      'Precio',
+        'quote.msg':           'Hola, quiero consultar el precio del producto {name} ({code}).',
+        'quote.msgNoCode':     'Hola, quiero consultar el precio del producto {name}.',
         'homeCta.spaces':      'Ver ambientes',
 
         // Pills / topbar actions
@@ -152,6 +156,7 @@
         'detail.seenIn':       'Visto en',
         'detail.viewClose':    'En contexto',
         'detail.viewCatalog':  'Catálogo',
+        'detail.viewAmbient':  'Ambiente',
         'detail.saved':        '♥ Guardado',
 
         // Spaces panel
@@ -160,6 +165,17 @@
         'spaces.filter.all': 'Todos',
         'spaces.list.title': 'Ambientes',
         'spaces.list.empty': 'No hay ambientes que coincidan con esos filtros.',
+        'roomType.Living':       'Living',
+        'roomType.Dining':       'Comedor',
+        'roomType.Kitchen':      'Cocina',
+        'roomType.Bedroom':      'Dormitorio',
+        'roomType.Bathroom':     'Baño',
+        'spacesChooser.eyebrow': 'Explorar',
+        'spacesChooser.title':   'Elegí un tipo de ambiente',
+        'spacesChooser.sub':     'Seleccioná el espacio donde querés ver las luminarias aplicadas.',
+        'spacesChooser.countOne':  'ambiente',
+        'spacesChooser.countMany': 'ambientes',
+        'spacesChooser.back':    'Volver a tipos de ambiente',
 
         // Downloads
         'downloads.download':       'Descargar PDF',
@@ -235,6 +251,10 @@
         'homeCta.sub':         'Show your client a living catalog with products applied in real spaces. A URL that replaces the PDF in showrooms, meetings and WhatsApp.',
         'homeCta.whatsapp':    'Chat on WhatsApp',
         'homeCta.whatsappMsg': 'Hi, I saw the LUXA demo and would like to talk about the project.',
+        'quote.cta':           'Ask for price',
+        'quote.ctaShort':      'Price',
+        'quote.msg':           'Hi, I would like to ask the price of {name} ({code}).',
+        'quote.msgNoCode':     'Hi, I would like to ask the price of {name}.',
         'homeCta.spaces':      'See spaces',
 
         'pill.results.singular': '{n} result',
@@ -276,6 +296,7 @@
         'detail.seenIn':       'Seen in',
         'detail.viewClose':    'In context',
         'detail.viewCatalog':  'Catalog',
+        'detail.viewAmbient':  'Space',
         'detail.saved':        '♥ Saved',
 
         'space.label':       'In context',
@@ -283,6 +304,17 @@
         'spaces.filter.all': 'All',
         'spaces.list.title': 'Spaces',
         'spaces.list.empty': 'No spaces match those filters.',
+        'roomType.Living':       'Living',
+        'roomType.Dining':       'Dining',
+        'roomType.Kitchen':      'Kitchen',
+        'roomType.Bedroom':      'Bedroom',
+        'roomType.Bathroom':     'Bathroom',
+        'spacesChooser.eyebrow': 'Explore',
+        'spacesChooser.title':   'Pick a room type',
+        'spacesChooser.sub':     'Select the space where you want to see the luminaires applied.',
+        'spacesChooser.countOne':  'space',
+        'spacesChooser.countMany': 'spaces',
+        'spacesChooser.back':    'Back to room types',
 
         // Filter sidebar
         'filters.categories':  'Categories',

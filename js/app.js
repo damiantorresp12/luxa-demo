@@ -135,7 +135,8 @@
   /* =============================================================================
      ROUTER + topbar
      ========================================================================== */
-  function go(route) {
+  function go(route, opts) {
+    opts = opts || {};
     if (!ROUTES[route]) route = 'home';
     currentRoute = route;
 
@@ -146,6 +147,14 @@
 
     if (route === 'favorites') renderFavorites();
     if (route === 'home')      refreshHomeMetas();
+    if (route === 'spaces' && !opts.preserveSpace) {
+      // Generic navigation into Spaces lands on the room-type chooser.
+      // Callers that already targeted a specific scene pass preserveSpace: true.
+      activeSpace = null;
+      activeSpaceFilters = { spaces: [], collections: [] };
+      renderSpaceSide();
+      renderActiveSpace();
+    }
 
     closeSidebar();
 
@@ -260,8 +269,8 @@
         '</div>';
 
       function openSpace() {
-        go('spaces');
         setActiveSpace(sp.id);
+        go('spaces', { preserveSpace: true });
       }
       card.addEventListener('click', openSpace);
       card.addEventListener('keydown', function (e) {
@@ -318,12 +327,41 @@
     catalogSide.addEventListener('click', function () { openDetail(p.id); });
     if (closeUp) {
       contextSide.addEventListener('click', function () {
-        openDetail(p.id, { closeUpImage: closeUp, contextLabel: contextLabel });
+        openDetail(p.id, {
+          closeUpImage: closeUp,
+          contextLabel: contextLabel,
+          spaceImage: sp && sp.image ? sp.image : null
+        });
       });
     } else {
       contextSide.addEventListener('click', function () { openDetail(p.id); });
     }
   }
+
+  /* Devuelve el número de WhatsApp limpio si está configurado, '' si es el placeholder
+     o no está. Compartido por todas las CTAs de WhatsApp (home + consultar precio). */
+  function whatsappNumber() {
+    var num = ((DATA.brand && DATA.brand.contact && DATA.brand.contact.whatsapp) || '').replace(/[^\d]/g, '');
+    var PLACEHOLDER = '5491100000000';
+    return (num && num !== PLACEHOLDER) ? num : '';
+  }
+
+  /* Construye la URL de wa.me con el mensaje "Consultar precio" para un producto. */
+  function quoteUrlForProduct(p) {
+    var num = whatsappNumber();
+    if (!num || !p) return '';
+    var msg = p.code
+      ? t('quote.msg',       { name: p.name, code: p.code })
+      : t('quote.msgNoCode', { name: p.name });
+    return 'https://wa.me/' + num + '?text=' + encodeURIComponent(msg);
+  }
+
+  /* SVG inline del icono WhatsApp — mismo trazo que usa el CTA del home. */
+  var WA_ICON_SVG =
+    '<svg viewBox="0 0 24 24" aria-hidden="true" class="ico-wa">' +
+      '<path d="M20.5 11.5a8.5 8.5 0 1 1-4.1-7.3l4.1-1.1-1.1 4.1a8.5 8.5 0 0 1 1.1 4.3z"/>' +
+      '<path d="M8.5 11.5h.01M12 11.5h.01M15.5 11.5h.01"/>' +
+    '</svg>';
 
   /* CTA cierre comercial: monta el href de WhatsApp con número y mensaje precargado.
      Si no hay número configurado, el botón queda inerte (no abre wa.me con un
@@ -496,6 +534,12 @@
   function productCard(p) {
     var card = el('article', 'card');
     card.setAttribute('tabindex', '0');
+    var waUrl = quoteUrlForProduct(p);
+    var quoteBtn = waUrl
+      ? '<a class="card-quote" href="' + waUrl + '" target="_blank" rel="noopener noreferrer" aria-label="' + t('quote.cta') + '">' +
+          WA_ICON_SVG + '<span>' + t('quote.cta') + '</span>' +
+        '</a>'
+      : '';
     card.innerHTML =
       '<div class="card-media">' +
         '<button class="fav-btn' + (isFav(p.id) ? ' is-fav' : '') + '" data-id="' + p.id + '" aria-label="Toggle favorite" aria-pressed="' + isFav(p.id) + '">' +
@@ -507,11 +551,15 @@
         '<span class="card-cat">' + t('category.' + p.category) + '</span>' +
         '<h3 class="card-name">' + p.name + '</h3>' +
         '<span class="card-specs">' + p.power + t('card.specsSep') + p.temperature + '</span>' +
-        '<span class="card-view">' + t('products.viewDetails') + '</span>' +
+        '<div class="card-foot">' +
+          '<span class="card-view">' + t('products.viewDetails') + '</span>' +
+          quoteBtn +
+        '</div>' +
       '</div>';
 
     card.addEventListener('click', function (e) {
       if (e.target.closest('.fav-btn')) return;
+      if (e.target.closest('.card-quote')) return;
       openDetail(p.id);
     });
     card.addEventListener('keydown', function (e) { if (e.key === 'Enter') openDetail(p.id); });
@@ -541,6 +589,7 @@
 
     var catalogImg = p.assets.image;
     var closeUp    = opts.closeUpImage || null;
+    var spaceImg   = opts.spaceImage || null;
     var mainImg    = closeUp || catalogImg;
 
     $('#detailImg').src = uri(mainImg);
@@ -556,27 +605,46 @@
       ctx.innerHTML = '';
     }
 
-    // Thumbnail switcher: only shown when both close-up and catalog are available
+    // Mini-gallery switcher: ambient → close-up → catalog. The ambient and
+    // close-up thumbs only appear when their respective images are available.
     var thumbs = $('#detailThumbs');
-    if (closeUp) {
-      thumbs.innerHTML =
-        '<button data-thumb="close" class="active">' +
-          '<img src="' + uri(closeUp) + '" alt="" />' +
-          '<span class="thumb-label">' + t('detail.viewClose') + '</span>' +
-        '</button>' +
-        '<button data-thumb="catalog">' +
+    if (closeUp || spaceImg) {
+      var parts = [];
+      if (spaceImg) {
+        parts.push(
+          '<button data-thumb="space">' +
+            '<img src="' + uri(spaceImg) + '" alt="" />' +
+            '<span class="thumb-label">' + t('detail.viewAmbient') + '</span>' +
+          '</button>'
+        );
+      }
+      if (closeUp) {
+        parts.push(
+          '<button data-thumb="close" class="active">' +
+            '<img src="' + uri(closeUp) + '" alt="" />' +
+            '<span class="thumb-label">' + t('detail.viewClose') + '</span>' +
+          '</button>'
+        );
+      }
+      parts.push(
+        '<button data-thumb="catalog"' + (!closeUp ? ' class="active"' : '') + '>' +
           '<img src="' + uri(catalogImg) + '" alt="" />' +
           '<span class="thumb-label">' + t('detail.viewCatalog') + '</span>' +
-        '</button>';
+        '</button>'
+      );
+      thumbs.innerHTML = parts.join('');
       thumbs.hidden = false;
       $$('button', thumbs).forEach(function (b) {
         b.addEventListener('click', function () {
           $$('button', thumbs).forEach(function (n) { n.classList.remove('active'); });
           b.classList.add('active');
           var which = b.dataset.thumb;
-          var src = which === 'close' ? closeUp : catalogImg;
+          var src = which === 'close' ? closeUp
+                  : which === 'space' ? spaceImg
+                  : catalogImg;
           $('#detailImg').src = uri(src);
-          ctx.hidden = which !== 'close';
+          // Keep the "seen in" caption only when showing the in-context close-up.
+          ctx.hidden = which !== 'close' || !opts.contextLabel;
         });
       });
     } else {
@@ -608,7 +676,12 @@
       '<p class="detail-desc">' + tx(p.description) + '</p>' +
       '<div class="spec-table">' + rows + '</div>' +
       '<div class="detail-actions">' +
-        '<button class="btn btn-primary" data-action="view-space">' + t('detail.viewInSpace') + '</button>' +
+        (quoteUrlForProduct(p)
+          ? '<a class="btn btn-primary detail-quote" href="' + quoteUrlForProduct(p) + '" target="_blank" rel="noopener noreferrer">' +
+              WA_ICON_SVG + '<span>' + t('quote.cta') + '</span>' +
+            '</a>'
+          : '') +
+        '<button class="btn btn-ghost" data-action="view-space">' + t('detail.viewInSpace') + '</button>' +
         '<button class="btn btn-ghost" data-action="download-sheet">' + t('detail.downloadSheet') + '</button>' +
         '<button class="btn btn-ghost detail-fav" data-action="fav">' +
           (isFav(p.id) ? t('detail.saved') : t('detail.favorite')) + '</button>' +
@@ -616,9 +689,9 @@
 
     $('[data-action="view-space"]', $('#detailBody')).addEventListener('click', function () {
       closeDetail();
-      go('spaces');
       var sp = findSpaceFor(p.id);
       if (sp) setActiveSpace(sp.id);
+      go('spaces', { preserveSpace: true });
     });
     $('[data-action="download-sheet"]', $('#detailBody')).addEventListener('click', function () {
       var dl = (DATA.downloads || [])[0];
@@ -649,8 +722,11 @@
   var activeSpaceFilters = { spaces: [], collections: [] };
 
   function parseSceneTags(scene) {
-    var name = (scene.name && scene.name.es) || (scene.name && scene.name.en) || scene.name || scene.id || '';
-    var s = String(name).trim();
+    // Room-type ("Living", "Dining"…) is parsed from the EN name so the ES
+    // translation can read naturally ("Colección Living Aballs") without
+    // breaking the room-type chooser or the lateral filters.
+    var nameEn = (scene.name && scene.name.en) || (typeof scene.name === 'string' ? scene.name : '') || scene.id || '';
+    var s = String(nameEn).trim();
     var withoutSuffix = s.replace(/\s+Collection\s*$/i, '');
     var firstSpace = withoutSuffix.indexOf(' ');
     if (firstSpace === -1) return { space: withoutSuffix, collection: '' };
@@ -786,8 +862,11 @@
           renderSpaceSide();
           renderActiveSpace();
         });
+        // For the "spaces" group, translate the EN tag (Living/Dining/Bathroom…)
+        // into the active language via the roomType.* i18n keys.
+        var displayLabel = (group === 'spaces') ? t('roomType.' + val) : val;
         row.appendChild(input);
-        row.appendChild(el('span', 'filter-check-label', val));
+        row.appendChild(el('span', 'filter-check-label', displayLabel));
         fs.appendChild(row);
       });
       wrap.appendChild(fs);
@@ -824,13 +903,108 @@
     activeSpace = id;
     renderSpaceSide();
     renderActiveSpace();
+    // Mobile: close the filters drawer if it's open so the chosen scene is visible.
+    var sSide = $('#spacesSide');
+    if (sSide && sSide.classList.contains('is-open')) closeFiltersDrawer();
+  }
+
+  /* Landing dentro de "Espacios": grilla de tipos de ambiente (Living, Comedor,
+     Cocina, etc) derivados del primer token del nombre de cada escena. Click
+     en un tipo → setea el filtro y abre el primer ambiente de ese tipo. */
+  function renderSpaceTypeChooser() {
+    var wrap = $('#spaceStageWrap');
+    if (!wrap) return;
+    wrap.classList.add('is-chooser');
+    wrap.innerHTML = '';
+
+    var all = spacesByCatalog();
+    var byType = {};
+    var typeImage = {};
+    all.forEach(function (sp) {
+      var tag = parseSceneTags(sp).space;
+      if (!tag) return;
+      byType[tag] = (byType[tag] || 0) + 1;
+      if (!typeImage[tag] && sp.image) typeImage[tag] = sp.image;
+    });
+
+    var preferredOrder = ['Living', 'Dining', 'Kitchen', 'Bedroom', 'Bathroom'];
+    var types = preferredOrder.filter(function (s) { return byType[s]; });
+    Object.keys(byType).forEach(function (s) { if (types.indexOf(s) === -1) types.push(s); });
+
+    if (!types.length) {
+      wrap.innerHTML = '<p class="spaces-list-empty">' + t('spaces.list.empty') + '</p>';
+      return;
+    }
+
+    var header = el('header', 'space-type-header');
+    header.innerHTML =
+      '<p class="eyebrow">' + t('spacesChooser.eyebrow') + '</p>' +
+      '<h2 class="space-type-title">' + t('spacesChooser.title') + '</h2>' +
+      '<p class="space-type-sub">' + t('spacesChooser.sub') + '</p>';
+    wrap.appendChild(header);
+
+    var grid = el('div', 'space-type-grid');
+    types.forEach(function (tag) {
+      var label = t('roomType.' + tag);
+      var n = byType[tag];
+      var countWord = t(n === 1 ? 'spacesChooser.countOne' : 'spacesChooser.countMany');
+      var card = el('button', 'space-type-card');
+      card.type = 'button';
+      card.innerHTML =
+        '<div class="space-type-card-media">' +
+          (typeImage[tag] ? '<img loading="lazy" src="' + uri(typeImage[tag]) + '" alt="' + label + '" />' : '') +
+        '</div>' +
+        '<div class="space-type-card-scrim"></div>' +
+        '<div class="space-type-card-body">' +
+          '<h3 class="space-type-card-title">' + label + '</h3>' +
+          '<p class="space-type-card-count">' + n + ' ' + countWord + '</p>' +
+        '</div>';
+      card.addEventListener('click', function () { pickRoomType(tag); });
+      grid.appendChild(card);
+    });
+    wrap.appendChild(grid);
+  }
+
+  function pickRoomType(tag) {
+    activeSpaceFilters.spaces = [tag];
+    activeSpaceFilters.collections = [];
+    var matched = visibleSpaces();
+    if (matched.length) {
+      setActiveSpace(matched[0].id);
+    } else {
+      // No scene matches (shouldn't happen since chooser only lists used types).
+      renderSpaceSide();
+      renderActiveSpace();
+    }
+  }
+
+  function backToSpaceChooser() {
+    activeSpace = null;
+    activeSpaceFilters = { spaces: [], collections: [] };
+    renderSpaceSide();
+    renderActiveSpace();
   }
 
   function renderActiveSpace() {
-    var sp = (DATA.spaces || []).filter(function (s) { return s.id === activeSpace; })[0];
     var wrap = $('#spaceStageWrap');
+    if (!wrap) return;
+    // No scene selected → show the room-type chooser landing instead.
+    if (!activeSpace) {
+      renderSpaceTypeChooser();
+      return;
+    }
+    wrap.classList.remove('is-chooser');
+    var sp = (DATA.spaces || []).filter(function (s) { return s.id === activeSpace; })[0];
     wrap.innerHTML = '';
-    if (!sp) return;
+    if (!sp) { renderSpaceTypeChooser(); return; }
+
+    // Breadcrumb back to the chooser, spans both columns of the stage grid.
+    var back = el('button', 'space-back-link');
+    back.type = 'button';
+    back.innerHTML = '<span class="space-back-arrow" aria-hidden="true">←</span>' +
+                     '<span>' + t('spacesChooser.back') + '</span>';
+    back.addEventListener('click', backToSpaceChooser);
+    wrap.appendChild(back);
 
     var hero = productById(sp.heroProduct);
     var bg = sp.image || (hero ? hero.assets.image : '');
@@ -875,8 +1049,8 @@
         var pid = node.dataset.id;
         var h = (sp.hotspots || []).filter(function (x) { return x.productId === pid; })[0];
         var opts = (h && h.closeUpImage)
-          ? { closeUpImage: h.closeUpImage, contextLabel: tx(sp.name) }
-          : null;
+          ? { closeUpImage: h.closeUpImage, contextLabel: tx(sp.name), spaceImage: sp.image }
+          : (sp.image ? { spaceImage: sp.image, contextLabel: tx(sp.name) } : null);
         // Hotspot path only: clicking a thumbnail in the side list skips the cinematic.
         var isHotspot = node.classList.contains('hotspot');
         if (isHotspot && h && h.transitionVideo) {
@@ -911,33 +1085,89 @@
     var stage = $('.space-stage');
     if (stage && overlay.parentNode !== stage) stage.appendChild(overlay);
 
+    // Use the current scene image as the overlay's backdrop so the user never
+    // sees a black flash while the video is still decoding its first frame.
+    if (sp.image) {
+      overlay.style.backgroundImage = 'url("' + uri(sp.image) + '")';
+    } else {
+      overlay.style.backgroundImage = '';
+    }
+
     // Fill the card (kept hidden until the video ends).
     $('#transitionCardEyebrow').textContent = t('category.' + prod.category);
     $('#transitionCardName').textContent    = prod.name;
     $('#transitionCardCode').textContent    = prod.code || '';
     $('#transitionCardDesc').textContent    = tx(prod.description);
+    var quoteLink = $('#transitionCardQuote');
+    var quoteLbl  = $('#transitionCardQuoteLabel');
+    var waUrl = quoteUrlForProduct(prod);
+    if (quoteLink) {
+      if (waUrl) {
+        quoteLink.href = waUrl;
+        quoteLink.hidden = false;
+      } else {
+        quoteLink.removeAttribute('href');
+        quoteLink.hidden = true;
+      }
+    }
+    if (quoteLbl) quoteLbl.textContent = t('quote.cta');
     card.hidden = true;
     // Always start collapsed; the user expands on tap.
     card.classList.remove('is-expanded');
     var toggleBtn = $('#transitionCardToggle');
     if (toggleBtn) toggleBtn.setAttribute('aria-expanded', 'false');
 
-    // Preload the final still — same image as the close-up the detail panel
-    // would show — so the last "frame" is rock-solid across browsers.
+    // Clear any stale close-up from a previous transition BEFORE we kick off the
+    // new preload — otherwise the old image can flash in for a beat.
     still.hidden = true;
-    still.src = h.closeUpImage ? uri(h.closeUpImage) : '';
+    still.removeAttribute('src');
 
-    // Reset and load the video.
+    // Preload the close-up out-of-band; only assign to the visible <img> once
+    // the bitmap is fully decoded so the reveal at the end is instant (no lag,
+    // no "previous image" ghost). If preload fails, we still flip on reveal.
+    var closeUpReady = !h.closeUpImage;
+    if (h.closeUpImage) {
+      var preloader = new Image();
+      preloader.onload = function () {
+        closeUpReady = true;
+        still.src = preloader.src;
+      };
+      preloader.onerror = function () {
+        closeUpReady = true;
+        still.src = uri(h.closeUpImage);
+      };
+      preloader.src = uri(h.closeUpImage);
+    }
+
+    // Reset video; keep it invisible until first frame is ready (avoids the
+    // black flash that some browsers show between src-set and first-decoded-frame).
     video.pause();
     video.removeAttribute('loop');
     video.muted = true;
+    video.style.visibility = '';
+    video.style.opacity = '0';
     video.src = uri(h.transitionVideo);
     video.currentTime = 0;
 
     overlay.hidden = false;
 
-    function revealCard() {
-      try { video.pause(); } catch (e) {}
+    var playStarted = false;
+    function startPlayback() {
+      if (playStarted) return;
+      playStarted = true;
+      // Fade the video in over the scene backdrop so the cut is invisible.
+      video.style.opacity = '1';
+      var p = video.play();
+      if (p && typeof p.catch === 'function') {
+        p.catch(function () { revealCard(); });
+      }
+    }
+    video.addEventListener('loadeddata', startPlayback);
+    // Safety net: if the browser never fires loadeddata (rare), kick playback
+    // anyway after a short wait so the user isn't stuck staring at a still.
+    var startFallback = setTimeout(startPlayback, 1200);
+
+    function finishReveal() {
       if (still.src) {
         still.hidden = false;
         // Hide the video underneath so nothing ghosts through the close-up.
@@ -945,8 +1175,19 @@
       }
       card.hidden = false;
     }
+    function revealCard() {
+      try { video.pause(); } catch (e) {}
+      if (closeUpReady) { finishReveal(); return; }
+      // Close-up still loading — wait briefly so we don't reveal a blank frame.
+      var poll = setInterval(function () {
+        if (closeUpReady) { clearInterval(poll); finishReveal(); }
+      }, 50);
+      setTimeout(function () { clearInterval(poll); finishReveal(); }, 1500);
+    }
 
     function cleanup() {
+      clearTimeout(startFallback);
+      video.removeEventListener('loadeddata', startPlayback);
       video.removeEventListener('ended', revealCard);
       skipBtn.removeEventListener('click', revealCard);
       btnDetail.removeEventListener('click', onDetail);
@@ -959,16 +1200,18 @@
       video.removeAttribute('src');
       video.load();
       video.style.visibility = '';
+      video.style.opacity = '';
       still.hidden = true;
       still.removeAttribute('src');
       overlay.hidden = true;
+      overlay.style.backgroundImage = '';
       card.hidden = true;
       if (overlay.parentNode !== document.body) document.body.appendChild(overlay);
     }
     function onDetail() {
       var opts = h.closeUpImage
-        ? { closeUpImage: h.closeUpImage, contextLabel: tx(sp.name) }
-        : null;
+        ? { closeUpImage: h.closeUpImage, contextLabel: tx(sp.name), spaceImage: sp.image }
+        : (sp.image ? { spaceImage: sp.image, contextLabel: tx(sp.name) } : null);
       closeOverlay();
       openDetail(pid, opts);
     }
@@ -981,12 +1224,6 @@
     btnDetail.addEventListener('click', onDetail);
     btnClose.addEventListener('click', closeOverlay);
     document.addEventListener('keydown', onKey);
-
-    // Start playback (muted, so autoplay is allowed).
-    var p = video.play();
-    if (p && typeof p.catch === 'function') {
-      p.catch(function () { revealCard(); });
-    }
   }
 
   function findSpaceFor(productId) {
@@ -1234,10 +1471,8 @@
      ========================================================================== */
   window.LUXA_App = {
     refreshSpaces: function () {
-      // If no space is active, activate the first one; otherwise re-render current
-      if (!activeSpace && DATA.spaces && DATA.spaces.length) {
-        activeSpace = DATA.spaces[0].id;
-      }
+      // Spaces panel now lands on a room-type chooser; the first scene is
+      // only activated when the user picks a type, so don't auto-select here.
       renderCatalogFilter();
       renderSpaceTabs();
       renderActiveSpace();

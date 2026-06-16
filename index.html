@@ -265,7 +265,14 @@
       <p class="transition-card-code" id="transitionCardCode"></p>
       <p class="transition-card-desc" id="transitionCardDesc"></p>
       <div class="transition-card-actions">
-        <button class="btn btn-primary transition-card-detail" id="transitionCardDetail" type="button">Ver detalle completo</button>
+        <a class="btn btn-primary transition-card-quote" id="transitionCardQuote" target="_blank" rel="noopener noreferrer" hidden>
+          <svg viewBox="0 0 24 24" aria-hidden="true" class="ico-wa">
+            <path d="M20.5 11.5a8.5 8.5 0 1 1-4.1-7.3l4.1-1.1-1.1 4.1a8.5 8.5 0 0 1 1.1 4.3z"/>
+            <path d="M8.5 11.5h.01M12 11.5h.01M15.5 11.5h.01"/>
+          </svg>
+          <span id="transitionCardQuoteLabel">Consultar precio</span>
+        </a>
+        <button class="btn btn-ghost transition-card-detail" id="transitionCardDetail" type="button">Ver detalle completo</button>
         <button class="btn btn-ghost transition-card-close" id="transitionCardClose" type="button">Volver al ambiente</button>
       </div>
     </div>

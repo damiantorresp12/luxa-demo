@@ -6,15 +6,15 @@
     {
       "id": "living-aballs-collection-01",
       "name": {
-        "es": "Living Aballs Collection",
+        "es": "Colección Living Aballs",
         "en": "Living Aballs Collection"
       },
       "tagline": {
-        "es": "Warm residential lighting collection",
+        "es": "Iluminación cálida para residencial",
         "en": "Warm residential lighting collection"
       },
       "description": {
-        "es": "A warm living setup combining ceiling, wall and decorative lighting in a balanced residential composition.",
+        "es": "Un living cálido que combina luz de techo, aplique de pared y decorativa en una composición residencial balanceada.",
         "en": "A warm living setup combining ceiling, wall and decorative lighting in a balanced residential composition."
       },
       "image": "assets/Spaces/Living 01/Living 01.jpeg",
@@ -49,15 +49,15 @@
     {
       "id": "dining-aballs-collection-10",
       "name": {
-        "es": "Dining Aballs Collection",
+        "es": "Colección Comedor Aballs",
         "en": "Dining Aballs Collection"
       },
       "tagline": {
-        "es": "Dining focused lighting collection",
+        "es": "Iluminación focal para comedor",
         "en": "Dining focused lighting collection"
       },
       "description": {
-        "es": "A focused dining lighting setup with a centered pendant and supporting wall and accent lights.",
+        "es": "Un comedor con luz focal sobre la mesa, acompañada de aplique de pared y luz de acento.",
         "en": "A focused dining lighting setup with a centered pendant and supporting wall and accent lights."
       },
       "image": "assets/Spaces/Dining 01/Dining 01.jpeg",
@@ -83,15 +83,15 @@
     {
       "id": "living-cellar-collection-03",
       "name": {
-        "es": "Living Cellar Collection",
+        "es": "Colección Living Cellar",
         "en": "Living Cellar Collection"
       },
       "tagline": {
-        "es": "Warm residential lighting collection",
+        "es": "Iluminación cálida para residencial",
         "en": "Warm residential lighting collection"
       },
       "description": {
-        "es": "A warm living setup combining ceiling, wall and decorative lighting in a balanced residential composition.",
+        "es": "Un living cálido que combina luz de techo, aplique de pared y decorativa en una composición residencial balanceada.",
         "en": "A warm living setup combining ceiling, wall and decorative lighting in a balanced residential composition."
       },
       "image": "assets/Spaces/Living 02/Living 02.jpeg",
@@ -123,15 +123,15 @@
     {
       "id": "bathroom-lighto-collection-26",
       "name": {
-        "es": "Bathroom Lighto Collection",
+        "es": "Colección Baño Lighto",
         "en": "Bathroom Lighto Collection"
       },
       "tagline": {
-        "es": "Clean functional bathroom lighting collection",
+        "es": "Iluminación funcional y limpia para baño",
         "en": "Clean functional bathroom lighting collection"
       },
       "description": {
-        "es": "A clean bathroom setup combining ceiling, wall and accent lighting for a functional refined composition.",
+        "es": "Un baño prolijo que combina luz de techo, aplique de pared y de acento, en una composición funcional y refinada.",
         "en": "A clean bathroom setup combining ceiling, wall and accent lighting for a functional refined composition."
       },
       "image": "assets/Spaces/Bathroom 01/bathroom 01.jpeg",
@@ -157,15 +157,15 @@
     {
       "id": "bedroom-soffio-collection-25",
       "name": {
-        "es": "Bedroom Soffio Collection",
+        "es": "Colección Dormitorio Soffio",
         "en": "Bedroom Soffio Collection"
       },
       "tagline": {
-        "es": "Soft and quiet bedroom lighting collection",
+        "es": "Iluminación suave y serena para dormitorio",
         "en": "Soft and quiet bedroom lighting collection"
       },
       "description": {
-        "es": "A soft bedroom setup mixing general, reading and bedside lighting for a quiet residential atmosphere.",
+        "es": "Un dormitorio suave que combina luz general, de lectura y de mesa de luz para una atmósfera residencial tranquila.",
         "en": "A soft bedroom setup mixing general, reading and bedside lighting for a quiet residential atmosphere."
       },
       "image": "assets/Spaces/bedroom 01/bedroom 01.jpeg",
@@ -191,15 +191,15 @@
     {
       "id": "bedroom-pendulum-collection-23",
       "name": {
-        "es": "Bedroom Pendulum Collection",
+        "es": "Colección Dormitorio Pendulum",
         "en": "Bedroom Pendulum Collection"
       },
       "tagline": {
-        "es": "Soft and quiet bedroom lighting collection",
+        "es": "Iluminación suave y serena para dormitorio",
         "en": "Soft and quiet bedroom lighting collection"
       },
       "description": {
-        "es": "A soft bedroom setup mixing general, reading and bedside lighting for a quiet residential atmosphere.",
+        "es": "Un dormitorio suave que combina luz general, de lectura y de mesa de luz para una atmósfera residencial tranquila.",
         "en": "A soft bedroom setup mixing general, reading and bedside lighting for a quiet residential atmosphere."
       },
       "image": "assets/Spaces/bedroom 02/bedroom 02.jpeg",
@@ -231,16 +231,16 @@
     {
       "id": "living-ic-collection-05",
       "name": {
-        "es": "Dining IC Collection",
+        "es": "Colección Comedor IC",
         "en": "Dining IC Collection"
       },
       "tagline": {
-        "es": "Dining focused lighting collection",
+        "es": "Iluminación focal para comedor",
         "en": "Dining focused lighting collection"
       },
       "description": {
-        "es": "A warm living setup combining ceiling, wall and decorative lighting in a balanced residential composition.",
-        "en": "A warm living setup combining ceiling, wall and decorative lighting in a balanced residential composition."
+        "es": "Un comedor con luz central de carácter, aplique y luz de pie en una composición balanceada.",
+        "en": "A focused dining setup with a central statement pendant, wall light and floor lamp in a balanced composition."
       },
       "image": "assets/Spaces/Dinning 02/Dinning 02.jpeg",
       "gallery": [

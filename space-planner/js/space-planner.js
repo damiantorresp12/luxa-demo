@@ -123,6 +123,30 @@
     bathroom: 'A clean bathroom setup combining ceiling, wall and accent lighting for a functional refined composition.'
   };
 
+  // ES counterparts used when publishing the sidecar JSON so the LUXA app
+  // doesn't fall back to showing the EN copy on the Spanish UI.
+  const APP_DESC_MAP_ES = {
+    living: 'Un living cálido que combina luz de techo, aplique de pared y decorativa en una composición residencial balanceada.',
+    dining: 'Un comedor con luz focal sobre la mesa, acompañada de aplique de pared y luz de acento.',
+    bedroom: 'Un dormitorio suave que combina luz general, de lectura y de mesa de luz para una atmósfera residencial tranquila.',
+    bathroom: 'Un baño prolijo que combina luz de techo, aplique de pared y de acento, en una composición funcional y refinada.'
+  };
+
+  const APP_INTENT_ES = {
+    living:   'Iluminación cálida para residencial',
+    dining:   'Iluminación focal para comedor',
+    bedroom:  'Iluminación suave y serena para dormitorio',
+    bathroom: 'Iluminación funcional y limpia para baño'
+  };
+
+  const SPACE_LABEL_ES = {
+    living:   'Living',
+    dining:   'Comedor',
+    bedroom:  'Dormitorio',
+    bathroom: 'Baño',
+    kitchen:  'Cocina'
+  };
+
   // Versioned localStorage key prefix — bump if state shape changes incompatibly.
   // The active catalog id is appended at runtime so each catalog has its own slot.
   const STORAGE_PREFIX = 'luxa.planner.v1.4';
@@ -1609,11 +1633,23 @@
       const slug = s.sceneId; // already kebab-ish but uses underscores
       const id = slug.replace(/_/g, '-');
 
+      // Build a natural ES scene name by swapping the EN space prefix for the
+      // ES label and reordering: "Living Aballs Collection" → "Colección Living Aballs".
+      const enName = s.sceneName || '';
+      const enSpacePrefix = cap(s.space) + ' ';
+      let collectionPart = enName;
+      if (collectionPart.toLowerCase().indexOf(enSpacePrefix.toLowerCase()) === 0) {
+        collectionPart = collectionPart.substring(enSpacePrefix.length);
+      }
+      collectionPart = collectionPart.replace(/\s+Collection\s*$/i, '').trim();
+      const esSpaceLabel = SPACE_LABEL_ES[s.space] || cap(s.space);
+      const esName = `Colección ${esSpaceLabel} ${collectionPart}`.replace(/\s+/g, ' ').trim();
+
       return {
         id,
-        name:        { es: s.sceneName, en: s.sceneName },
-        tagline:     { es: s.commercialIntent, en: s.commercialIntent },
-        description: { es: s.appDescription || s.reason, en: s.appDescription || s.reason },
+        name:        { es: esName, en: s.sceneName },
+        tagline:     { es: APP_INTENT_ES[s.space] || s.commercialIntent, en: s.commercialIntent },
+        description: { es: APP_DESC_MAP_ES[s.space] || s.appDescription || s.reason, en: s.appDescription || s.reason },
         image: s.imagePath || '',
         gallery: s.imagePath ? [s.imagePath] : [],
         heroProduct,
