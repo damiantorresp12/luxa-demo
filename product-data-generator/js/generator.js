@@ -54,7 +54,13 @@
     items: [],             // [{ key, image, status, base, ...productFields, _baseline }]
     plannerProductsBaseline: [], // products.json fresh from the planner
     selectedKey: null,
-    filters: { search: '', status: '', type: '', collection: '' }
+    filters: { search: '', status: '', type: '', collection: '' },
+    // catalogIds of products whose image was deleted via "Borrar imagen". Kept
+    // here separately from state.items because the item itself disappears on
+    // reload (listImages() doesn't see files in _trash/), but the catalogId
+    // still needs to go into the sidecar's `removed` array so the app filters
+    // the static catalog.data.js entry out.
+    removedCatalogIds: []
   };
 
   // ---------- DOM ----------
@@ -246,7 +252,8 @@
       localStorage.setItem(storageKey(), JSON.stringify({
         catalog: state.activeCatalog,
         savedAt: new Date().toISOString(),
-        items: payload
+        items: payload,
+        removedCatalogIds: state.removedCatalogIds.slice()
       }));
     } catch (e) { /* ignore */ }
   }
@@ -297,6 +304,21 @@
       if (!res.ok) return [];
       const json = await res.json();
       return Array.isArray(json) ? json : [];
+    } catch (e) {
+      return [];
+    }
+  }
+
+  // Read the `removed` array from the app's currently-published sidecar so a
+  // republish doesn't drop catalogIds whose images were already trashed in a
+  // past session (those items no longer exist in state.items, so they would
+  // otherwise vanish from `removed` on the next publish and reappear in the app).
+  async function loadPublishedRemovedIds(catalogId) {
+    try {
+      const res = await fetch(`../data/products.${catalogId}.json`, { cache: 'no-store' });
+      if (!res.ok) return [];
+      const json = await res.json();
+      return Array.isArray(json && json.removed) ? json.removed.slice() : [];
     } catch (e) {
       return [];
     }
@@ -799,9 +821,13 @@
   // also exist in the static js/catalog.data.js disappear too — without this,
   // a removed curated product would still show up in the app.
   function buildRemovedIdList() {
-    return state.items
+    const fromItems = state.items
       .filter(it => it.removed && it.catalogId)
       .map(it => it.catalogId);
+    const deletedImages = state.removedCatalogIds || [];
+    // De-duplicate. Both sources can contribute the same id (e.g. user marked
+    // "Quitar del catálogo" and then later deleted the image).
+    return Array.from(new Set([...fromItems, ...deletedImages]));
   }
 
   // Items the user *intended* to publish (catalogId filled) but that miss
@@ -1051,6 +1077,15 @@
         return;
       }
       const idx = state.items.findIndex(i => i.key === state.selectedKey);
+      // Stamp the catalogId before splicing so the app's sidecar can filter
+      // this product out of the static catalog.data.js on next publish. Without
+      // this, a curated product whose image we just trashed would still render
+      // as a broken card in the app.
+      if (idx !== -1 && it.catalogId) {
+        if (!state.removedCatalogIds.includes(it.catalogId)) {
+          state.removedCatalogIds.push(it.catalogId);
+        }
+      }
       if (idx !== -1) state.items.splice(idx, 1);
       state.selectedKey = null;
       persistDraft();
@@ -1094,16 +1129,32 @@
 
   async function reloadAll() {
     els.summary.textContent = 'Cargando…';
-    const [files, planner] = await Promise.all([
+    const [files, planner, publishedRemoved] = await Promise.all([
       listImages(),
-      loadPlannerProducts(state.activeCatalog)
+      loadPlannerProducts(state.activeCatalog),
+      loadPublishedRemovedIds(state.activeCatalog)
     ]);
     state.plannerProductsBaseline = planner;
     state.items = buildItems(files, planner);
     const draft = loadDraft();
     if (draft) {
       applyDraftOverlay(state.items, draft);
+      state.removedCatalogIds = Array.isArray(draft.removedCatalogIds)
+        ? draft.removedCatalogIds.slice()
+        : [];
+    } else {
+      state.removedCatalogIds = [];
     }
+    // Merge in catalogIds that the currently-published sidecar already marks as
+    // removed. This preserves "image trashed in a previous session" entries
+    // (e.g. Apollo and Ayno) across republish — without this, a publish would
+    // overwrite the sidecar with `removed: []` and the curated catalog.data.js
+    // entries would reappear as broken cards in the app.
+    publishedRemoved.forEach(id => {
+      if (id && !state.removedCatalogIds.includes(id)) {
+        state.removedCatalogIds.push(id);
+      }
+    });
     // Auto-fill empty fields after the draft overlay. The user's explicit
     // edits win because the overlay already ran; we only fill what is still
     // blank — except for `category`, which we also replace when the planner

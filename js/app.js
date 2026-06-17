@@ -1245,6 +1245,10 @@
         still.hidden = false;
         // Hide the video underneath so nothing ghosts through the close-up.
         video.style.visibility = 'hidden';
+        // Drop the scene backdrop now that the close-up is on screen. Without
+        // this the scene leaks through any transparent edge of the still and
+        // shows up as a "ghost image" behind the product close-up.
+        overlay.style.backgroundImage = '';
       }
       card.hidden = false;
     }

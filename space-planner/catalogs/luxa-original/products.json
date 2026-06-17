@@ -1,5 +1,59 @@
 [
   {
+    "id": "DVA-5756-Tempo-Wall-Lamp",
+    "name": "Tempo Wall",
+    "image": "../assets/Imagenes/DVA-5756 Tempo Wall Lamp_corona.jpg",
+    "catalogId": "tempo-wall",
+    "category": "Wall Lights",
+    "type": "wall_light",
+    "collection": "Tempo",
+    "code": "DVA-5756",
+    "designer": "LUXA Studio",
+    "power": "12 W",
+    "lumens": "850 lm",
+    "temperature": "2700 K",
+    "cri": "≥ 90",
+    "ip": "IP44",
+    "dimensions": "Ø 200 × D 110 mm",
+    "finish": "Spun aluminium · Matte black",
+    "application": {
+      "es": "Pasillos y paredes de mesa de luz",
+      "en": "Hallways and bedside walls"
+    },
+    "description": {
+      "es": "La pantalla Tempo girada hacia la pared. Baño hacia arriba y hacia abajo con el mismo carácter suave y sin deslumbre que su hermana colgante.",
+      "en": "The Tempo shade turned to the wall. Up-and-down wash with the same gentle, glare-free character as its pendant sibling."
+    },
+    "featured": true
+  },
+  {
+    "id": "DVA-5776-Tempo-Pendant-Lamp",
+    "name": "Tempo Pendant",
+    "image": "../assets/Imagenes/DVA-5776 Tempo Pendant Lamp_corona.jpg",
+    "catalogId": "tempo-pendant",
+    "category": "Pendants",
+    "type": "pendant",
+    "collection": "Tempo",
+    "code": "DVA-5776",
+    "designer": "LUXA Studio",
+    "power": "18 W",
+    "lumens": "1280 lm",
+    "temperature": "2700 K",
+    "cri": "≥ 90",
+    "ip": "IP20",
+    "dimensions": "Ø 320 × H 280 mm",
+    "finish": "Spun aluminium · Matte black",
+    "application": {
+      "es": "Mesas de comedor e islas de cocina",
+      "en": "Dining tables and kitchen islands"
+    },
+    "description": {
+      "es": "Un colgante de precisión silenciosa. La pantalla hilada pliega la luz en un haz suave, ideal sobre una mesa donde la calidez importa más que el alcance.",
+      "en": "A quietly precise pendant. The spun shade folds light into a soft pool, ideal over a table where warmth matters more than throw."
+    },
+    "featured": true
+  },
+  {
     "id": "DVA-5945",
     "name": "DVA-5945 Flat Floor Lamp",
     "image": "../assets/Imagenes/DVA-5945 Flat Floor Lamp_corona.jpg",
@@ -157,6 +211,67 @@
     }
   },
   {
+    "id": "DVA-Aballs-Chandelier-4",
+    "name": "Aballs Chandelier 4",
+    "image": "../assets/Imagenes/DVA-Aballs Chandelier 4_corona.jpg",
+    "catalogId": "aballs-chandelier-4",
+    "category": "Chandeliers",
+    "type": "pendant",
+    "collection": "Aballs",
+    "spaces": [
+      "living",
+      "dining"
+    ],
+    "code": "DVA-AB4",
+    "designer": "LUXA Studio",
+    "power": "4 × 6 W",
+    "lumens": "2000 lm",
+    "temperature": "2700 K",
+    "cri": "≥ 90",
+    "ip": "IP20",
+    "dimensions": "Ø 600 × H 500 mm",
+    "finish": "Opal spheres · Brushed brass frame",
+    "application": {
+      "es": "Recibidores y comedores compactos",
+      "en": "Entries and compact dining"
+    },
+    "description": {
+      "es": "Un cuarteto de esferas encendidas — la pieza más discreta de la familia Aballs, a escala de ambientes más pequeños.",
+      "en": "A quartet of glowing spheres — the most discreet member of the Aballs family, scaled for smaller rooms."
+    }
+  },
+  {
+    "id": "DVA-Aballs-Chandelier-8",
+    "name": "Aballs Chandelier 8",
+    "image": "../assets/Imagenes/DVA-Aballs Chandelier 8_corona.jpg",
+    "catalogId": "aballs-chandelier-8",
+    "category": "Chandeliers",
+    "type": "pendant",
+    "collection": "Aballs",
+    "spaces": [
+      "living",
+      "dining"
+    ],
+    "code": "DVA-AB8",
+    "designer": "LUXA Studio",
+    "power": "8 × 6 W",
+    "lumens": "4000 lm",
+    "temperature": "2700 K",
+    "cri": "≥ 90",
+    "ip": "IP20",
+    "dimensions": "Ø 900 × H 700 mm",
+    "finish": "Opal spheres · Matte black frame",
+    "application": {
+      "es": "Comedores y hospitality",
+      "en": "Dining rooms and hospitality"
+    },
+    "description": {
+      "es": "Ocho globos opal orbitan una armadura negra y esbelta — una araña contemporánea que cambia el cristal por luz pura y difusa.",
+      "en": "Eight opal globes orbit a slender black armature — a contemporary chandelier that swaps crystal for pure, diffuse light."
+    },
+    "featured": true
+  },
+  {
     "id": "DVA-Aballs-T",
     "name": "DVA-Aballs M Table Lamp",
     "image": "../assets/Imagenes/DVA-Aballs M Table Lamp_corona.jpg",
@@ -185,6 +300,137 @@
     "description": {
       "es": "Un único globo opal sostenido por un brazo fino. La pieza de escritorio de la familia Aballs — suave, redonda y tranquilizadora.",
       "en": "A single opal globe held by a slim arm. The desk-scale member of the Aballs family — soft, round and reassuring."
+    }
+  },
+  {
+    "id": "DVA-Aim-LED-Pendant-Lamp",
+    "name": "Aim LED Pendant",
+    "image": "../assets/Imagenes/DVA-Aim LED Pendant Lamp_vray.jpg",
+    "catalogId": "aim-led-pendant",
+    "category": "Pendants",
+    "type": "pendant",
+    "collection": "Aim",
+    "code": "DVA-AIM",
+    "designer": "LUXA Studio",
+    "power": "24 W",
+    "lumens": "1750 lm",
+    "temperature": "3000 K",
+    "cri": "≥ 90",
+    "ip": "IP20",
+    "dimensions": "Ø 240 × H 320 mm",
+    "finish": "Aluminium · Polished",
+    "application": {
+      "es": "Mesadas, mesas auxiliares, rincones de lectura",
+      "en": "Counters, side tables, reading corners"
+    },
+    "description": {
+      "es": "La alimentación flexible permite orientar el cabezal exactamente donde la luz hace falta. Arquitectura y gesto en una sola luminaria.",
+      "en": "The flexible feed lets the head be aimed exactly where light is needed. Architecture and gesture in a single fixture."
+    },
+    "featured": true
+  },
+  {
+    "id": "DVA-Albus-Twisted-Table-Lamp",
+    "name": "Albus Twisted Table",
+    "image": "../assets/Imagenes/DVA-Albus Twisted Table Lamp_corona.jpg",
+    "catalogId": "albus-twisted-table",
+    "category": "Table Lamps",
+    "type": "table_lamp",
+    "code": "DVA-ALB",
+    "designer": "LUXA Studio",
+    "power": "6 W",
+    "lumens": "420 lm",
+    "temperature": "2700 K",
+    "cri": "≥ 90",
+    "ip": "IP20",
+    "dimensions": "Ø 180 × H 400 mm",
+    "finish": "Twisted ceramic · Glazed ivory",
+    "application": {
+      "es": "Recibidores y rincones decorativos",
+      "en": "Entries and decorative vignettes"
+    },
+    "description": {
+      "es": "Un cuerpo cerámico torsionado a mano atrapa la luz en sus crestas. Oficio y brillo en igual medida.",
+      "en": "A hand-twisted ceramic body catches light along its ridges. Craft and glow in equal measure."
+    }
+  },
+  {
+    "id": "DVA-Aplomb-Suspension-Light",
+    "name": "Aplomb Suspension",
+    "image": "../assets/Imagenes/DVA-Aplomb Suspension Light_corona.jpg",
+    "catalogId": "aplomb-suspension",
+    "category": "Pendants",
+    "type": "pendant",
+    "collection": "Aplomb",
+    "code": "DVA-APL",
+    "designer": "LUXA Studio",
+    "power": "20 W",
+    "lumens": "1500 lm",
+    "temperature": "3000 K",
+    "cri": "≥ 90",
+    "ip": "IP65",
+    "dimensions": "Ø 180 × H 230 mm",
+    "finish": "Cast concrete · Natural grey",
+    "application": {
+      "es": "Bares, baños e interiores aptos para exterior",
+      "en": "Bars, bathrooms and outdoor-rated interiors"
+    },
+    "description": {
+      "es": "Fundida en hormigón, cruda y a la vez refinada. El cuerpo mate absorbe el deslumbramiento y ancla la luz con honestidad material.",
+      "en": "Cast in concrete, raw yet refined. The matte body absorbs glare and grounds the light with material honesty."
+    }
+  },
+  {
+    "id": "DVA-Arco-Floor-Lamp",
+    "name": "Arco Floor",
+    "image": "../assets/Imagenes/DVA-Arco Floor Lamp_corona.jpg",
+    "catalogId": "arco-floor",
+    "category": "Floor Lamps",
+    "type": "floor_lamp",
+    "collection": "Arco",
+    "code": "DVA-ARC",
+    "designer": "LUXA Studio",
+    "power": "22 W",
+    "lumens": "1600 lm",
+    "temperature": "3000 K",
+    "cri": "≥ 90",
+    "ip": "IP20",
+    "dimensions": "Reach 2100 × H 2400 mm",
+    "finish": "Marble base · Polished steel arc",
+    "application": {
+      "es": "Sobre sofás y zonas de estar",
+      "en": "Over sofas and lounge seating"
+    },
+    "description": {
+      "es": "El arco que llevó la luz cenital adonde ninguna pieza de techo podía llegar. Un contrapeso de mármol ancla una curva de acero envolvente.",
+      "en": "The arc that put overhead light where no ceiling fitting could reach. A marble counterweight anchors a sweeping steel curve."
+    },
+    "featured": true
+  },
+  {
+    "id": "DVA-Arena-Suspension-Lamp-150",
+    "name": "Arena Suspension 150",
+    "image": "../assets/Imagenes/DVA-Arena Suspension Lamp 150_corona.jpg",
+    "catalogId": "arena-suspension",
+    "category": "Pendants",
+    "type": "pendant",
+    "collection": "Arena",
+    "code": "DVA-ARN",
+    "designer": "LUXA Studio",
+    "power": "48 W",
+    "lumens": "3600 lm",
+    "temperature": "3000 K",
+    "cri": "≥ 90",
+    "ip": "IP20",
+    "dimensions": "Ø 1500 × H 60 mm",
+    "finish": "Anodised aluminium ring",
+    "application": {
+      "es": "Mesas de reunión y lobbies",
+      "en": "Conference tables and lobbies"
+    },
+    "description": {
+      "es": "Un anillo luminoso fino que flota sobre el ambiente. La luz ascendente roza el techo mientras un baño descendente define la superficie debajo.",
+      "en": "A thin luminous ring that floats above the room. Uplight grazes the ceiling while a soft downward wash defines the surface below."
     }
   },
   {
@@ -311,6 +557,118 @@
     }
   },
   {
+    "id": "DVA-Atollo-Table-Lamp",
+    "name": "Atollo Table",
+    "image": "../assets/Imagenes/DVA-Atollo Table Lamp_corona.jpg",
+    "catalogId": "atollo-table",
+    "category": "Table Lamps",
+    "type": "table_lamp",
+    "collection": "Atollo",
+    "code": "DVA-ATO",
+    "designer": "LUXA Studio",
+    "power": "9 W",
+    "lumens": "650 lm",
+    "temperature": "2700 K",
+    "cri": "≥ 90",
+    "ip": "IP20",
+    "dimensions": "Ø 380 × H 500 mm",
+    "finish": "Lacquered metal · Matte white",
+    "application": {
+      "es": "Consolas, aparadores y escritorios",
+      "en": "Consoles, sideboards and desks"
+    },
+    "description": {
+      "es": "Cono, cilindro y semiesfera — una lámpara destilada a geometría pura. Un ícono que es escultura de día y luz de noche.",
+      "en": "Cone, cylinder and hemisphere — a lamp distilled to pure geometry. An icon that behaves like sculpture by day and light by night."
+    },
+    "featured": true
+  },
+  {
+    "id": "DVA-Awa-Large-Suspended-Light",
+    "name": "Awa Suspended",
+    "image": "../assets/Imagenes/DVA-Awa Large Suspended Light_corona.jpg",
+    "catalogId": "awa-suspended",
+    "category": "Pendants",
+    "type": "pendant",
+    "collection": "Awa",
+    "code": "DVA-AWA",
+    "designer": "LUXA Studio",
+    "power": "15 W",
+    "lumens": "1100 lm",
+    "temperature": "2700 K",
+    "cri": "≥ 90",
+    "ip": "IP20",
+    "dimensions": "Ø 380 × H 300 mm",
+    "finish": "Opal glass · Satin nickel",
+    "application": {
+      "es": "Dormitorios y comedores íntimos",
+      "en": "Bedrooms and intimate dining"
+    },
+    "description": {
+      "es": "Una cúpula opal generosa difunde la luz por igual en todas las direcciones — sin puntos calientes, sin deslumbre, solo una presencia cálida.",
+      "en": "A generous opal dome diffuses light evenly in every direction — no hotspots, no glare, only a warm presence."
+    }
+  },
+  {
+    "id": "DVA-Bitpop-C-22-Recessed-Downlight",
+    "name": "Bitpop C 2.2 Downlight",
+    "image": "../assets/Imagenes/DVA-Bitpop C 2.2 Recessed Downlight_corona.jpg",
+    "catalogId": "bitpop-downlight",
+    "category": "Downlights",
+    "type": "downlight",
+    "code": "DVA-BIT",
+    "designer": "LUXA Studio",
+    "power": "9 W",
+    "lumens": "780 lm",
+    "temperature": "3000 K",
+    "cri": "≥ 90",
+    "ip": "IP44",
+    "dimensions": "Ø 85 × cut-out Ø 75 mm",
+    "finish": "Trimless · Matte white",
+    "application": {
+      "es": "Iluminación general y de acento en techo",
+      "en": "General and accent ceiling lighting"
+    },
+    "description": {
+      "es": "Un downlight empotrado compacto con celda profunda para cortar el deslumbramiento. Desaparece en el techo, dejando solo la luz.",
+      "en": "A compact recessed downlight with a deep cell to cut glare. Disappears into the ceiling, leaving only the light."
+    }
+  },
+  {
+    "id": "DVA-BO-32-Surface-Ceiling-Light",
+    "name": "BO 32 Surface Ceiling",
+    "image": "../assets/Imagenes/DVA-BO 32 Surface Ceiling Light_corona.jpg",
+    "catalogId": "bo32-ceiling",
+    "category": "Ceiling Lights",
+    "type": "ceiling_light",
+    "collection": "BO",
+    "style": "decorative",
+    "spaces": [
+      "living",
+      "dining",
+      "kitchen",
+      "bedroom",
+      "bathroom"
+    ],
+    "code": "DVA-BO32",
+    "designer": "LUXA Studio",
+    "power": "16 W",
+    "lumens": "1300 lm",
+    "temperature": "3000 K",
+    "cri": "≥ 90",
+    "ip": "IP20",
+    "dimensions": "Ø 320 × D 70 mm",
+    "finish": "Aluminium · Matte white",
+    "application": {
+      "es": "Cocinas, pasillos y retail",
+      "en": "Kitchens, corridors and retail"
+    },
+    "description": {
+      "es": "Un disco de superficie limpio con reflector profundo anti-deslumbramiento. Embutido, moderno y silenciosamente eficiente.",
+      "en": "A clean surface disc with a deep anti-glare reflector. Flush, modern and quietly efficient."
+    }
+  },
+  {
     "id": "DVA-Bolle-Orizzontale-Hanging-Lamp",
     "name": "Bolle Orizzontale",
     "image": "../assets/Imagenes/DVA-Bolle Orizzontale Hanging Lamp_corona.jpg",
@@ -339,6 +697,40 @@
     "description": {
       "es": "Esferas sopladas a mano suspendidas en aparente ingravidez. Un racimo escultórico que se lee como luz hecha materia.",
       "en": "Hand-blown spheres suspended in apparent weightlessness. A sculptural cluster that reads as light made tangible."
+    }
+  },
+  {
+    "id": "DVA-Came-26-Recessed-Downlight",
+    "name": "Came 2.6 Downlight",
+    "image": "../assets/Imagenes/DVA-Came 2.6 Recessed Downlight_corona.jpg",
+    "catalogId": "came-downlight",
+    "category": "Ceiling Lights",
+    "type": "spotlight",
+    "collection": "Came",
+    "style": "architectural",
+    "spaces": [
+      "living",
+      "dining",
+      "kitchen",
+      "bedroom",
+      "bathroom"
+    ],
+    "code": "DVA-CAM",
+    "designer": "LUXA Studio",
+    "power": "13 W",
+    "lumens": "1050 lm",
+    "temperature": "3000 K",
+    "cri": "≥ 90",
+    "ip": "IP44",
+    "dimensions": "Ø 95 × cut-out Ø 85 mm",
+    "finish": "Adjustable trim · Black baffle",
+    "application": {
+      "es": "Aplicaciones de acento y baño de pared",
+      "en": "Accent and wall-wash applications"
+    },
+    "description": {
+      "es": "Un spot empotrado orientable para rasar paredes y resaltar obras de arte. Óptica precisa en un cuerpo discreto y ajustable.",
+      "en": "A tilting recessed spot for grazing walls and highlighting art. Precise optics in a discreet, adjustable body."
     }
   },
   {
@@ -1162,6 +1554,7 @@
     "spaces": [
       "living",
       "dining",
+      "bedroom",
       "bathroom"
     ],
     "code": "DVA-SOF-WV",

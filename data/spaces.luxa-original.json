@@ -1,7 +1,7 @@
 {
   "_readme": "Auto-managed by the Space Planner. Save this file as data/spaces.luxa-original.json in the LUXA project root — the app fetches all data/spaces.*.json files at boot and merges them into window.LUXA.spaces. Same id → planner entry replaces curated entry. Product IDs use catalogId from products.json when present.",
   "catalog": "luxa-original",
-  "exportedAt": "2026-06-16T15:25:48.642Z",
+  "exportedAt": "2026-06-17T15:42:00.544Z",
   "entries": [
     {
       "id": "living-aballs-collection-01",
@@ -104,19 +104,22 @@
           "productId": "cellar-7634-pendant",
           "x": 44.73,
           "y": 36.9,
-          "closeUpImage": "assets/Spaces/Living 02/Living 02 close up 03.jpeg"
+          "closeUpImage": "assets/Spaces/Living 02/Living 02 close up 03.jpeg",
+          "transitionVideo": "assets/Transiciones/Living 02/Living 02  tran 02.mp4"
         },
         {
           "productId": "cellar-7635-wall",
           "x": 15.89,
           "y": 46.96,
-          "closeUpImage": "assets/Spaces/Living 02/Living 02 close up 01.jpeg"
+          "closeUpImage": "assets/Spaces/Living 02/Living 02 close up 01.jpeg",
+          "transitionVideo": "assets/Transiciones/Living 02/Living 02  tran 01.mp4"
         },
         {
           "productId": "cellar-7637-table",
           "x": 90.43,
           "y": 76.23,
-          "closeUpImage": "assets/Spaces/Living 02/Living 02 close up 02.jpeg"
+          "closeUpImage": "assets/Spaces/Living 02/Living 02 close up 02.jpeg",
+          "transitionVideo": "assets/Transiciones/Living 02/Living 02 tran 03.mp4"
         }
       ]
     },
@@ -176,17 +179,24 @@
       "hotspots": [
         {
           "productId": "soffio-pendant-light",
-          "x": 50.79,
-          "y": 45.55,
+          "x": 51.65,
+          "y": 43.61,
           "closeUpImage": "assets/Spaces/bedroom 01/bedroom close up 02.jpeg",
           "transitionVideo": "assets/Transiciones/bedroom 01/bedroom 01  tran 02.mp4"
         },
         {
           "productId": "soffio-table-lamp",
-          "x": 30.64,
-          "y": 67.24,
+          "x": 30.44,
+          "y": 67.59,
           "closeUpImage": "assets/Spaces/bedroom 01/bedroom close up 01.jpeg",
           "transitionVideo": "assets/Transiciones/bedroom 01/bedroom 01  tran 01.mp4"
+        },
+        {
+          "productId": "soffio-wall-vertical-lamp",
+          "x": 85.62,
+          "y": 50.66,
+          "closeUpImage": "assets/Spaces/bedroom 01/bedroom close up 03.jpeg",
+          "transitionVideo": "assets/Transiciones/bedroom 01/bedroom 01  tran 03.mp4"
         }
       ]
     },
@@ -254,19 +264,56 @@
           "productId": "ic-light-s",
           "x": 50.13,
           "y": 53.48,
-          "closeUpImage": "assets/Spaces/Dinning 02/Dinning 02 close up 03.jpeg"
+          "closeUpImage": "assets/Spaces/Dinning 02/Dinning 02 close up 03.jpeg",
+          "transitionVideo": "assets/Transiciones/Dinning 02/Dinning 02 tran 02.mp4"
         },
         {
           "productId": "IC",
           "x": 93.72,
           "y": 40.78,
-          "closeUpImage": "assets/Spaces/Dinning 02/Dinning 02 close up 01.jpeg"
+          "closeUpImage": "assets/Spaces/Dinning 02/Dinning 02 close up 01.jpeg",
+          "transitionVideo": "assets/Transiciones/Dinning 02/Dinning 02 tran 03.mp4"
         },
         {
           "productId": "ic-light-f",
           "x": 6.41,
           "y": 84.35,
-          "closeUpImage": "assets/Spaces/Dinning 02/Dinning 02 close up 02.jpeg"
+          "closeUpImage": "assets/Spaces/Dinning 02/Dinning 02 close up 02.jpeg",
+          "transitionVideo": "assets/Transiciones/Dinning 02/Dinning 02 tran 01.mp4"
+        }
+      ]
+    },
+    {
+      "id": "kitchen-bo-and-came-combination-sceen-manual-27",
+      "name": {
+        "es": "Colección Cocina BO and Came combination sceen",
+        "en": "Kitchen BO and Came combination sceen"
+      },
+      "tagline": {
+        "es": "Iluminación funcional para cocina",
+        "en": "Functional kitchen lighting collection"
+      },
+      "description": {
+        "es": "Una cocina funcional que combina luz focal sobre la isla y las mesadas con luz general y de acento.",
+        "en": "A functional kitchen setup combining task lighting over the island and counters with general and accent illumination."
+      },
+      "image": "assets/Spaces/Kitchen 01/Kitchen 01.jpeg",
+      "gallery": [
+        "assets/Spaces/Kitchen 01/Kitchen 01.jpeg"
+      ],
+      "heroProduct": "bo32-ceiling",
+      "hotspots": [
+        {
+          "productId": "bo32-ceiling",
+          "x": 76.47,
+          "y": 18.21,
+          "closeUpImage": "assets/Spaces/Kitchen 01/Kitchen 01 close up 01.jpeg"
+        },
+        {
+          "productId": "came-downlight",
+          "x": 40.52,
+          "y": 20.33,
+          "closeUpImage": "assets/Spaces/Kitchen 01/Kitchen 01 close up 02.jpeg"
         }
       ]
     }

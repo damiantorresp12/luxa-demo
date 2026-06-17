@@ -7,7 +7,7 @@
 
   // ---------- Configuration ----------
 
-  const SPACES = ['living', 'dining', 'bedroom', 'bathroom'];
+  const SPACES = ['living', 'dining', 'kitchen', 'bedroom', 'bathroom'];
 
   const VALID_TYPES = [
     'pendant', 'ceiling_light', 'wall_light',
@@ -37,6 +37,16 @@
       intent: 'Dining focused lighting collection',
       reasonTemplate: (col) =>
         `Pairs a ${col} pendant with wall and accent lighting so the table is the protagonist while the room stays well lit.`
+    },
+    kitchen: {
+      slots: [
+        ['pendant', 'ceiling_light', 'linear_light'],
+        ['downlight', 'spotlight'],
+        ['wall_light']
+      ],
+      intent: 'Functional kitchen lighting collection',
+      reasonTemplate: (col) =>
+        `Combines task lighting over the island and counters with general and accent lighting from the ${col} family for a complete kitchen composition.`
     },
     bedroom: {
       slots: [
@@ -94,6 +104,16 @@
       spotlight: 'track above accent wall or artwork',
       linear_light: 'ceiling perimeter'
     },
+    kitchen: {
+      pendant: 'centered above the island or main counter',
+      ceiling_light: 'ceiling center',
+      wall_light: 'backsplash area or above the sink',
+      table_lamp: 'open shelving or counter (decorative accent)',
+      floor_lamp: 'corner near breakfast nook',
+      downlight: 'recessed ceiling above countertops',
+      spotlight: 'track above the island or accent wall',
+      linear_light: 'under-cabinet lighting or ceiling perimeter'
+    },
     bedroom: {
       pendant: 'above bed center',
       ceiling_light: 'ceiling center above the bed',
@@ -119,6 +139,7 @@
   const APP_DESC_MAP = {
     living: 'A warm living setup combining ceiling, wall and decorative lighting in a balanced residential composition.',
     dining: 'A focused dining lighting setup with a centered pendant and supporting wall and accent lights.',
+    kitchen: 'A functional kitchen setup combining task lighting over the island and counters with general and accent illumination.',
     bedroom: 'A soft bedroom setup mixing general, reading and bedside lighting for a quiet residential atmosphere.',
     bathroom: 'A clean bathroom setup combining ceiling, wall and accent lighting for a functional refined composition.'
   };
@@ -128,6 +149,7 @@
   const APP_DESC_MAP_ES = {
     living: 'Un living cálido que combina luz de techo, aplique de pared y decorativa en una composición residencial balanceada.',
     dining: 'Un comedor con luz focal sobre la mesa, acompañada de aplique de pared y luz de acento.',
+    kitchen: 'Una cocina funcional que combina luz focal sobre la isla y las mesadas con luz general y de acento.',
     bedroom: 'Un dormitorio suave que combina luz general, de lectura y de mesa de luz para una atmósfera residencial tranquila.',
     bathroom: 'Un baño prolijo que combina luz de techo, aplique de pared y de acento, en una composición funcional y refinada.'
   };
@@ -135,6 +157,7 @@
   const APP_INTENT_ES = {
     living:   'Iluminación cálida para residencial',
     dining:   'Iluminación focal para comedor',
+    kitchen:  'Iluminación funcional para cocina',
     bedroom:  'Iluminación suave y serena para dormitorio',
     bathroom: 'Iluminación funcional y limpia para baño'
   };
@@ -949,6 +972,8 @@
         return `Create a premium modern living room scene featuring a coordinated lighting collection. The space includes ${products}. Show a warm, elegant residential atmosphere with a sofa, side table or coffee table, a visible feature wall, dark neutral materials, soft textures and natural wood or stone details. All lighting products should be clearly visible, well integrated into the scene, with balanced protagonism — no single product dominates the others. Camera: wide eye-level interior catalog shot, premium composition, realistic lighting, high-end showroom style.`;
       case 'dining':
         return `Create a premium modern dining room scene featuring a coordinated lighting collection. The space includes ${products}. Show an elegant dining table with chairs, the pendant centered above the table and support lighting from the wall or ceiling. Use warm neutral materials, refined surfaces and a soft ambient mood. All products should be clearly visible with balanced protagonism. Camera: wide eye-level dining catalog shot, premium composition, realistic lighting, high-end showroom style.`;
+      case 'kitchen':
+        return `Create a premium modern kitchen scene featuring a coordinated lighting collection. The space includes ${products}. Show a refined kitchen with an island or main counter, cabinetry, backsplash and warm materials. The lighting should mix task light over the working areas with general and accent lighting. All products should be clearly visible with balanced protagonism. Camera: wide eye-level kitchen catalog shot, premium composition, realistic lighting, high-end showroom style.`;
       case 'bedroom':
         return `Create a premium modern bedroom scene featuring a coordinated lighting collection. The space includes ${products}. Show a calm, warm and quiet atmosphere with a bed, bedside tables, soft textiles and a layered light setup that mixes general, reading and accent lighting. All products should be clearly visible with balanced protagonism. Camera: wide eye-level bedroom catalog shot, premium composition, realistic lighting, high-end showroom style.`;
       case 'bathroom':
@@ -971,6 +996,8 @@
         return `Use a wide eye-level camera showing the full living area. ${placements} Use warm ambient lighting plus accent lighting from the wall and decorative fixtures. Keep all products clearly visible without overcrowding the scene. Avoid extreme angles, hidden fixtures or harsh shadows.`;
       case 'dining':
         return `Use a wide eye-level camera centered on the dining table. ${placements} Use the pendant as the main source and add subtle accent lighting on walls or ceiling. Avoid harsh shadows and keep the table clean and well composed.`;
+      case 'kitchen':
+        return `Use a wide eye-level camera showing the kitchen with the island or main counter in focus. ${placements} Use task lighting over the working area as the main source and add general and accent lighting. Avoid harsh shadows on the counter and keep materials warm and refined.`;
       case 'bedroom':
         return `Use a wide eye-level camera showing the bed and the bedside area. ${placements} Use soft layered lighting — general ambient, reading and accent. Avoid clinical lighting and overcrowded compositions.`;
       case 'bathroom':
@@ -1002,12 +1029,51 @@
     scene.hotspotPlan = hotspotsForScene(scene);
   }
 
+  // Bring hotspotPlan and productRoles back in sync with the scene's current
+  // productObjects. Run after editing a scene's product list, and defensively
+  // when opening the hotspot/brief editors so older scenes already saved with
+  // a stale plan get cleaned up. Preserves x/y/closeUpImage/transitionVideo
+  // on surviving entries and drops entries whose product was removed.
+  function reconcileScenePlans(scene) {
+    const products = scene.productObjects || [];
+    const productNames = products.map(p => p.name);
+
+    if (scene.hotspotPlan) {
+      const surviving = scene.hotspotPlan.filter(h => productNames.includes(h.product));
+      const present = new Set(surviving.map(h => h.product));
+      products.forEach(p => {
+        if (!present.has(p.name)) {
+          surviving.push({
+            product: p.name,
+            suggestedArea: (HOTSPOT_MAP[scene.space] || {})[p.type] || 'visible focal area'
+          });
+        }
+      });
+      scene.hotspotPlan = surviving;
+    }
+
+    if (scene.productRoles) {
+      const survivingRoles = scene.productRoles.filter(r => productNames.includes(r.product));
+      const presentRoles = new Set(survivingRoles.map(r => r.product));
+      products.forEach(p => {
+        if (!presentRoles.has(p.name)) {
+          survivingRoles.push({
+            product: p.name,
+            role: ROLE_MAP[p.type] || 'general lighting'
+          });
+        }
+      });
+      scene.productRoles = survivingRoles;
+    }
+  }
+
   // ---------- AI Brief modal ----------
 
   function openBriefModal(sceneId) {
     const scene = findSceneById(sceneId);
     if (!scene) return;
     if (!scene.aiPrompt) generateBrief(scene);
+    reconcileScenePlans(scene);
     state.briefSceneId = sceneId;
 
     els.briefTitle.textContent = `AI Brief — ${scene.sceneName}`;
@@ -1195,6 +1261,7 @@
       target.reason = reason;
       target.products = productObjects.map(p => p.name);
       target.productObjects = productObjects;
+      reconcileScenePlans(target);
       toast(`Updated: ${name}`);
     } else {
       // create new approved scene
@@ -1230,6 +1297,8 @@
     if (!scene) return;
     // Ensure brief structure exists so we have a hotspotPlan to attach coords to
     if (!scene.hotspotPlan) generateBrief(scene);
+    // Pick up products added/removed since the plan was first generated
+    reconcileScenePlans(scene);
     state.hotspotSceneId = sceneId;
     state.hotspotSelectedIdx = 0;
 
@@ -1645,9 +1714,18 @@
       const esSpaceLabel = SPACE_LABEL_ES[s.space] || cap(s.space);
       const esName = `Colección ${esSpaceLabel} ${collectionPart}`.replace(/\s+/g, ' ').trim();
 
+      // Make sure the EN name also starts with the space prefix (e.g. "Kitchen ")
+      // because the app's room-type chooser derives the room type from the first
+      // word of the EN name. If the user typed a scene name without the prefix
+      // (e.g. "BO and Came combination scene"), the chooser would otherwise show
+      // a raw i18n key like "roomType.BO" instead of "Cocina".
+      const enSpaceLabel = cap(s.space);
+      const enNameHasPrefix = enName.toLowerCase().indexOf(enSpaceLabel.toLowerCase() + ' ') === 0;
+      const enName2 = enNameHasPrefix ? enName : `${enSpaceLabel} ${enName}`.trim();
+
       return {
         id,
-        name:        { es: esName, en: s.sceneName },
+        name:        { es: esName, en: enName2 },
         tagline:     { es: APP_INTENT_ES[s.space] || s.commercialIntent, en: s.commercialIntent },
         description: { es: APP_DESC_MAP_ES[s.space] || s.appDescription || s.reason, en: s.appDescription || s.reason },
         image: s.imagePath || '',
