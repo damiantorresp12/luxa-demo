@@ -387,17 +387,56 @@
   }
 
   function initHome() {
-    var heroImg = DATA.homeHeroImage;
-    if (!heroImg) {
+    // Build the hero slide list. Prefer DATA.homeHeroImages (array) but stay
+    // back-compatible with the legacy single DATA.homeHeroImage. Falls back to a
+    // sample product image if neither is set, so the home never renders empty.
+    var imgs = Array.isArray(DATA.homeHeroImages) ? DATA.homeHeroImages.slice() : [];
+    if (!imgs.length && DATA.homeHeroImage) imgs.push(DATA.homeHeroImage);
+    if (!imgs.length) {
       var fallback = productById('arco-floor') || DATA.products[0];
-      if (fallback) heroImg = fallback.assets.image;
+      if (fallback) imgs.push(fallback.assets.image);
     }
-    if (heroImg) $('#homeHero').style.backgroundImage = 'url("' + uri(heroImg) + '")';
+    initHomeHeroSlides(imgs);
 
-    renderHomeSpaces();
     renderHomeBridge();
+    renderHomeSpaces();
     initHomeCta();
     refreshHomeMetas();
+  }
+
+  // Hero slideshow. With 1 image we just paint it as the hero background.
+  // With 2+ we stack <div> slides absolutely positioned and cross-fade with
+  // opacity. The first slide starts visible; a setInterval rotates the active
+  // index. Each rotation also re-asserts background-image so we don't depend on
+  // every slide being preloaded into the DOM at boot.
+  var heroSlideTimer = null;
+  function initHomeHeroSlides(imgs) {
+    var wrap = $('#homeHeroSlides');
+    var hero = $('#homeHero');
+    if (!wrap || !hero) return;
+    if (heroSlideTimer) { clearInterval(heroSlideTimer); heroSlideTimer = null; }
+    wrap.innerHTML = '';
+    if (!imgs.length) { hero.style.backgroundImage = ''; return; }
+
+    // Always clear the legacy inline background so the slide layer wins.
+    hero.style.backgroundImage = '';
+
+    imgs.forEach(function (src, i) {
+      var slide = document.createElement('div');
+      slide.className = 'home-hero-slide' + (i === 0 ? ' is-active' : '');
+      slide.style.backgroundImage = 'url("' + uri(src) + '")';
+      wrap.appendChild(slide);
+    });
+
+    if (imgs.length < 2) return;
+    var idx = 0;
+    heroSlideTimer = setInterval(function () {
+      var slides = wrap.querySelectorAll('.home-hero-slide');
+      if (!slides.length) return;
+      slides[idx].classList.remove('is-active');
+      idx = (idx + 1) % slides.length;
+      slides[idx].classList.add('is-active');
+    }, 5000);
   }
 
   /* =============================================================================

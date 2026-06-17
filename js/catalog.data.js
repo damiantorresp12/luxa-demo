@@ -366,6 +366,13 @@
     ],
 
     homeHeroImage: 'assets/Spaces/Living 01/Living 01.jpeg',
+    // Slideshow del hero del home. Pueden ser 1, 2, 3 o más imágenes — la app
+    // las roto automáticamente con fade. Para cambiar, editar este array.
+    homeHeroImages: [
+      'assets/Spaces/Living 01/Living 01.jpeg',
+      'assets/Spaces/bedroom 01/bedroom 01.jpeg',
+      'assets/Spaces/Kitchen 01/Kitchen 01.jpeg'
+    ],
 
     /* ----------------------------------------------------------------------- */
     /* PRODUCTS — names/codes/designer/specs en inglés (universales).
