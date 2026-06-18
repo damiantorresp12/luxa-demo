@@ -2009,6 +2009,10 @@
   "removed": [
     "265-wall",
     "apollo-floor",
-    "ayno-floor"
+    "ayno-floor",
+    "tempo-wall",
+    "tempo-pendant",
+    "aim-led-pendant",
+    "aplomb-suspension"
   ]
 }

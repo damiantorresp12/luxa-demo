@@ -338,6 +338,41 @@
     }
   }
 
+  // List image filenames inside the sibling _trash/ folder so we can map them
+  // back to catalogIds via the app's curated catalog (window.LUXA.products) and
+  // the planner's sidecar baseline. This is what catches the case where the
+  // user moved an image to _trash/ from the file explorer (instead of the
+  // "Borrar imagen" button) — the catalogId is still needed in the removed[]
+  // array so the app filters out the now-broken curated entry.
+  async function listTrashedImages() {
+    try {
+      const res = await fetch(`/__list?path=${encodeURIComponent(IMAGES_PATH + '/_trash')}`, { cache: 'no-store' });
+      if (!res.ok) return [];
+      const json = await res.json();
+      return (json && json.ok && Array.isArray(json.files)) ? json.files : [];
+    } catch (e) {
+      return [];
+    }
+  }
+
+  // Map filenames in _trash/ to catalogIds by checking the app's curated catalog
+  // (window.LUXA.products) and the planner baseline. Returns deduped catalogIds.
+  function deriveRemovedFromTrash(trashedFiles, plannerProducts) {
+    if (!trashedFiles || !trashedFiles.length) return [];
+    const appProducts = (window.LUXA && Array.isArray(window.LUXA.products))
+      ? window.LUXA.products : [];
+    const ids = new Set();
+    trashedFiles.forEach(fn => {
+      // Match against curated catalog by image basename
+      const fromApp = appProducts.find(p => p.assets && p.assets.image && p.assets.image.split('/').pop() === fn);
+      if (fromApp && fromApp.id) ids.add(fromApp.id);
+      // Match against planner baseline by image basename
+      const fromPlanner = plannerProducts.find(p => p.image && p.image.split('/').pop() === fn);
+      if (fromPlanner && fromPlanner.catalogId) ids.add(fromPlanner.catalogId);
+    });
+    return Array.from(ids);
+  }
+
   // ---------- Build items (the magic of pre-filling) ----------
 
   function buildItems(imageFiles, plannerProducts) {
@@ -1129,10 +1164,11 @@
 
   async function reloadAll() {
     els.summary.textContent = 'Cargando…';
-    const [files, planner, publishedRemoved] = await Promise.all([
+    const [files, planner, publishedRemoved, trashedFiles] = await Promise.all([
       listImages(),
       loadPlannerProducts(state.activeCatalog),
-      loadPublishedRemovedIds(state.activeCatalog)
+      loadPublishedRemovedIds(state.activeCatalog),
+      listTrashedImages()
     ]);
     state.plannerProductsBaseline = planner;
     state.items = buildItems(files, planner);
@@ -1155,6 +1191,21 @@
         state.removedCatalogIds.push(id);
       }
     });
+    // Auto-detect images the user moved to _trash/ from the file explorer
+    // (not via the "Borrar imagen" button) and map them to catalogIds. Without
+    // this, those products still ship their entry in the sidecar's products[]
+    // with a now-broken image path → the app renders a card with alt-text only.
+    const trashIds = deriveRemovedFromTrash(trashedFiles, planner);
+    trashIds.forEach(id => {
+      if (id && !state.removedCatalogIds.includes(id)) {
+        state.removedCatalogIds.push(id);
+      }
+    });
+    // Also drop any state.items entry whose catalogId is now in the removed list
+    // — otherwise the publish would still include the product in the sidecar's
+    // products[] with a broken image path (the removed[] filter would catch it,
+    // but the duplication is wasteful and confusing).
+    state.items = state.items.filter(it => !it.catalogId || !state.removedCatalogIds.includes(it.catalogId));
     // Auto-fill empty fields after the draft overlay. The user's explicit
     // edits win because the overlay already ran; we only fill what is still
     // blank — except for `category`, which we also replace when the planner

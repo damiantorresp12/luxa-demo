@@ -806,7 +806,11 @@
 
   function sceneCardHTML(s, mode) {
     const isApproved = mode === 'approved';
-    const isRejected = state.rejected.has(s.sceneId);
+    // Approved always wins visually — if a scene was rejected earlier and then
+    // re-approved (or restored after a removal), the rejected dim shouldn't
+    // leak through. The state.rejected entry is also cleaned up by approve/
+    // removeApproved so this is just belt-and-suspenders.
+    const isRejected = !isApproved && state.rejected.has(s.sceneId);
     const cls = `scene-card${isApproved ? ' approved' : ''}${isRejected ? ' rejected' : ''}`;
     const hasBrief = !!s.aiPrompt;
 
@@ -921,6 +925,8 @@
     const copy = { ...s, status: 'approved' };
     delete copy._sourceMode;
     state.approved.push(copy);
+    // Clear any stale rejected mark so the approved card doesn't render dim.
+    state.rejected.delete(id);
     state.scenes = state.scenes.filter(x => x.sceneId !== id);
     renderScenes();
     saveState();
@@ -936,6 +942,10 @@
 
   function removeApproved(id) {
     state.approved = state.approved.filter(x => x.sceneId !== id);
+    // Removing an approved scene shouldn't leave the sceneId in `rejected` —
+    // that would dim sibling approved cards if the id ever reappears (e.g. via
+    // an Edit Scene → re-approve flow).
+    state.rejected.delete(id);
     renderApproved();
     saveState();
   }

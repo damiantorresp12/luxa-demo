@@ -1,7 +1,7 @@
 {
   "_readme": "Auto-managed by the Space Planner. Save this file as data/spaces.luxa-original.json in the LUXA project root — the app fetches all data/spaces.*.json files at boot and merges them into window.LUXA.spaces. Same id → planner entry replaces curated entry. Product IDs use catalogId from products.json when present.",
   "catalog": "luxa-original",
-  "exportedAt": "2026-06-17T15:42:00.544Z",
+  "exportedAt": "2026-06-18T20:14:10.288Z",
   "entries": [
     {
       "id": "living-aballs-collection-01",
@@ -64,19 +64,20 @@
       "gallery": [
         "assets/Spaces/Dining 01/Dining 01.jpeg"
       ],
-      "heroProduct": "aballs-chandelier-12",
+      "heroProduct": "aballs-a-wall",
       "hotspots": [
-        {
-          "productId": "aballs-chandelier-12",
-          "x": 50.13,
-          "y": 42.9,
-          "closeUpImage": "assets/Spaces/Dining 01/Dining 01 close up 02.jpeg"
-        },
         {
           "productId": "aballs-a-wall",
           "x": 91.09,
           "y": 50.31,
           "closeUpImage": "assets/Spaces/Dining 01/Dining 01 close up 01.jpeg"
+        },
+        {
+          "productId": "aballs-chandelier-4",
+          "x": 49.87,
+          "y": 43.61,
+          "closeUpImage": "assets/Spaces/Dining 01/Dining 01 close up 02.jpeg",
+          "transitionVideo": "assets/Transiciones/Dining 01/Dining 01 tran 01.mp4"
         }
       ]
     },
@@ -147,13 +148,15 @@
           "productId": "lighto-c-ceiling",
           "x": 50,
           "y": 21.38,
-          "closeUpImage": "assets/Spaces/Bathroom 01/Bathroom 01 close up 02.jpeg"
+          "closeUpImage": "assets/Spaces/Bathroom 01/Bathroom 01 close up 02.jpeg",
+          "transitionVideo": "assets/Transiciones/Bathroom 01/bathroom 01 tran 02.mp4"
         },
         {
           "productId": "lighto-a-wall",
-          "x": 13.39,
-          "y": 52.25,
-          "closeUpImage": "assets/Spaces/Bathroom 01/bathroom 01 close up 01.jpeg"
+          "x": 14.71,
+          "y": 52.43,
+          "closeUpImage": "assets/Spaces/Bathroom 01/bathroom 01 close up 01.jpeg",
+          "transitionVideo": "assets/Transiciones/Bathroom 01/bathroom 01 tran 01.mp4"
         }
       ]
     },
@@ -307,13 +310,15 @@
           "productId": "bo32-ceiling",
           "x": 76.47,
           "y": 18.21,
-          "closeUpImage": "assets/Spaces/Kitchen 01/Kitchen 01 close up 01.jpeg"
+          "closeUpImage": "assets/Spaces/Kitchen 01/Kitchen 01 close up 01.jpeg",
+          "transitionVideo": "assets/Transiciones/Kitchen 01/Kitchen 01 tran 01.mp4"
         },
         {
           "productId": "came-downlight",
           "x": 40.52,
           "y": 20.33,
-          "closeUpImage": "assets/Spaces/Kitchen 01/Kitchen 01 close up 02.jpeg"
+          "closeUpImage": "assets/Spaces/Kitchen 01/Kitchen 01 close up 02.jpeg",
+          "transitionVideo": "assets/Transiciones/Kitchen 01/Kitchen 01 tran 02.mp4"
         }
       ]
     }
