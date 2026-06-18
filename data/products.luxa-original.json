@@ -1,80 +1,8 @@
 {
   "_readme": "Producto sidecar para la app LUXA. Generado por el Product Data Generator. Editar a mano sólo si sabés lo que hacés. La lista \"removed\" indica catalogIds que la app debe filtrar del catálogo estático.",
   "catalogId": "luxa-original",
-  "exportedAt": "2026-06-17T15:20:06.268Z",
+  "exportedAt": "2026-06-18T23:06:03.747Z",
   "products": [
-    {
-      "id": "tempo-wall",
-      "code": "DVA-5756",
-      "name": "Tempo Wall",
-      "category": "Wall Lights",
-      "collection": "Tempo",
-      "spaces": [],
-      "designer": "LUXA Studio",
-      "power": "12 W",
-      "lumens": "850 lm",
-      "temperature": "2700 K",
-      "cri": "≥ 90",
-      "ip": "IP44",
-      "dimensions": "Ø 200 × D 110 mm",
-      "finish": "Spun aluminium · Matte black",
-      "application": {
-        "es": "Pasillos y paredes de mesa de luz",
-        "en": "Hallways and bedside walls"
-      },
-      "description": {
-        "es": "La pantalla Tempo girada hacia la pared. Baño hacia arriba y hacia abajo con el mismo carácter suave y sin deslumbre que su hermana colgante.",
-        "en": "The Tempo shade turned to the wall. Up-and-down wash with the same gentle, glare-free character as its pendant sibling."
-      },
-      "featured": true,
-      "assets": {
-        "image": "assets/Imagenes/DVA-5756 Tempo Wall Lamp_corona.jpg",
-        "model": null,
-        "gallery": [],
-        "pdfs": [],
-        "glb": null,
-        "fbx": null,
-        "ies": null,
-        "dwg": null,
-        "bim": null
-      }
-    },
-    {
-      "id": "tempo-pendant",
-      "code": "DVA-5776",
-      "name": "Tempo Pendant",
-      "category": "Pendants",
-      "collection": "Tempo",
-      "spaces": [],
-      "designer": "LUXA Studio",
-      "power": "18 W",
-      "lumens": "1280 lm",
-      "temperature": "2700 K",
-      "cri": "≥ 90",
-      "ip": "IP20",
-      "dimensions": "Ø 320 × H 280 mm",
-      "finish": "Spun aluminium · Matte black",
-      "application": {
-        "es": "Mesas de comedor e islas de cocina",
-        "en": "Dining tables and kitchen islands"
-      },
-      "description": {
-        "es": "Un colgante de precisión silenciosa. La pantalla hilada pliega la luz en un haz suave, ideal sobre una mesa donde la calidez importa más que el alcance.",
-        "en": "A quietly precise pendant. The spun shade folds light into a soft pool, ideal over a table where warmth matters more than throw."
-      },
-      "featured": true,
-      "assets": {
-        "image": "assets/Imagenes/DVA-5776 Tempo Pendant Lamp_corona.jpg",
-        "model": null,
-        "gallery": [],
-        "pdfs": [],
-        "glb": null,
-        "fbx": null,
-        "ies": null,
-        "dwg": null,
-        "bim": null
-      }
-    },
     {
       "id": "flat-floor",
       "code": "DVA-5945",
@@ -390,42 +318,6 @@
       }
     },
     {
-      "id": "aim-led-pendant",
-      "code": "DVA-AIM",
-      "name": "Aim LED Pendant",
-      "category": "Pendants",
-      "collection": "Aim",
-      "spaces": [],
-      "designer": "LUXA Studio",
-      "power": "24 W",
-      "lumens": "1750 lm",
-      "temperature": "3000 K",
-      "cri": "≥ 90",
-      "ip": "IP20",
-      "dimensions": "Ø 240 × H 320 mm",
-      "finish": "Aluminium · Polished",
-      "application": {
-        "es": "Mesadas, mesas auxiliares, rincones de lectura",
-        "en": "Counters, side tables, reading corners"
-      },
-      "description": {
-        "es": "La alimentación flexible permite orientar el cabezal exactamente donde la luz hace falta. Arquitectura y gesto en una sola luminaria.",
-        "en": "The flexible feed lets the head be aimed exactly where light is needed. Architecture and gesture in a single fixture."
-      },
-      "featured": true,
-      "assets": {
-        "image": "assets/Imagenes/DVA-Aim LED Pendant Lamp_vray.jpg",
-        "model": null,
-        "gallery": [],
-        "pdfs": [],
-        "glb": null,
-        "fbx": null,
-        "ies": null,
-        "dwg": null,
-        "bim": null
-      }
-    },
-    {
       "id": "albus-twisted-table",
       "code": "DVA-ALB",
       "name": "Albus Twisted Table",
@@ -451,42 +343,6 @@
       "featured": false,
       "assets": {
         "image": "assets/Imagenes/DVA-Albus Twisted Table Lamp_corona.jpg",
-        "model": null,
-        "gallery": [],
-        "pdfs": [],
-        "glb": null,
-        "fbx": null,
-        "ies": null,
-        "dwg": null,
-        "bim": null
-      }
-    },
-    {
-      "id": "aplomb-suspension",
-      "code": "DVA-APL",
-      "name": "Aplomb Suspension",
-      "category": "Pendants",
-      "collection": "Aplomb",
-      "spaces": [],
-      "designer": "LUXA Studio",
-      "power": "20 W",
-      "lumens": "1500 lm",
-      "temperature": "3000 K",
-      "cri": "≥ 90",
-      "ip": "IP65",
-      "dimensions": "Ø 180 × H 230 mm",
-      "finish": "Cast concrete · Natural grey",
-      "application": {
-        "es": "Bares, baños e interiores aptos para exterior",
-        "en": "Bars, bathrooms and outdoor-rated interiors"
-      },
-      "description": {
-        "es": "Fundida en hormigón, cruda y a la vez refinada. El cuerpo mate absorbe el deslumbramiento y ancla la luz con honestidad material.",
-        "en": "Cast in concrete, raw yet refined. The matte body absorbs glare and grounds the light with material honesty."
-      },
-      "featured": false,
-      "assets": {
-        "image": "assets/Imagenes/DVA-Aplomb Suspension Light_corona.jpg",
         "model": null,
         "gallery": [],
         "pdfs": [],
@@ -1770,6 +1626,7 @@
       "spaces": [
         "living",
         "dining",
+        "kitchen",
         "bedroom"
       ],
       "designer": "LUXA Studio",
@@ -1810,6 +1667,7 @@
       "spaces": [
         "living",
         "dining",
+        "kitchen",
         "bedroom"
       ],
       "designer": "LUXA Studio",
@@ -1850,6 +1708,7 @@
       "spaces": [
         "living",
         "dining",
+        "kitchen",
         "bedroom",
         "bathroom"
       ],

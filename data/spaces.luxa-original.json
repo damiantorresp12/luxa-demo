@@ -1,7 +1,7 @@
 {
   "_readme": "Auto-managed by the Space Planner. Save this file as data/spaces.luxa-original.json in the LUXA project root — the app fetches all data/spaces.*.json files at boot and merges them into window.LUXA.spaces. Same id → planner entry replaces curated entry. Product IDs use catalogId from products.json when present.",
   "catalog": "luxa-original",
-  "exportedAt": "2026-06-18T20:14:10.288Z",
+  "exportedAt": "2026-06-18T23:09:13.803Z",
   "entries": [
     {
       "id": "living-aballs-collection-01",
@@ -142,7 +142,7 @@
       "gallery": [
         "assets/Spaces/Bathroom 01/bathroom 01.jpeg"
       ],
-      "heroProduct": "lighto-c-ceiling",
+      "heroProduct": "lighto-a-wall",
       "hotspots": [
         {
           "productId": "lighto-c-ceiling",
@@ -319,6 +319,40 @@
           "y": 20.33,
           "closeUpImage": "assets/Spaces/Kitchen 01/Kitchen 01 close up 02.jpeg",
           "transitionVideo": "assets/Transiciones/Kitchen 01/Kitchen 01 tran 02.mp4"
+        }
+      ]
+    },
+    {
+      "id": "kitchen-roomor-kitchen-scene-manual-27",
+      "name": {
+        "es": "Colección Cocina Roomor kitchen Scene",
+        "en": "Kitchen Roomor kitchen Scene"
+      },
+      "tagline": {
+        "es": "Iluminación funcional para cocina",
+        "en": "Functional kitchen lighting collection"
+      },
+      "description": {
+        "es": "Una cocina funcional que combina luz focal sobre la isla y las mesadas con luz general y de acento.",
+        "en": "A functional kitchen setup combining task lighting over the island and counters with general and accent illumination."
+      },
+      "image": "assets/Spaces/Kitchen 02/Kitchen 02.jpeg",
+      "gallery": [
+        "assets/Spaces/Kitchen 02/Kitchen 02.jpeg"
+      ],
+      "heroProduct": "roomor-1-suspended-light-2481e0b00",
+      "hotspots": [
+        {
+          "productId": "roomor-1-suspended-light-2481e0b00",
+          "x": 50.92,
+          "y": 44.31,
+          "closeUpImage": "assets/Spaces/Kitchen 02/Kitchen 02 Close up 02.jpeg"
+        },
+        {
+          "productId": "roomor-1-table-lamp-637120b00",
+          "x": 18.26,
+          "y": 63.36,
+          "closeUpImage": "assets/Spaces/Kitchen 02/Kitchen 02 Close up 01.jpeg"
         }
       ]
     }
