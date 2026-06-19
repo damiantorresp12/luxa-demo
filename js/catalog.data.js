@@ -1013,4 +1013,32 @@
       });
     });
   })();
+
+  /* =============================================================================
+     Color variants — per-product color swatches in the catalog view
+     -----------------------------------------------------------------------------
+     Reads data/color-variants.json. Each entry maps a render filename basename
+     (e.g. "DVA-BO 32 Surface Ceiling Light_corona") to a list of color options
+     [{id, image}]. For each product whose assets.image basename matches a key,
+     we attach p.colorVariants. The product card and detail panel render the
+     swatches conditionally. Default color = the one whose image matches the
+     product's original assets.image; if none match, the first variant.
+     ========================================================================== */
+  (function mergeColorVariants() {
+    if (typeof fetch !== 'function') return;
+    // Save the manifest globally so the app can re-apply it after every
+    // sidecar merge replaces product objects (otherwise the colorVariants
+    // attached here gets blown away by the products.json merge that runs in
+    // parallel and tends to finish slightly later).
+    fetch('data/color-variants.json', { cache: 'no-store' })
+      .then(function (res) { return res.ok ? res.json() : null; })
+      .then(function (json) {
+        if (!json || !json.variants) return;
+        window.LUXA._colorVariantsByBasename = json.variants;
+        if (window.LUXA_App && typeof window.LUXA_App.refreshProducts === 'function') {
+          window.LUXA_App.refreshProducts();
+        }
+      })
+      .catch(function () { /* manifest is optional — silently skip */ });
+  })();
 })();

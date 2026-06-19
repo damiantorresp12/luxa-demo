@@ -1,0 +1,94 @@
+{
+  "_readme": "Manifest de variantes de color para luminarias del catalogo. Generado a partir de las subcarpetas de assets/Imagenes/Imagenes_colors/. La key de cada entry es el basename del filename original del render (assets.image del producto, sin extension). La app lo lee al boot y attacha las variantes al producto correspondiente. Para regenerar despues de agregar/quitar variantes, ver tools/build-color-variants.ps1 (a crear) o regenerar a mano siguiendo la misma estructura.",
+  "generatedAt": "2026-06-18",
+  "variants": {
+    "DVA-Aballs A II Ceiling Light_corona": [
+      { "id": "gold",  "image": "assets/Imagenes/Imagenes_colors/DVA-Aballs A II Ceiling Light_corona/gold.jpeg" },
+      { "id": "white", "image": "assets/Imagenes/Imagenes_colors/DVA-Aballs A II Ceiling Light_corona/white.jpeg" }
+    ],
+    "DVA-Aballs A Wall Light_corona": [
+      { "id": "gold",  "image": "assets/Imagenes/Imagenes_colors/DVA-Aballs A Wall Light_corona/gold.jpeg" },
+      { "id": "white", "image": "assets/Imagenes/Imagenes_colors/DVA-Aballs A Wall Light_corona/white.jpeg" }
+    ],
+    "DVA-Aballs Chandelier 4_corona": [
+      { "id": "gold",  "image": "assets/Imagenes/Imagenes_colors/DVA-Aballs Chandelier 4_corona/gold.jpeg" },
+      { "id": "white", "image": "assets/Imagenes/Imagenes_colors/DVA-Aballs Chandelier 4_corona/white.jpeg" }
+    ],
+    "DVA-Aballs M Table Lamp_corona": [
+      { "id": "black", "image": "assets/Imagenes/Imagenes_colors/DVA-Aballs M Table Lamp_corona/black.jpeg" },
+      { "id": "white", "image": "assets/Imagenes/Imagenes_colors/DVA-Aballs M Table Lamp_corona/white.jpeg" }
+    ],
+    "DVA-BO 32 Surface Ceiling Light_corona": [
+      { "id": "gold",  "image": "assets/Imagenes/Imagenes_colors/DVA-BO 32 Surface Ceiling Light_corona/gold.jpeg" },
+      { "id": "white", "image": "assets/Imagenes/Imagenes_colors/DVA-BO 32 Surface Ceiling Light_corona/white.jpeg" }
+    ],
+    "DVA-Came 2.6 Recessed Downlight_corona": [
+      { "id": "black", "image": "assets/Imagenes/Imagenes_colors/DVA-Came 2.6 Recessed Downlight_corona/black.jpeg" },
+      { "id": "gold",  "image": "assets/Imagenes/Imagenes_colors/DVA-Came 2.6 Recessed Downlight_corona/gold.jpeg" }
+    ],
+    "DVA-Cellar 7634 Pendant Lamp_corona": [
+      { "id": "gold",  "image": "assets/Imagenes/Imagenes_colors/DVA-Cellar 7634 Pendant Lamp_corona/gold.jpeg" },
+      { "id": "white", "image": "assets/Imagenes/Imagenes_colors/DVA-Cellar 7634 Pendant Lamp_corona/white.jpeg" }
+    ],
+    "DVA-Cellar 7635 Wall Light_corona": [
+      { "id": "gold",  "image": "assets/Imagenes/Imagenes_colors/DVA-Cellar 7635 Wall Light_corona/gold.jpeg" },
+      { "id": "white", "image": "assets/Imagenes/Imagenes_colors/DVA-Cellar 7635 Wall Light_corona/white.jpeg" }
+    ],
+    "DVA-Cellar 7637 Table Lamp_corona": [
+      { "id": "gold",  "image": "assets/Imagenes/Imagenes_colors/DVA-Cellar 7637 Table Lamp_corona/gold.jpeg" },
+      { "id": "white", "image": "assets/Imagenes/Imagenes_colors/DVA-Cellar 7637 Table Lamp_corona/white.jpeg" }
+    ],
+    "DVA-Grashoppa Floor Lamp_corona": [
+      { "id": "gold",  "image": "assets/Imagenes/Imagenes_colors/DVA-Grashoppa Floor Lamp_corona/gold.jpeg" },
+      { "id": "white", "image": "assets/Imagenes/Imagenes_colors/DVA-Grashoppa Floor Lamp_corona/white.jpeg" }
+    ],
+    "DVA-Grashoppa Pendant Light_corona": [
+      { "id": "gold",  "image": "assets/Imagenes/Imagenes_colors/DVA-Grashoppa Pendant Light_corona/gold.jpeg" },
+      { "id": "white", "image": "assets/Imagenes/Imagenes_colors/DVA-Grashoppa Pendant Light_corona/white.jpeg" }
+    ],
+    "DVA-Grashoppa Task Table Lamp_corona": [
+      { "id": "gold",  "image": "assets/Imagenes/Imagenes_colors/DVA-Grashoppa Task Table Lamp_corona/gold.jpeg" },
+      { "id": "white", "image": "assets/Imagenes/Imagenes_colors/DVA-Grashoppa Task Table Lamp_corona/white.jpeg" }
+    ],
+    "DVA-IC Light CW_vray": [
+      { "id": "black", "image": "assets/Imagenes/Imagenes_colors/DVA-IC Light CW_vray/black.jpeg" },
+      { "id": "white", "image": "assets/Imagenes/Imagenes_colors/DVA-IC Light CW_vray/white.jpeg" }
+    ],
+    "DVA-IC Light F_vray": [
+      { "id": "black", "image": "assets/Imagenes/Imagenes_colors/DVA-IC Light F_vray/black.jpeg" },
+      { "id": "white", "image": "assets/Imagenes/Imagenes_colors/DVA-IC Light F_vray/white.jpeg" }
+    ],
+    "DVA-IC Light S_vray": [
+      { "id": "black", "image": "assets/Imagenes/Imagenes_colors/DVA-IC Light S_vray/black.jpeg" },
+      { "id": "white", "image": "assets/Imagenes/Imagenes_colors/DVA-IC Light S_vray/white.jpeg" }
+    ],
+    "DVA-IC Light T1 Low_vray": [
+      { "id": "black", "image": "assets/Imagenes/Imagenes_colors/DVA-IC Light T1 Low_vray/black.jpeg" },
+      { "id": "white", "image": "assets/Imagenes/Imagenes_colors/DVA-IC Light T1 Low_vray/white.jpeg" }
+    ],
+    "DVA-Lighto A Wall Light_corona": [
+      { "id": "black", "image": "assets/Imagenes/Imagenes_colors/DVA-Lighto A Wall Light_corona/black.jpeg" },
+      { "id": "white", "image": "assets/Imagenes/Imagenes_colors/DVA-Lighto A Wall Light_corona/white.jpeg" }
+    ],
+    "DVA-Lighto C Ceiling Light_corona": [
+      { "id": "black", "image": "assets/Imagenes/Imagenes_colors/DVA-Lighto C Ceiling Light_corona/black.jpeg" },
+      { "id": "white", "image": "assets/Imagenes/Imagenes_colors/DVA-Lighto C Ceiling Light_corona/white.jpeg" }
+    ],
+    "DVA-Pendulum Floor Lamp_corona": [
+      { "id": "gold",  "image": "assets/Imagenes/Imagenes_colors/DVA-Pendulum Floor Lamp_corona/gold.jpeg" },
+      { "id": "white", "image": "assets/Imagenes/Imagenes_colors/DVA-Pendulum Floor Lamp_corona/white.jpeg" }
+    ],
+    "DVA-Soffio Pendant Light_corona": [
+      { "id": "black", "image": "assets/Imagenes/Imagenes_colors/DVA-Soffio Pendant Light_corona/black.jpeg" },
+      { "id": "white", "image": "assets/Imagenes/Imagenes_colors/DVA-Soffio Pendant Light_corona/white.jpeg" }
+    ],
+    "DVA-Soffio Table Lamp_corona": [
+      { "id": "black", "image": "assets/Imagenes/Imagenes_colors/DVA-Soffio Table Lamp_corona/black.jpeg" },
+      { "id": "gold",  "image": "assets/Imagenes/Imagenes_colors/DVA-Soffio Table Lamp_corona/gold.jpeg" }
+    ],
+    "DVA-Soffio Wall Vertical Lamp_corona": [
+      { "id": "black", "image": "assets/Imagenes/Imagenes_colors/DVA-Soffio Wall Vertical Lamp_corona/black.jpeg" },
+      { "id": "white", "image": "assets/Imagenes/Imagenes_colors/DVA-Soffio Wall Vertical Lamp_corona/white.jpeg" }
+    ]
+  }
+}

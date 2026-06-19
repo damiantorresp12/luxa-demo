@@ -1,7 +1,7 @@
 {
   "_readme": "Auto-managed by the Space Planner. Save this file as data/spaces.luxa-original.json in the LUXA project root — the app fetches all data/spaces.*.json files at boot and merges them into window.LUXA.spaces. Same id → planner entry replaces curated entry. Product IDs use catalogId from products.json when present.",
   "catalog": "luxa-original",
-  "exportedAt": "2026-06-18T23:09:13.803Z",
+  "exportedAt": "2026-06-19T20:58:11.795Z",
   "entries": [
     {
       "id": "living-aballs-collection-01",
@@ -70,7 +70,8 @@
           "productId": "aballs-a-wall",
           "x": 91.09,
           "y": 50.31,
-          "closeUpImage": "assets/Spaces/Dining 01/Dining 01 close up 01.jpeg"
+          "closeUpImage": "assets/Spaces/Dining 01/Dining 01 close up 01.jpeg",
+          "transitionVideo": "assets/Transiciones/Dining 01/Dining 01 tran 02.mp4"
         },
         {
           "productId": "aballs-chandelier-4",
@@ -352,7 +353,8 @@
           "productId": "roomor-1-table-lamp-637120b00",
           "x": 18.26,
           "y": 63.36,
-          "closeUpImage": "assets/Spaces/Kitchen 02/Kitchen 02 Close up 01.jpeg"
+          "closeUpImage": "assets/Spaces/Kitchen 02/Kitchen 02 Close up 01.jpeg",
+          "transitionVideo": "assets/Transiciones/Kitchen 02/Kitchen 02 tran 01.mp4"
         }
       ]
     }

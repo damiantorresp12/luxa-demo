@@ -570,6 +570,57 @@
     $('#productCount').textContent = pluralized('products.count', visibleProductCount());
   }
 
+  // Per-color visual + i18n label. New colors only need an entry here to render.
+  // The "original" entry has no hex: the swatch uses the render thumbnail instead.
+  var COLOR_PALETTE = {
+    original: { es: 'Original', en: 'Original' },
+    white:    { hex: '#f5f5f5', es: 'Blanco', en: 'White' },
+    black:    { hex: '#1a1a1a', es: 'Negro',  en: 'Black' },
+    gold:     { hex: '#c9a24b', es: 'Dorado', en: 'Gold'  }
+  };
+  function colorLabel(id) {
+    var c = COLOR_PALETTE[id];
+    if (!c) return id;
+    return (lang === 'en' ? c.en : c.es);
+  }
+  function swatchBackgroundStyle(variant) {
+    // For "original", show a mini render thumb so it's visually distinct from
+    // the solid color swatches. For named colors, use the palette hex.
+    if (variant.id === 'original') {
+      return 'background:#1a1a1a url("' + uri(variant.image) + '") center/cover';
+    }
+    var hex = (COLOR_PALETTE[variant.id] && COLOR_PALETTE[variant.id].hex) || '#888';
+    return 'background:' + hex;
+  }
+  // Active color per product id, in-memory only. Cleared on reload — that's
+  // intentional so the user can compare colors fresh each session.
+  var activeColorByProduct = {};
+  function getActiveColorId(p) {
+    if (!p.colorVariants) return null;
+    var stored = activeColorByProduct[p.id];
+    if (stored && p.colorVariants.some(function (v) { return v.id === stored; })) return stored;
+    return p.defaultColorId || p.colorVariants[0].id;
+  }
+  function getActiveColorImage(p) {
+    if (!p.colorVariants) return p.assets.image;
+    var id = getActiveColorId(p);
+    var v = p.colorVariants.find(function (x) { return x.id === id; });
+    return (v && v.image) || p.assets.image;
+  }
+  function colorSwatchesHTML(p) {
+    if (!p.colorVariants || !p.colorVariants.length) return '';
+    var active = getActiveColorId(p);
+    return '<div class="color-swatches" data-id="' + p.id + '">' +
+      p.colorVariants.map(function (v) {
+        var lbl = colorLabel(v.id);
+        return '<button type="button" class="color-swatch' + (v.id === active ? ' is-active' : '') +
+          (v.id === 'original' ? ' is-original' : '') +
+          '" data-color="' + v.id + '" style="' + swatchBackgroundStyle(v) + '" ' +
+          'aria-label="' + lbl + '" title="' + lbl + '"><span class="sr-only">' + lbl + '</span></button>';
+      }).join('') +
+    '</div>';
+  }
+
   function productCard(p) {
     var card = el('article', 'card');
     card.setAttribute('tabindex', '0');
@@ -584,7 +635,8 @@
         '<button class="fav-btn' + (isFav(p.id) ? ' is-fav' : '') + '" data-id="' + p.id + '" aria-label="Toggle favorite" aria-pressed="' + isFav(p.id) + '">' +
           '<span class="heart-empty">♡</span><span class="heart-full">♥</span>' +
         '</button>' +
-        '<img loading="lazy" src="' + uri(p.assets.image) + '" alt="' + p.name + '" />' +
+        '<img loading="lazy" src="' + uri(getActiveColorImage(p)) + '" alt="' + p.name + '" />' +
+        colorSwatchesHTML(p) +
       '</div>' +
       '<div class="card-body">' +
         '<span class="card-cat">' + t('category.' + p.category) + '</span>' +
@@ -599,10 +651,24 @@
     card.addEventListener('click', function (e) {
       if (e.target.closest('.fav-btn')) return;
       if (e.target.closest('.card-quote')) return;
+      if (e.target.closest('.color-swatch')) return;
       openDetail(p.id);
     });
     card.addEventListener('keydown', function (e) { if (e.key === 'Enter') openDetail(p.id); });
     $('.fav-btn', card).addEventListener('click', function (e) { e.stopPropagation(); toggleFav(p.id); });
+    // Swatch clicks: swap the visible image and re-mark the active button.
+    $$('.color-swatch', card).forEach(function (btn) {
+      btn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        var colorId = btn.dataset.color;
+        activeColorByProduct[p.id] = colorId;
+        var img = $('.card-media img', card);
+        if (img) img.src = uri(getActiveColorImage(p));
+        $$('.color-swatch', card).forEach(function (b) {
+          b.classList.toggle('is-active', b.dataset.color === colorId);
+        });
+      });
+    });
     return card;
   }
 
@@ -626,13 +692,61 @@
     if (!p) return;
     opts = opts || {};
 
-    var catalogImg = p.assets.image;
+    // Catalog image follows the user's active color choice. The close-up and
+    // ambient stills stay as-is — they're scene renders, not catalog renders.
+    var catalogImg = getActiveColorImage(p);
     var closeUp    = opts.closeUpImage || null;
     var spaceImg   = opts.spaceImage || null;
     var mainImg    = closeUp || catalogImg;
 
     $('#detailImg').src = uri(mainImg);
     $('#detailImg').alt = p.name;
+
+    // Color swatches row inside the detail-media. Only renders if the product
+    // has variants AND we're viewing it from the bare catalog (no close-up /
+    // ambient context). When the detail was opened from a space or a hotspot,
+    // we hide the swatches — the conversation is about the product in context,
+    // not about catalog variants.
+    var fromSpaceContext = !!(closeUp || spaceImg);
+    var swatchHost = $('#detailColorSwatches');
+    if (swatchHost) {
+      if (p.colorVariants && p.colorVariants.length && !fromSpaceContext) {
+        swatchHost.innerHTML = colorSwatchesHTML(p);
+        swatchHost.hidden = false;
+        $$('.color-swatch', swatchHost).forEach(function (btn) {
+          btn.addEventListener('click', function () {
+            var colorId = btn.dataset.color;
+            activeColorByProduct[p.id] = colorId;
+            var newImg = getActiveColorImage(p);
+            // Update main image if the user is viewing catalog (or if there's
+            // no mini-gallery active, which means catalog is the only view).
+            var activeThumb = $('#detailThumbs button.active');
+            var viewingCatalog = !activeThumb || activeThumb.dataset.thumb === 'catalog';
+            if (viewingCatalog) $('#detailImg').src = uri(newImg);
+            // Update the catalog thumbnail src so the mini-gallery stays consistent.
+            var catThumb = $('#detailThumbs button[data-thumb="catalog"] img');
+            if (catThumb) catThumb.src = uri(newImg);
+            $$('.color-swatch', swatchHost).forEach(function (b) {
+              b.classList.toggle('is-active', b.dataset.color === colorId);
+            });
+            // Live-update the same product's card in the grid so the catalog
+            // grid behind the panel reflects the choice when the user closes.
+            $$('#productGrid .card, #favoritesGrid .card').forEach(function (card) {
+              var favBtn = $('.fav-btn', card);
+              if (!favBtn || favBtn.dataset.id !== p.id) return;
+              var img = $('.card-media img', card);
+              if (img) img.src = uri(newImg);
+              $$('.color-swatch', card).forEach(function (b) {
+                b.classList.toggle('is-active', b.dataset.color === colorId);
+              });
+            });
+          });
+        });
+      } else {
+        swatchHost.innerHTML = '';
+        swatchHost.hidden = true;
+      }
+    }
 
     // In-context caption: shown when a closeUpImage is available
     var ctx = $('#detailContext');
@@ -1448,6 +1562,7 @@
      ========================================================================== */
   function renderAll() {
     initHome();
+    attachColorVariantsAll();
     renderFilters();
     renderProducts();
     updateProductCount();
@@ -1636,11 +1751,52 @@
       renderHomeBridge();
     },
     refreshProducts: function () {
+      attachColorVariantsAll();
       renderFilters();
       renderProducts();
       updateProductCount();
     }
   };
+
+  // Walk window.LUXA.products and (re-)attach colorVariants from the manifest
+  // cached at window.LUXA._colorVariantsByBasename. Idempotent — safe to call
+  // before every render. Without this the sidecar merge that runs in parallel
+  // with the manifest fetch would silently strip the variants from products it
+  // replaces.
+  // Universe of colors a luminaria can come in. The system assumes a product
+  // never has more than these — if a product has N-1 of them in the manifest,
+  // the missing one IS the color of the curated render. That's the trick we
+  // use to label the "default render" swatch with a proper color name instead
+  // of generic "original" + thumbnail.
+  var KNOWN_COLORS = ['black', 'white', 'gold'];
+
+  function attachColorVariantsAll() {
+    var manifest = (window.LUXA && window.LUXA._colorVariantsByBasename) || null;
+    if (!manifest) return;
+    var products = (window.LUXA && window.LUXA.products) || [];
+    products.forEach(function (p) {
+      if (!p.assets || !p.assets.image) return;
+      var fn = String(p.assets.image).split('/').pop().replace(/\.[^.]+$/, '');
+      var list = manifest[fn];
+      if (!list || !list.length) return;
+      // Don't double up if the curated render IS already one of the variants.
+      var alreadyHasOriginal = list.some(function (v) { return v.image === p.assets.image; });
+      if (alreadyHasOriginal) {
+        p.colorVariants = list.slice();
+        p.defaultColorId = p.colorVariants[0].id;
+        return;
+      }
+      // Infer the original's color: if exactly one of the KNOWN_COLORS isn't
+      // in the manifest, that's the color of the curated render. Otherwise
+      // fall back to a generic "original" swatch (thumbnail style).
+      var presentIds = list.map(function (v) { return v.id; });
+      var missing = KNOWN_COLORS.filter(function (c) { return presentIds.indexOf(c) === -1; });
+      var originalId = (missing.length === 1) ? missing[0] : 'original';
+      var prepended = { id: originalId, image: p.assets.image };
+      p.colorVariants = [prepended].concat(list);
+      p.defaultColorId = originalId;
+    });
+  }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
   else init();
