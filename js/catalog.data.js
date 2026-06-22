@@ -35,7 +35,7 @@
         'nav.products':   'Productos',
         'nav.spaces':     'Ambientes',
         'nav.downloads':  'Descargas',
-        'nav.favorites':  'Favoritos',
+        'nav.favorites':  'Tu Proyecto',
         'nav.about':      'Acerca',
 
         // Topbar (eyebrow + title) por ruta
@@ -48,7 +48,7 @@
         'topbar.downloads.eyebrow': 'Recursos',
         'topbar.downloads.title':   'Descargas',
         'topbar.favorites.eyebrow': 'Tu selección',
-        'topbar.favorites.title':   'Favoritos',
+        'topbar.favorites.title':   'Tu Proyecto',
         'topbar.about.eyebrow':     'La marca',
         'topbar.about.title':       'Sobre LUXA',
 
@@ -61,7 +61,7 @@
         // Shortcuts
         'shortcut.products': 'Productos',
         'shortcut.spaces':   'Ambientes',
-        'shortcut.favorites':'Guardados',
+        'shortcut.favorites':'Mi Proyecto',
         'shortcut.downloads':'Recursos',
         'shortcut.meta.fixtures': '{n} luminarias',
         'shortcut.meta.rooms':    '{n} ambientes',
@@ -78,7 +78,15 @@
         'homeSpaces.viewAll':  'Ver todos los ambientes →',
         'homeSpaces.cta':      'Explorar ambiente',
         'homeQuick.products':  'Ver catálogo completo',
-        'homeQuick.favorites': 'Mis guardados',
+        'homeQuick.favorites': 'Mi Proyecto',
+
+        // Home — Tipos de luminaria (collage por categoría)
+        'homeTypes.eyebrow':   'Explorar por tipo',
+        'homeTypes.title':     'Tipos de luminaria',
+        'homeTypes.viewAll':   'Ver catálogo completo →',
+        'homeTypes.cta':       'Ver categoría',
+        'homeTypes.countOne':  'producto',
+        'homeTypes.countMany': 'productos',
 
         // Home — Bridge: catálogo ↔ contexto
         'homeBridge.eyebrow':       'Del catálogo al ambiente',
@@ -185,9 +193,28 @@
         'dl.kind.Guide':            'Guía',
 
         // Favorites empty state
-        'favorites.empty.title': 'Tu colección está vacía',
-        'favorites.empty.sub':   'Guardá luminarias tocando el corazón en cualquier card.',
-        'favorites.browse':      'Ver productos'
+        'favorites.empty.title': 'Tu proyecto está vacío',
+        'favorites.empty.sub':   'Guardá luminarias tocando el corazón en cualquier card y armá tu proyecto.',
+        'favorites.browse':      'Ver productos',
+
+        // Tu Proyecto — título editable + acciones PDF / WhatsApp
+        'project.titleLabel':       'Nombre del proyecto',
+        'project.titlePlaceholder': 'Ej: Hotel Delta',
+        'project.downloadPdf':      'Descargar PDF',
+        'project.sendWhatsapp':     'Enviar por WhatsApp',
+        'project.untitled':         'Proyecto sin nombre',
+        'project.pdf.brand':        'LUXA · TD Lighting Experience',
+        'project.pdf.subtitle':     'Selección de luminarias',
+        'project.pdf.generatedOn':  'Generado el {date}',
+        'project.pdf.itemsCount':   '{n} luminarias seleccionadas',
+        'project.pdf.code':         'Código',
+        'project.pdf.category':     'Categoría',
+        'project.pdf.power':        'Potencia',
+        'project.pdf.temp':         'Temperatura',
+        'project.pdf.footer':       'Catálogo interactivo LUXA · Para cotización y consultas, contactanos por WhatsApp.',
+        'project.wa.intro':         'Hola, te paso mi proyecto:',
+        'project.wa.introTitled':   'Hola, te paso mi proyecto "{title}":',
+        'project.wa.outro':         'Quedo a la espera de tu cotización. ¡Gracias!'
       },
 
       en: {
@@ -195,7 +222,7 @@
         'nav.products':   'Products',
         'nav.spaces':     'Spaces',
         'nav.downloads':  'Downloads',
-        'nav.favorites':  'Favorites',
+        'nav.favorites':  'Your Project',
         'nav.about':      'About',
 
         'topbar.home.eyebrow':      'Welcome',
@@ -206,8 +233,8 @@
         'topbar.spaces.title':      'Spaces',
         'topbar.downloads.eyebrow': 'Resources',
         'topbar.downloads.title':   'Downloads',
-        'topbar.favorites.eyebrow': 'Your saved',
-        'topbar.favorites.title':   'Favorites',
+        'topbar.favorites.eyebrow': 'Your selection',
+        'topbar.favorites.title':   'Your Project',
         'topbar.about.eyebrow':     'The brand',
         'topbar.about.title':       'About LUXA',
 
@@ -218,7 +245,7 @@
 
         'shortcut.products':       'Browse Products',
         'shortcut.spaces':         'Explore Spaces',
-        'shortcut.favorites':      'Saved Items',
+        'shortcut.favorites':      'My Project',
         'shortcut.downloads':      'Resources',
         'shortcut.meta.fixtures':  '{n} fixtures',
         'shortcut.meta.rooms':     '{n} rooms',
@@ -235,7 +262,15 @@
         'homeSpaces.viewAll':  'View all spaces →',
         'homeSpaces.cta':      'Explore space',
         'homeQuick.products':  'Browse full catalog',
-        'homeQuick.favorites': 'My saved items',
+        'homeQuick.favorites': 'My Project',
+
+        // Home — Fixture types (collage by category)
+        'homeTypes.eyebrow':   'Browse by type',
+        'homeTypes.title':     'Fixture types',
+        'homeTypes.viewAll':   'View full catalog →',
+        'homeTypes.cta':       'View category',
+        'homeTypes.countOne':  'product',
+        'homeTypes.countMany': 'products',
 
         // Home — Bridge: catalog ↔ context
         'homeBridge.eyebrow':       'From catalog to context',
@@ -335,9 +370,28 @@
         'dl.kind.Collection':       'Collection',
         'dl.kind.Guide':            'Guide',
 
-        'favorites.empty.title': 'Your collection is empty',
-        'favorites.empty.sub':   'Save products you love by tapping the heart on any card.',
-        'favorites.browse':      'Browse products'
+        'favorites.empty.title': 'Your project is empty',
+        'favorites.empty.sub':   'Save products you love by tapping the heart on any card and build your project.',
+        'favorites.browse':      'Browse products',
+
+        // Your Project — editable title + PDF / WhatsApp actions
+        'project.titleLabel':       'Project name',
+        'project.titlePlaceholder': 'e.g. Hotel Delta',
+        'project.downloadPdf':      'Download PDF',
+        'project.sendWhatsapp':     'Send via WhatsApp',
+        'project.untitled':         'Untitled project',
+        'project.pdf.brand':        'LUXA · TD Lighting Experience',
+        'project.pdf.subtitle':     'Selected fixtures',
+        'project.pdf.generatedOn':  'Generated on {date}',
+        'project.pdf.itemsCount':   '{n} fixtures selected',
+        'project.pdf.code':         'Code',
+        'project.pdf.category':     'Category',
+        'project.pdf.power':        'Power',
+        'project.pdf.temp':         'Color temp.',
+        'project.pdf.footer':       'LUXA interactive catalog · For quotes and questions, reach us on WhatsApp.',
+        'project.wa.intro':         'Hi, here is my project:',
+        'project.wa.introTitled':   'Hi, here is my project "{title}":',
+        'project.wa.outro':         'Looking forward to your quote. Thanks!'
       }
     },
 
@@ -349,7 +403,10 @@
       contact: {
         /* WhatsApp en formato internacional sin '+' ni espacios.
            Origen: +54 9 11 6002-9154 (Argentina · móvil) */
-        whatsapp: '5491160029154'
+        whatsapp: '5491160029154',
+        /* URLs completas de redes sociales. Dejá '' para esconder el icono. */
+        facebook:  '',
+        instagram: ''
       }
     },
 

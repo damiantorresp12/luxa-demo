@@ -1,7 +1,7 @@
 {
   "_readme": "Auto-managed by the Space Planner. Save this file as data/spaces.luxa-original.json in the LUXA project root — the app fetches all data/spaces.*.json files at boot and merges them into window.LUXA.spaces. Same id → planner entry replaces curated entry. Product IDs use catalogId from products.json when present.",
   "catalog": "luxa-original",
-  "exportedAt": "2026-06-19T20:58:11.795Z",
+  "exportedAt": "2026-06-22T13:35:18.324Z",
   "entries": [
     {
       "id": "living-aballs-collection-01",
@@ -347,7 +347,8 @@
           "productId": "roomor-1-suspended-light-2481e0b00",
           "x": 50.92,
           "y": 44.31,
-          "closeUpImage": "assets/Spaces/Kitchen 02/Kitchen 02 Close up 02.jpeg"
+          "closeUpImage": "assets/Spaces/Kitchen 02/Kitchen 02 Close up 02.jpeg",
+          "transitionVideo": "assets/Transiciones/Kitchen 02/Kitchen 02 tran 02.mp4"
         },
         {
           "productId": "roomor-1-table-lamp-637120b00",

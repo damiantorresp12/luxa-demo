@@ -9,8 +9,9 @@
   var DATA = window.LUXA;
   if (!DATA) { console.error('LUXA data not loaded'); return; }
 
-  var FAV_KEY  = 'luxa.favorites';
-  var LANG_KEY = 'luxa.lang';
+  var FAV_KEY     = 'luxa.favorites';
+  var LANG_KEY    = 'luxa.lang';
+  var PROJECT_KEY = 'luxa.project.title';
 
   /* Lenguaje activo. Default 'es'. */
   var lang = 'en';
@@ -238,6 +239,82 @@
     };
   }
 
+  // Map each productId → its first curated close-up image across all spaces.
+  // Used by the home "Tipos de luminaria" collage to pick the most "destacado"
+  // (already-curated-in-a-scene) representative image per category.
+  function closeUpByProductId() {
+    var map = {};
+    (DATA.spaces || []).forEach(function (sp) {
+      (sp.hotspots || []).forEach(function (h) {
+        if (h.productId && h.closeUpImage && !map[h.productId]) {
+          map[h.productId] = h.closeUpImage;
+        }
+      });
+    });
+    return map;
+  }
+
+  // Pick the best representative product for a given category:
+  // 1. First product in the category that already has a curated close-up in a space
+  // 2. Otherwise the first product in the category
+  function representativeProductForCategory(category, closeUpMap) {
+    var inCat = (DATA.products || []).filter(function (p) { return p.category === category; });
+    if (!inCat.length) return null;
+    var curated = inCat.filter(function (p) { return closeUpMap[p.id]; });
+    return (curated[0] || inCat[0]);
+  }
+
+  function renderHomeTypes() {
+    var grid = $('#homeTypesGrid');
+    if (!grid) return;
+    // The categories the user wants front-and-center on Home.
+    var CATEGORIES = ['Pendants', 'Floor Lamps', 'Ceiling Lights', 'Wall Lights'];
+    var closeUps = closeUpByProductId();
+
+    grid.innerHTML = '';
+    var any = false;
+    CATEGORIES.forEach(function (cat) {
+      var p = representativeProductForCategory(cat, closeUps);
+      if (!p) return;
+      any = true;
+      var img = closeUps[p.id] || (p.assets && p.assets.image);
+      var count = (DATA.products || []).filter(function (x) { return x.category === cat; }).length;
+      var countWord = t(count === 1 ? 'homeTypes.countOne' : 'homeTypes.countMany');
+      var label = t('category.' + cat);
+
+      var card = el('article', 'type-card');
+      card.setAttribute('tabindex', '0');
+      card.setAttribute('role', 'link');
+      card.setAttribute('aria-label', label);
+      card.innerHTML =
+        '<div class="type-card-media">' +
+          (img ? '<img loading="lazy" src="' + uri(img) + '" alt="' + label + '" />' : '') +
+        '</div>' +
+        '<div class="type-card-scrim"></div>' +
+        '<div class="type-card-body">' +
+          '<h3 class="type-card-title">' + label + '</h3>' +
+          '<p class="type-card-count">' + count + ' ' + countWord + '</p>' +
+          '<span class="type-card-cta">' + t('homeTypes.cta') + ' →</span>' +
+        '</div>';
+
+      function openCat() {
+        activeFilters = { categories: [cat], spaces: [], collections: [] };
+        // Re-render the catalog + filter sidebar so the new active filter is
+        // visually reflected (chip checked, list filtered) before navigating.
+        renderFilters();
+        renderProducts();
+        updateProductCount();
+        go('products');
+      }
+      card.addEventListener('click', openCat);
+      card.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openCat(); }
+      });
+      grid.appendChild(card);
+    });
+    grid.hidden = !any;
+  }
+
   function renderHomeSpaces() {
     var grid = $('#homeSpacesGrid');
     if (!grid) return;
@@ -366,6 +443,33 @@
   /* CTA cierre comercial: monta el href de WhatsApp con número y mensaje precargado.
      Si no hay número configurado, el botón queda inerte (no abre wa.me con un
      número de juguete que podría hacer ruido). */
+  // Sidebar foot social row: muestra cada icono solo si hay URL real en
+  // brand.contact. WhatsApp arma su URL con wa.me; FB/IG usan la URL completa
+  // que Damian ponga en catalog.data.js.
+  function initSidebarSocial() {
+    var c = (DATA.brand && DATA.brand.contact) || {};
+    var fb = $('#socialFacebook');
+    var ig = $('#socialInstagram');
+    var wa = $('#socialWhatsapp');
+    if (fb) {
+      if (c.facebook) { fb.href = c.facebook; fb.hidden = false; }
+      else { fb.hidden = true; }
+    }
+    if (ig) {
+      if (c.instagram) { ig.href = c.instagram; ig.hidden = false; }
+      else { ig.hidden = true; }
+    }
+    if (wa) {
+      var num = whatsappNumber();
+      if (num) {
+        wa.href = 'https://wa.me/' + num;
+        wa.hidden = false;
+      } else {
+        wa.hidden = true;
+      }
+    }
+  }
+
   function initHomeCta() {
     var link = $('#homeCtaWhatsapp');
     if (!link) return;
@@ -399,6 +503,7 @@
     initHomeHeroSlides(imgs);
 
     renderHomeBridge();
+    renderHomeTypes();
     renderHomeSpaces();
     initHomeCta();
     refreshHomeMetas();
@@ -702,17 +807,19 @@
     $('#detailImg').src = uri(mainImg);
     $('#detailImg').alt = p.name;
 
-    // Color swatches row inside the detail-media. Only renders if the product
-    // has variants AND we're viewing it from the bare catalog (no close-up /
-    // ambient context). When the detail was opened from a space or a hotspot,
-    // we hide the swatches — the conversation is about the product in context,
-    // not about catalog variants.
-    var fromSpaceContext = !!(closeUp || spaceImg);
+    // Color swatches row inside the detail-media. Only meaningful when the
+    // user is looking at the CATALOG thumb (the white-bg render) — changing the
+    // swatch on a space or close-up thumb wouldn't visibly do anything and
+    // would be confusing. So we hide the swatches whenever the initial view is
+    // a close-up, and the thumb-click handler below toggles them as the user
+    // switches between thumbs.
     var swatchHost = $('#detailColorSwatches');
     if (swatchHost) {
-      if (p.colorVariants && p.colorVariants.length && !fromSpaceContext) {
+      if (p.colorVariants && p.colorVariants.length) {
         swatchHost.innerHTML = colorSwatchesHTML(p);
-        swatchHost.hidden = false;
+        // If the detail opened on a close-up, we start hidden; the thumb
+        // handler will show on catalog click.
+        swatchHost.hidden = !!closeUp;
         $$('.color-swatch', swatchHost).forEach(function (btn) {
           btn.addEventListener('click', function () {
             var colorId = btn.dataset.color;
@@ -792,10 +899,19 @@
           $$('button', thumbs).forEach(function (n) { n.classList.remove('active'); });
           b.classList.add('active');
           var which = b.dataset.thumb;
+          // For the catalog thumb, re-resolve the active color variant so the
+          // user's swatch choice (which can happen after the thumbs were built)
+          // wins over the snapshot taken at openDetail() time.
           var src = which === 'close' ? closeUp
                   : which === 'space' ? spaceImg
-                  : catalogImg;
+                  : getActiveColorImage(p);
           $('#detailImg').src = uri(src);
+          // Color swatches are only meaningful on the catalog view (white-bg
+          // render). Hide them on space/close-up so the user doesn't think the
+          // swatch is broken when the click does nothing visible.
+          if (swatchHost && p.colorVariants && p.colorVariants.length) {
+            swatchHost.hidden = which !== 'catalog';
+          }
           // Keep the "seen in" caption only when showing the in-context close-up.
           ctx.hidden = which !== 'close' || !opts.contextLabel;
         });
@@ -1240,7 +1356,7 @@
           ? { closeUpImage: h.closeUpImage, contextLabel: tx(sp.name), spaceImage: sp.image }
           : (sp.image ? { spaceImage: sp.image, contextLabel: tx(sp.name) } : null);
         var isHotspot = node.classList.contains('hotspot');
-        if (isHotspot && h && h.transitionVideo) {
+        if (isHotspot && h && h.transitionVideo && $('#transitionOverlay')) {
           // Anchor the cinematic to THIS section's stage (not the first one
           // on the page), so multi-scene layouts play the video in place.
           playHotspotTransition(pid, h, sp, stage);
@@ -1256,6 +1372,10 @@
   function renderActiveSpace() {
     var wrap = $('#spaceStageWrap');
     if (!wrap) return;
+    // Rescue the transition overlay before we wipe wrap.innerHTML below; if it
+    // was parented inside a stage it would otherwise get destroyed and future
+    // hotspot clicks would silently no-op.
+    resetTransitionOverlay();
     // No scene selected → show the room-type chooser landing instead.
     if (!activeSpace) {
       wrap.classList.remove('is-list');
@@ -1292,6 +1412,33 @@
      video, giving a reliable "frozen on the product" final frame, and a small
      info card appears on top.
      ========================================================================== */
+
+  // The transition overlay is moved into a .space-stage during playback. If the
+  // user leaves the scene (back button, filter change, language switch, room
+  // re-pick) without explicitly closing the overlay, the upcoming wrap.innerHTML
+  // wipe would destroy it — leaving future hotspot clicks with nowhere to play.
+  // Call this BEFORE any spaces re-render to return the overlay to <body> and
+  // reset its state.
+  function resetTransitionOverlay() {
+    var overlay = $('#transitionOverlay');
+    if (!overlay) return;
+    var video = $('#transitionVideo');
+    var still = $('#transitionStill');
+    var card  = $('#transitionCard');
+    if (video) {
+      try { video.pause(); } catch (e) {}
+      video.removeAttribute('src');
+      try { video.load(); } catch (e) {}
+      video.style.visibility = '';
+      video.style.opacity = '';
+    }
+    if (still) { still.hidden = true; still.removeAttribute('src'); }
+    if (card)  { card.hidden = true; card.classList.remove('is-expanded'); }
+    overlay.hidden = true;
+    overlay.style.backgroundImage = '';
+    if (overlay.parentNode !== document.body) document.body.appendChild(overlay);
+  }
+
   function playHotspotTransition(pid, h, sp, stageEl) {
     var prod = productById(pid);
     if (!prod) return;
@@ -1521,22 +1668,184 @@
   /* =============================================================================
      FAVORITES
      ========================================================================== */
+  function loadProjectTitle() { try { return localStorage.getItem(PROJECT_KEY) || ''; } catch (e) { return ''; } }
+  function saveProjectTitle(v) { try { localStorage.setItem(PROJECT_KEY, v || ''); } catch (e) {} }
+
   function renderFavorites() {
-    var grid = $('#favoritesGrid');
-    var empty = $('#favoritesEmpty');
-    var favs = loadFavs();
+    var grid   = $('#favoritesGrid');
+    var empty  = $('#favoritesEmpty');
+    var header = $('#projectHeader');
+    var favs   = loadFavs();
     grid.innerHTML = '';
 
     var items = favs.map(productById).filter(Boolean);
     if (items.length === 0) {
       grid.hidden = true;
       empty.hidden = false;
+      if (header) header.hidden = true;
     } else {
       grid.hidden = false;
       empty.hidden = true;
+      if (header) header.hidden = false;
       items.forEach(function (p) { grid.appendChild(productCard(p)); });
+      hydrateProjectHeader(items);
     }
     if ($('#panel-favorites').hidden === false) renderTopbarActions('favorites');
+  }
+
+  function hydrateProjectHeader(items) {
+    var input = $('#projectTitleInput');
+    if (input && input.dataset.bound !== '1') {
+      input.value = loadProjectTitle();
+      input.addEventListener('input', function () {
+        saveProjectTitle(input.value);
+        refreshProjectWaLink(items);
+      });
+      input.dataset.bound = '1';
+    } else if (input) {
+      // Re-bind value when re-rendering after lang switch etc.
+      input.value = loadProjectTitle();
+    }
+
+    var pdfBtn = $('#projectPdfBtn');
+    if (pdfBtn) {
+      pdfBtn.onclick = function () {
+        var fresh = loadFavs().map(productById).filter(Boolean);
+        if (!fresh.length) return;
+        exportProjectPdf(fresh, loadProjectTitle());
+      };
+    }
+
+    refreshProjectWaLink(items);
+  }
+
+  function refreshProjectWaLink(items) {
+    var waBtn = $('#projectWaBtn');
+    if (!waBtn) return;
+    var num = whatsappNumber();
+    if (!num || !items || !items.length) {
+      waBtn.hidden = true;
+      waBtn.removeAttribute('href');
+      return;
+    }
+    waBtn.href = buildProjectWhatsappUrl(items, loadProjectTitle());
+    waBtn.hidden = false;
+  }
+
+  function buildProjectWhatsappUrl(items, title) {
+    var num = whatsappNumber();
+    if (!num) return '';
+    var clean = (title || '').trim();
+    var intro = clean
+      ? t('project.wa.introTitled', { title: clean })
+      : t('project.wa.intro');
+    var lines = items.map(function (p) {
+      return '• ' + p.name + (p.code ? ' (' + p.code + ')' : '');
+    });
+    var msg = intro + '\n\n' + lines.join('\n') + '\n\n' + t('project.wa.outro');
+    return 'https://wa.me/' + num + '?text=' + encodeURIComponent(msg);
+  }
+
+  function exportProjectPdf(items, title) {
+    var win = window.open('', '_blank');
+    if (!win) {
+      // Pop-up blocked — fall back to printing the current window after a
+      // throwaway DOM build (rare; most modern browsers allow user-triggered popups).
+      alert('No se pudo abrir la ventana de impresión. Habilitá los pop-ups para este sitio.');
+      return;
+    }
+    var html = buildProjectPdfHTML(items, title);
+    win.document.open();
+    win.document.write(html);
+    win.document.close();
+  }
+
+  function escapeHtml(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+
+  function buildProjectPdfHTML(items, title) {
+    var clean = (title || '').trim() || t('project.untitled');
+    var date = new Date().toLocaleDateString(lang === 'en' ? 'en-US' : 'es-AR', {
+      year: 'numeric', month: 'long', day: 'numeric'
+    });
+    var origin = window.location.origin + window.location.pathname.replace(/\/[^\/]*$/, '/');
+    var brandAccent = (DATA.brand && DATA.brand.accent) || '#c9a24b';
+    var brandName = (DATA.brand && DATA.brand.name) || 'LUXA';
+
+    var cards = items.map(function (p) {
+      var img = origin + uri(getActiveColorImage(p));
+      var specs = [
+        [t('project.pdf.code'),     p.code],
+        [t('project.pdf.category'), t('category.' + p.category)],
+        [t('project.pdf.power'),    p.power],
+        [t('project.pdf.temp'),     p.temperature]
+      ].filter(function (r) { return r[1]; }).map(function (r) {
+        return '<div class="spec"><span class="k">' + escapeHtml(r[0]) + '</span><span class="v">' + escapeHtml(r[1]) + '</span></div>';
+      }).join('');
+      var desc = tx(p.description) || '';
+      return '' +
+        '<article class="pdf-card">' +
+          '<div class="pdf-card-media"><img src="' + escapeHtml(img) + '" alt="' + escapeHtml(p.name) + '"/></div>' +
+          '<div class="pdf-card-body">' +
+            '<span class="cat">' + escapeHtml(t('category.' + p.category)) + '</span>' +
+            '<h3>' + escapeHtml(p.name) + '</h3>' +
+            '<div class="specs">' + specs + '</div>' +
+            (desc ? '<p class="desc">' + escapeHtml(desc) + '</p>' : '') +
+          '</div>' +
+        '</article>';
+    }).join('');
+
+    var countLine = t('project.pdf.itemsCount', { n: items.length });
+    var dateLine  = t('project.pdf.generatedOn', { date: date });
+
+    return '<!DOCTYPE html><html lang="' + lang + '"><head><meta charset="utf-8"/>' +
+      '<title>' + escapeHtml(clean) + ' · ' + brandName + '</title>' +
+      '<style>' +
+        '*{box-sizing:border-box}' +
+        'html,body{margin:0;padding:0;background:#fff;color:#1a1a1a;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;-webkit-print-color-adjust:exact;print-color-adjust:exact}' +
+        '.page{max-width:780px;margin:0 auto;padding:40px 36px}' +
+        '.cover{border-bottom:2px solid ' + brandAccent + ';padding-bottom:24px;margin-bottom:28px}' +
+        '.cover .brand{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:' + brandAccent + ';margin:0 0 12px}' +
+        '.cover h1{font-size:36px;margin:0 0 8px;font-weight:600;line-height:1.1}' +
+        '.cover .sub{font-size:13px;color:#666;margin:0 0 4px}' +
+        '.cover .meta{font-size:12px;color:#888;margin:8px 0 0}' +
+        '.pdf-grid{display:grid;grid-template-columns:1fr;gap:18px}' +
+        '.pdf-card{display:grid;grid-template-columns:180px 1fr;gap:18px;border:1px solid #eee;border-radius:8px;padding:14px;page-break-inside:avoid;break-inside:avoid}' +
+        '.pdf-card-media{background:#f7f7f7;border-radius:6px;overflow:hidden;display:flex;align-items:center;justify-content:center;aspect-ratio:1/1}' +
+        '.pdf-card-media img{max-width:100%;max-height:100%;object-fit:contain}' +
+        '.pdf-card-body{display:flex;flex-direction:column;gap:6px;min-width:0}' +
+        '.pdf-card-body .cat{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:' + brandAccent + '}' +
+        '.pdf-card-body h3{margin:0;font-size:18px;font-weight:600}' +
+        '.specs{display:grid;grid-template-columns:1fr 1fr;gap:4px 14px;margin-top:6px}' +
+        '.spec{display:flex;flex-direction:column;gap:1px}' +
+        '.spec .k{font-size:9px;letter-spacing:1px;text-transform:uppercase;color:#999}' +
+        '.spec .v{font-size:12px;color:#222}' +
+        '.desc{font-size:12px;color:#555;line-height:1.45;margin:8px 0 0}' +
+        '.foot{margin-top:32px;padding-top:16px;border-top:1px solid #eee;font-size:11px;color:#888;text-align:center}' +
+        '@media print{.page{padding:20px}.pdf-card{border-color:#ddd}}' +
+      '</style></head><body>' +
+        '<div class="page">' +
+          '<header class="cover">' +
+            '<p class="brand">' + escapeHtml(t('project.pdf.brand')) + '</p>' +
+            '<h1>' + escapeHtml(clean) + '</h1>' +
+            '<p class="sub">' + escapeHtml(t('project.pdf.subtitle')) + '</p>' +
+            '<p class="meta">' + escapeHtml(countLine) + ' · ' + escapeHtml(dateLine) + '</p>' +
+          '</header>' +
+          '<div class="pdf-grid">' + cards + '</div>' +
+          '<footer class="foot">' + escapeHtml(t('project.pdf.footer')) + '</footer>' +
+        '</div>' +
+        '<script>' +
+          'window.addEventListener("load",function(){' +
+            'var imgs=document.images,left=imgs.length;' +
+            'if(!left){setTimeout(function(){window.focus();window.print();},150);return;}' +
+            'function done(){if(--left<=0){setTimeout(function(){window.focus();window.print();},150);}}' +
+            'for(var i=0;i<imgs.length;i++){if(imgs[i].complete){done();}else{imgs[i].addEventListener("load",done);imgs[i].addEventListener("error",done);}}' +
+          '});' +
+        '<\/script>' +
+      '</body></html>';
   }
 
   document.addEventListener('click', function (e) {
@@ -1730,6 +2039,7 @@
     bindGlobalNav();
     bindFilterDrawers();
     bindTransitionCard();
+    initSidebarSocial();
 
     var start = (window.location.hash || '').replace('#', '');
     go(ROUTES[start] ? start : 'home');
@@ -1749,11 +2059,14 @@
       renderHomeSpaces();
       // Bridge necesita findSpaceFor() para el caption "En contexto"
       renderHomeBridge();
+      // Types collage usa los close-ups de spaces para el "más destacado"
+      renderHomeTypes();
     },
     refreshProducts: function () {
       attachColorVariantsAll();
       renderFilters();
       renderProducts();
+      renderHomeTypes();
       updateProductCount();
     }
   };

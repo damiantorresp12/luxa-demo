@@ -21,3 +21,6 @@ assets/models/
 # Backups del Space Planner
 space-planner/**/*.bak.json
 space-planner/**/*.pre-cleanup.bak.json
+
+# Backups locales generados por el Product Data Generator (no van a prod)
+data/*.bak.json

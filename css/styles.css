@@ -209,15 +209,41 @@ svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width:
 }
 
 .sidebar-foot {
-  display: flex; align-items: center; gap: 10px;
-  padding: 14px 10px 4px;
+  display: flex; flex-direction: column; gap: 14px;
+  padding: 16px 10px 4px;
   border-top: 1px solid var(--line-soft);
   margin-top: 12px;
   font-size: 0.72rem;
   color: var(--ink-faint);
 }
+.sidebar-foot-status { display: flex; align-items: center; gap: 10px; }
 .sidebar-foot p { margin: 0; line-height: 1.3; color: var(--ink-dim); }
-.sidebar-foot-sub { color: var(--ink-faint) !important; font-size: 0.6rem; letter-spacing: 0.14em; text-transform: uppercase; margin-top: 2px !important; }
+.sidebar-foot-sub {
+  color: var(--ink-faint) !important;
+  font-size: 0.6rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  text-align: center;
+}
+.sidebar-social {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+}
+.social-ico {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  border: 1px solid var(--line-soft);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--ink-dim);
+  transition: border-color .25s var(--ease), color .25s var(--ease), transform .25s var(--ease);
+}
+.social-ico svg { width: 14px; height: 14px; fill: currentColor; }
+.social-ico:hover {
+  border-color: var(--brass);
+  color: var(--brass);
+  transform: translateY(-2px);
+}
 .dot {
   width: 7px; height: 7px; border-radius: 50%;
   background: #58c773;
@@ -558,6 +584,122 @@ svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width:
 }
 .space-card-cta::after { content: '→'; transition: transform 0.3s var(--ease); }
 .space-card:hover .space-card-cta { gap: 14px; color: var(--brass); }
+
+/* =============================================================================
+   HOME · Tipos de luminaria — collage editorial por categoría
+   (Colgantes, De pie, De techo). 3 cards de igual peso, close-up del producto
+   más curado de cada categoría como portada.
+   ========================================================================== */
+.home-types {
+  padding: 70px var(--gutter) 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  border-top: 1px solid var(--line-soft);
+}
+.home-types-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+.home-types-head .eyebrow { margin-bottom: 12px; display: block; }
+.home-types-title {
+  font-family: var(--serif);
+  font-size: clamp(2rem, 3.6vw, 3rem);
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  line-height: 1.05;
+}
+.home-types-all {
+  font-size: 0.78rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+  padding-bottom: 8px;
+  transition: color 0.3s var(--ease);
+}
+.home-types-all:hover { color: var(--brass); }
+
+.home-types-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+}
+.home-types-grid[hidden] { display: none; }
+@media (max-width: 1100px) {
+  .home-types-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+.type-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius);
+  border: 1px solid var(--line-soft);
+  background: var(--panel);
+  cursor: pointer;
+  aspect-ratio: 4 / 5;
+  transition: border-color 0.4s var(--ease), transform 0.5s var(--ease);
+}
+.type-card:hover { border-color: var(--brass); transform: translateY(-3px); }
+.type-card:focus-visible { outline: 2px solid var(--brass); outline-offset: 3px; }
+
+.type-card-media {
+  position: absolute; inset: 0;
+  background: radial-gradient(120% 120% at 50% 20%, #232328, #0d0d0f 75%);
+}
+.type-card-media img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  transition: transform 0.9s var(--ease);
+}
+.type-card:hover .type-card-media img { transform: scale(1.05); }
+
+.type-card-scrim {
+  position: absolute; inset: 0;
+  background: linear-gradient(0deg,
+    rgba(8,8,10,0.92) 0%,
+    rgba(8,8,10,0.50) 38%,
+    rgba(8,8,10,0.08) 72%,
+    transparent 100%);
+  pointer-events: none;
+}
+
+.type-card-body {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  padding: 26px 28px;
+  z-index: 2;
+}
+.type-card-title {
+  font-family: var(--serif);
+  font-size: clamp(1.5rem, 2.2vw, 2.1rem);
+  font-weight: 500;
+  line-height: 1.05;
+  color: var(--ink);
+  margin: 0 0 6px;
+  transition: color 0.35s var(--ease);
+}
+.type-card:hover .type-card-title { color: var(--brass); }
+.type-card-count {
+  font-size: 0.74rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--brass);
+  margin: 0 0 14px;
+}
+.type-card-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.72rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink);
+  transition: gap 0.3s var(--ease), color 0.3s var(--ease);
+}
+.type-card:hover .type-card-cta { gap: 14px; color: var(--brass); }
 
 /* =============================================================================
    HOME · Bridge — del catálogo al ambiente (split editorial)
@@ -1820,6 +1962,71 @@ svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width:
 .dl-card .btn { margin-top: 12px; align-self: flex-start; }
 
 /* =============================================================================
+   PANEL: TU PROYECTO — header con título editable + acciones (PDF, WhatsApp)
+   ========================================================================== */
+.project-header {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-areas:
+    "label   actions"
+    "input   actions";
+  gap: 6px 20px;
+  align-items: end;
+  padding: 18px 0 22px;
+  margin: 0 0 24px;
+  border-bottom: 1px solid var(--line);
+}
+.project-title-label {
+  grid-area: label;
+  font-size: 0.7rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+}
+.project-title-input {
+  grid-area: input;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid transparent;
+  font-family: var(--serif);
+  font-size: clamp(1.4rem, 3vw, 2rem);
+  font-weight: 500;
+  color: var(--ink);
+  padding: 4px 0;
+  width: 100%;
+  outline: none;
+  transition: border-color .2s ease;
+}
+.project-title-input::placeholder { color: var(--ink-faint); font-style: italic; }
+.project-title-input:hover { border-bottom-color: var(--line); }
+.project-title-input:focus { border-bottom-color: var(--brass); }
+.project-actions {
+  grid-area: actions;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+.project-actions .btn { white-space: nowrap; }
+.project-action-ico {
+  display: inline-block;
+  margin-right: 6px;
+  font-weight: 600;
+}
+@media (max-width: 720px) {
+  .project-header {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "label"
+      "input"
+      "actions";
+    gap: 6px;
+  }
+  .project-actions { justify-content: flex-start; }
+}
+
+/* =============================================================================
    PANEL: FAVORITES — empty state
    ========================================================================== */
 .empty-state {
@@ -1906,6 +2113,8 @@ svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width:
   .home-hero-text { padding: 0 24px; }
   .home-hero { min-height: calc(100vh - var(--topbar-h)); }
   .home-spaces { padding: 50px var(--gutter) 22px; }
+  .home-types  { padding: 50px var(--gutter) 22px; }
+  .home-types-grid { grid-template-columns: 1fr; }
   .home-bridge { padding: 50px var(--gutter) 30px; }
   .home-cta { padding: 50px var(--gutter) 50px; }
   .home-cta-inner { padding: 40px 24px; }
