@@ -1,7 +1,7 @@
 {
   "_readme": "Auto-managed by the Space Planner. Save this file as data/spaces.luxa-original.json in the LUXA project root — the app fetches all data/spaces.*.json files at boot and merges them into window.LUXA.spaces. Same id → planner entry replaces curated entry. Product IDs use catalogId from products.json when present.",
   "catalog": "luxa-original",
-  "exportedAt": "2026-06-22T13:35:18.324Z",
+  "exportedAt": "2026-06-23T16:16:06.850Z",
   "entries": [
     {
       "id": "living-aballs-collection-01",
@@ -356,6 +356,161 @@
           "y": 63.36,
           "closeUpImage": "assets/Spaces/Kitchen 02/Kitchen 02 Close up 01.jpeg",
           "transitionVideo": "assets/Transiciones/Kitchen 02/Kitchen 02 tran 01.mp4"
+        }
+      ]
+    },
+    {
+      "id": "living-gashoppa-colection-manual-28",
+      "name": {
+        "es": "Colección Living Gashoppa colection",
+        "en": "Living Gashoppa colection"
+      },
+      "tagline": {
+        "es": "Iluminación cálida para residencial",
+        "en": "Warm residential lighting collection"
+      },
+      "description": {
+        "es": "Un living cálido que combina luz de techo, aplique de pared y decorativa en una composición residencial balanceada.",
+        "en": "A warm living setup combining ceiling, wall and decorative lighting in a balanced residential composition."
+      },
+      "image": "assets/Spaces/Living 03/Living 03.jpeg",
+      "gallery": [
+        "assets/Spaces/Living 03/Living 03.jpeg"
+      ],
+      "heroProduct": "grashoppa-floor-lamp",
+      "hotspots": [
+        {
+          "productId": "grashoppa-floor-lamp",
+          "x": 31.56,
+          "y": 85.05,
+          "closeUpImage": "assets/Spaces/Living 03/Living 03 close up 03.jpeg",
+          "transitionVideo": "assets/Transiciones/Living 03/Living 03 tran 01.mp4"
+        },
+        {
+          "productId": "grashoppa-pendant-light",
+          "x": 59.88,
+          "y": 50.66,
+          "closeUpImage": "assets/Spaces/Living 03/Living 03 close up 01.jpeg",
+          "transitionVideo": "assets/Transiciones/Living 03/Living 03 tran 03.mp4"
+        },
+        {
+          "productId": "grashoppa-task-table-lamp",
+          "x": 8.65,
+          "y": 76.06,
+          "closeUpImage": "assets/Spaces/Living 03/Living 03 close up 02.jpeg",
+          "transitionVideo": "assets/Transiciones/Living 03/Living 03 tran 02.mp4"
+        }
+      ]
+    },
+    {
+      "id": "bathroom-awa-suspended-manual-29",
+      "name": {
+        "es": "Colección Baño Awa suspended",
+        "en": "Bathroom Awa suspended"
+      },
+      "tagline": {
+        "es": "Iluminación funcional y limpia para baño",
+        "en": "Clean functional bathroom lighting collection"
+      },
+      "description": {
+        "es": "Un baño prolijo que combina luz de techo, aplique de pared y de acento, en una composición funcional y refinada.",
+        "en": "A clean bathroom setup combining ceiling, wall and accent lighting for a functional refined composition."
+      },
+      "image": "assets/Spaces/bathroom 02/Bathroom 02.jpeg",
+      "gallery": [
+        "assets/Spaces/bathroom 02/Bathroom 02.jpeg"
+      ],
+      "heroProduct": "awa-suspended",
+      "hotspots": [
+        {
+          "productId": "awa-suspended",
+          "x": 50.13,
+          "y": 42.9,
+          "closeUpImage": "assets/Spaces/bathroom 02/Bathroom 02 close up 1.jpeg"
+        }
+      ]
+    },
+    {
+      "id": "living-orb-collection-07",
+      "name": {
+        "es": "Colección Comedor Orb",
+        "en": "Dining Orb Collection"
+      },
+      "tagline": {
+        "es": "Iluminación focal para comedor",
+        "en": "Dining focused lighting collection"
+      },
+      "description": {
+        "es": "Un comedor con luz focal sobre la mesa, acompañada de aplique de pared y luz de acento.",
+        "en": "A warm living setup combining ceiling, wall and decorative lighting in a balanced residential composition."
+      },
+      "image": "assets/Spaces/Dining 03/Dining 03.jpeg",
+      "gallery": [
+        "assets/Spaces/Dining 03/Dining 03.jpeg"
+      ],
+      "heroProduct": "orb-floor-lamp",
+      "hotspots": [
+        {
+          "productId": "orb-floor-lamp",
+          "x": 21.56,
+          "y": 62.65,
+          "closeUpImage": "assets/Spaces/Dining 03/Dining 03 close up 03.jpeg"
+        },
+        {
+          "productId": "orb-pendant",
+          "x": 36.3,
+          "y": 7.98,
+          "closeUpImage": "assets/Spaces/Dining 03/Dining 03 close up 02.jpeg",
+          "transitionVideo": "assets/Transiciones/Dining 03/Dining 03 tran 01.mp4"
+        },
+        {
+          "productId": "orb-table-lamp",
+          "x": 84.37,
+          "y": 66.53,
+          "closeUpImage": "assets/Spaces/Dining 03/Dining 03 close up 01.jpeg",
+          "transitionVideo": "assets/Transiciones/Dining 03/Dining 03 tran 02.mp4"
+        }
+      ]
+    },
+    {
+      "id": "office-arum-collection-17",
+      "name": {
+        "es": "Colección Oficina Arum",
+        "en": "Office Arum Collection"
+      },
+      "tagline": {
+        "es": "Iluminación funcional y focal para oficina",
+        "en": "Functional and focused office lighting collection"
+      },
+      "description": {
+        "es": "Una oficina enfocada que combina luz general de techo con iluminación focal sobre el escritorio y luz de acento en paredes o estantes.",
+        "en": "A focused office setup combining general overhead light with task lighting at the desk and accent lighting on walls or shelves."
+      },
+      "image": "assets/Spaces/Office 01/Office 01.jpeg",
+      "gallery": [
+        "assets/Spaces/Office 01/Office 01.jpeg"
+      ],
+      "heroProduct": "arum floor",
+      "hotspots": [
+        {
+          "productId": "arum floor",
+          "x": 93.72,
+          "y": 85.23
+        },
+        {
+          "productId": "arum-table",
+          "x": 22.48,
+          "y": 71.12
+        },
+        {
+          "productId": "arum-wall-lamp-tall",
+          "x": 9.97,
+          "y": 54.37
+        },
+        {
+          "productId": "arum-wall",
+          "x": 74.89,
+          "y": 31.79
         }
       ]
     }

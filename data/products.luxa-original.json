@@ -1,7 +1,7 @@
 {
   "_readme": "Producto sidecar para la app LUXA. Generado por el Product Data Generator. Editar a mano sólo si sabés lo que hacés. La lista \"removed\" indica catalogIds que la app debe filtrar del catálogo estático.",
   "catalogId": "luxa-original",
-  "exportedAt": "2026-06-18T23:06:03.747Z",
+  "exportedAt": "2026-06-23T16:08:58.316Z",
   "products": [
     {
       "id": "flat-floor",
@@ -390,49 +390,14 @@
       }
     },
     {
-      "id": "arena-suspension",
-      "code": "DVA-ARN",
-      "name": "Arena Suspension 150",
-      "category": "Pendants",
-      "collection": "Arena",
-      "spaces": [],
-      "designer": "LUXA Studio",
-      "power": "48 W",
-      "lumens": "3600 lm",
-      "temperature": "3000 K",
-      "cri": "≥ 90",
-      "ip": "IP20",
-      "dimensions": "Ø 1500 × H 60 mm",
-      "finish": "Anodised aluminium ring",
-      "application": {
-        "es": "Mesas de reunión y lobbies",
-        "en": "Conference tables and lobbies"
-      },
-      "description": {
-        "es": "Un anillo luminoso fino que flota sobre el ambiente. La luz ascendente roza el techo mientras un baño descendente define la superficie debajo.",
-        "en": "A thin luminous ring that floats above the room. Uplight grazes the ceiling while a soft downward wash defines the surface below."
-      },
-      "featured": false,
-      "assets": {
-        "image": "assets/Imagenes/DVA-Arena Suspension Lamp 150_corona.jpg",
-        "model": null,
-        "gallery": [],
-        "pdfs": [],
-        "glb": null,
-        "fbx": null,
-        "ies": null,
-        "dwg": null,
-        "bim": null
-      }
-    },
-    {
       "id": "arum floor",
       "code": "DVA-ARF",
       "name": "Arum Floor",
       "category": "Floor Lamps",
       "collection": "Arum",
       "spaces": [
-        "living"
+        "living",
+        "office"
       ],
       "designer": "LUXA Studio",
       "power": "18 W",
@@ -471,7 +436,8 @@
       "collection": "Arum",
       "spaces": [
         "living",
-        "bedroom"
+        "bedroom",
+        "office"
       ],
       "designer": "LUXA Studio",
       "power": "7 W",
@@ -510,7 +476,8 @@
       "collection": "Arum",
       "spaces": [
         "living",
-        "dining"
+        "dining",
+        "office"
       ],
       "designer": "LUXA Studio",
       "power": "11 W",
@@ -549,7 +516,8 @@
       "collection": "Arum",
       "spaces": [
         "living",
-        "bedroom"
+        "bedroom",
+        "office"
       ],
       "designer": "LUXA Studio",
       "power": "9 W",
@@ -622,7 +590,10 @@
       "name": "Awa Suspended",
       "category": "Pendants",
       "collection": "Awa",
-      "spaces": [],
+      "spaces": [
+        "kitchen",
+        "bathroom"
+      ],
       "designer": "LUXA Studio",
       "power": "15 W",
       "lumens": "1100 lm",

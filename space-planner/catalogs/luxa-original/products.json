@@ -301,32 +301,6 @@
     "featured": true
   },
   {
-    "id": "DVA-Arena-Suspension-Lamp-150",
-    "name": "Arena Suspension 150",
-    "image": "../assets/Imagenes/DVA-Arena Suspension Lamp 150_corona.jpg",
-    "catalogId": "arena-suspension",
-    "category": "Pendants",
-    "type": "pendant",
-    "collection": "Arena",
-    "code": "DVA-ARN",
-    "designer": "LUXA Studio",
-    "power": "48 W",
-    "lumens": "3600 lm",
-    "temperature": "3000 K",
-    "cri": "≥ 90",
-    "ip": "IP20",
-    "dimensions": "Ø 1500 × H 60 mm",
-    "finish": "Anodised aluminium ring",
-    "application": {
-      "es": "Mesas de reunión y lobbies",
-      "en": "Conference tables and lobbies"
-    },
-    "description": {
-      "es": "Un anillo luminoso fino que flota sobre el ambiente. La luz ascendente roza el techo mientras un baño descendente define la superficie debajo.",
-      "en": "A thin luminous ring that floats above the room. Uplight grazes the ceiling while a soft downward wash defines the surface below."
-    }
-  },
-  {
     "id": "DVA-Arum-Floor-Lamp-by-Ferm-Living",
     "name": "Arum Floor",
     "image": "../assets/Imagenes/DVA-Arum Floor Lamp by Ferm Living.jpg",
@@ -336,7 +310,8 @@
     "collection": "Arum",
     "style": "decorative",
     "spaces": [
-      "living"
+      "living",
+      "office"
     ],
     "code": "DVA-ARF",
     "designer": "LUXA Studio",
@@ -367,7 +342,8 @@
     "style": "decorative",
     "spaces": [
       "living",
-      "bedroom"
+      "bedroom",
+      "office"
     ],
     "code": "DVA-ART",
     "designer": "LUXA Studio",
@@ -398,7 +374,8 @@
     "style": "decorative",
     "spaces": [
       "living",
-      "dining"
+      "dining",
+      "office"
     ],
     "code": "DVA-ARW-T",
     "designer": "LUXA Studio",
@@ -429,7 +406,8 @@
     "style": "decorative",
     "spaces": [
       "living",
-      "bedroom"
+      "bedroom",
+      "office"
     ],
     "code": "DVA-ARW",
     "designer": "LUXA Studio",
@@ -484,6 +462,10 @@
     "category": "Pendants",
     "type": "pendant",
     "collection": "Awa",
+    "spaces": [
+      "kitchen",
+      "bathroom"
+    ],
     "code": "DVA-AWA",
     "designer": "LUXA Studio",
     "power": "15 W",

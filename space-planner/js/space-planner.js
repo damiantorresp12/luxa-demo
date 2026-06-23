@@ -7,7 +7,7 @@
 
   // ---------- Configuration ----------
 
-  const SPACES = ['living', 'dining', 'kitchen', 'bedroom', 'bathroom'];
+  const SPACES = ['living', 'dining', 'kitchen', 'bedroom', 'bathroom', 'office'];
 
   const VALID_TYPES = [
     'pendant', 'ceiling_light', 'wall_light',
@@ -67,6 +67,16 @@
       intent: 'Clean functional bathroom lighting collection',
       reasonTemplate: (col) =>
         `Covers general, mirror and accent lighting from the ${col} family for a clean, functional bathroom composition.`
+    },
+    office: {
+      slots: [
+        ['pendant', 'ceiling_light', 'linear_light'],
+        ['table_lamp', 'floor_lamp'],
+        ['wall_light', 'spotlight']
+      ],
+      intent: 'Functional and focused office lighting collection',
+      reasonTemplate: (col) =>
+        `Combines general overhead light with desk task lighting and accent illumination from the ${col} family for a focused, balanced office setup.`
     }
   };
 
@@ -133,6 +143,16 @@
       downlight: 'recessed ceiling above vanity and shower',
       spotlight: 'track above mirror or shower',
       linear_light: 'mirror wash or ceiling cove'
+    },
+    office: {
+      pendant: 'centered above the desk or meeting area',
+      ceiling_light: 'ceiling center above the workspace',
+      wall_light: 'next to the bookshelf or feature wall',
+      table_lamp: 'on the desk',
+      floor_lamp: 'corner near reading chair or workspace',
+      downlight: 'recessed ceiling above desk and seating',
+      spotlight: 'track above bookshelf or accent wall',
+      linear_light: 'ceiling perimeter or above the desk'
     }
   };
 
@@ -141,7 +161,8 @@
     dining: 'A focused dining lighting setup with a centered pendant and supporting wall and accent lights.',
     kitchen: 'A functional kitchen setup combining task lighting over the island and counters with general and accent illumination.',
     bedroom: 'A soft bedroom setup mixing general, reading and bedside lighting for a quiet residential atmosphere.',
-    bathroom: 'A clean bathroom setup combining ceiling, wall and accent lighting for a functional refined composition.'
+    bathroom: 'A clean bathroom setup combining ceiling, wall and accent lighting for a functional refined composition.',
+    office: 'A focused office setup combining general overhead light with task lighting at the desk and accent lighting on walls or shelves.'
   };
 
   // ES counterparts used when publishing the sidecar JSON so the LUXA app
@@ -151,7 +172,8 @@
     dining: 'Un comedor con luz focal sobre la mesa, acompañada de aplique de pared y luz de acento.',
     kitchen: 'Una cocina funcional que combina luz focal sobre la isla y las mesadas con luz general y de acento.',
     bedroom: 'Un dormitorio suave que combina luz general, de lectura y de mesa de luz para una atmósfera residencial tranquila.',
-    bathroom: 'Un baño prolijo que combina luz de techo, aplique de pared y de acento, en una composición funcional y refinada.'
+    bathroom: 'Un baño prolijo que combina luz de techo, aplique de pared y de acento, en una composición funcional y refinada.',
+    office: 'Una oficina enfocada que combina luz general de techo con iluminación focal sobre el escritorio y luz de acento en paredes o estantes.'
   };
 
   const APP_INTENT_ES = {
@@ -159,7 +181,8 @@
     dining:   'Iluminación focal para comedor',
     kitchen:  'Iluminación funcional para cocina',
     bedroom:  'Iluminación suave y serena para dormitorio',
-    bathroom: 'Iluminación funcional y limpia para baño'
+    bathroom: 'Iluminación funcional y limpia para baño',
+    office:   'Iluminación funcional y focal para oficina'
   };
 
   const SPACE_LABEL_ES = {
@@ -167,7 +190,8 @@
     dining:   'Comedor',
     bedroom:  'Dormitorio',
     bathroom: 'Baño',
-    kitchen:  'Cocina'
+    kitchen:  'Cocina',
+    office:   'Oficina'
   };
 
   // Versioned localStorage key prefix — bump if state shape changes incompatibly.
@@ -988,6 +1012,8 @@
         return `Create a premium modern bedroom scene featuring a coordinated lighting collection. The space includes ${products}. Show a calm, warm and quiet atmosphere with a bed, bedside tables, soft textiles and a layered light setup that mixes general, reading and accent lighting. All products should be clearly visible with balanced protagonism. Camera: wide eye-level bedroom catalog shot, premium composition, realistic lighting, high-end showroom style.`;
       case 'bathroom':
         return `Create a premium modern bathroom scene featuring a coordinated lighting collection. The space includes ${products}. Show a clean and functional bathroom with a mirror, vanity or washbasin area, stone or light neutral materials and refined clean lines. The lighting should feel functional yet elegant. All products should be clearly visible with balanced protagonism. Camera: wide eye-level bathroom catalog shot, premium composition, realistic lighting, high-end showroom style.`;
+      case 'office':
+        return `Create a premium modern office scene featuring a coordinated lighting collection. The space includes ${products}. Show a refined work environment with a desk, ergonomic chair, bookshelves or a feature wall, warm neutral materials and a focused yet welcoming atmosphere. The lighting should mix general overhead light with task lighting at the desk and accent lighting on walls or shelves. All products should be clearly visible with balanced protagonism. Camera: wide eye-level office catalog shot, premium composition, realistic lighting, high-end showroom style.`;
       default:
         return `Create a premium interior scene including ${products}, with balanced protagonism for every product. Wide eye-level catalog shot.`;
     }
@@ -1012,6 +1038,8 @@
         return `Use a wide eye-level camera showing the bed and the bedside area. ${placements} Use soft layered lighting — general ambient, reading and accent. Avoid clinical lighting and overcrowded compositions.`;
       case 'bathroom':
         return `Use a wide eye-level camera showing the vanity / mirror area. ${placements} Use clean functional lighting with subtle accents. Keep materials light and refined and avoid harsh shadows on the mirror.`;
+      case 'office':
+        return `Use a wide eye-level camera showing the office workspace with the desk in focus. ${placements} Use general overhead light as the main source with task lighting at the desk and subtle accent lighting on walls or shelves. Avoid harsh shadows on the desk and keep materials warm and refined.`;
       default:
         return `Use a wide eye-level camera. ${placements} Keep all products clearly visible.`;
     }
