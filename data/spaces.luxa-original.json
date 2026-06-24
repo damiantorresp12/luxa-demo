@@ -150,14 +150,14 @@
           "x": 50,
           "y": 21.38,
           "closeUpImage": "assets/Spaces/Bathroom 01/Bathroom 01 close up 02.jpeg",
-          "transitionVideo": "assets/Transiciones/Bathroom 01/bathroom 01 tran 02.mp4"
+          "transitionVideo": "assets/Transiciones/bathroom 01/bathroom 01 tran 02.mp4"
         },
         {
           "productId": "lighto-a-wall",
           "x": 14.71,
           "y": 52.43,
           "closeUpImage": "assets/Spaces/Bathroom 01/bathroom 01 close up 01.jpeg",
-          "transitionVideo": "assets/Transiciones/Bathroom 01/bathroom 01 tran 01.mp4"
+          "transitionVideo": "assets/Transiciones/bathroom 01/bathroom 01 tran 01.mp4"
         }
       ]
     },

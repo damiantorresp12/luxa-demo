@@ -950,13 +950,16 @@
               WA_ICON_SVG + '<span>' + t('quote.cta') + '</span>' +
             '</a>'
           : '') +
-        '<button class="btn btn-ghost" data-action="view-space">' + t('detail.viewInSpace') + '</button>' +
+        (findSpaceFor(p.id)
+          ? '<button class="btn btn-ghost" data-action="view-space">' + t('detail.viewInSpace') + '</button>'
+          : '') +
         '<button class="btn btn-ghost" data-action="download-sheet">' + t('detail.downloadSheet') + '</button>' +
         '<button class="btn btn-ghost detail-fav" data-action="fav">' +
           (isFav(p.id) ? t('detail.saved') : t('detail.favorite')) + '</button>' +
       '</div>';
 
-    $('[data-action="view-space"]', $('#detailBody')).addEventListener('click', function () {
+    var viewSpaceBtn = $('[data-action="view-space"]', $('#detailBody'));
+    if (viewSpaceBtn) viewSpaceBtn.addEventListener('click', function () {
       closeDetail();
       var sp = findSpaceFor(p.id);
       if (sp) setActiveSpace(sp.id);
