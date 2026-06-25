@@ -831,44 +831,11 @@
         id: 'general-catalog',
         title:       { es: 'Catálogo General 2026', en: 'LUXA General Catalog 2026' },
         kind: 'Catalog',
-        pages:       { es: '128 pp · PDF', en: '128 pp · PDF' },
+        pages:       { es: '7 pp · PDF', en: '7 pp · PDF' },
         file: 'assets/pdfs/luxa-general-catalog-2026.pdf',
         description: {
           es: 'La colección completa — cada familia, acabado y dato fotométrico en un solo volumen.',
           en: 'The complete collection — every family, finish and photometric figure in one volume.'
-        }
-      },
-      {
-        id: 'downlights-sheet',
-        title:       { es: 'Ficha Técnica de Downlights', en: 'Downlights Technical Sheet' },
-        kind: 'Technical',
-        pages:       { es: '12 pp · PDF', en: '12 pp · PDF' },
-        file: 'assets/pdfs/downlights-technical-sheet.pdf',
-        description: {
-          es: 'Aberturas, ángulos de haz, opciones de driver y grados IP de la familia empotrada.',
-          en: 'Cut-outs, beam angles, driver options and IP ratings for the recessed range.'
-        }
-      },
-      {
-        id: 'spotlights-collection',
-        title:       { es: 'Colección de Spotlights', en: 'Spotlights Collection' },
-        kind: 'Collection',
-        pages:       { es: '24 pp · PDF', en: '24 pp · PDF' },
-        file: 'assets/pdfs/spotlights-collection.pdf',
-        description: {
-          es: 'Iluminación de acento ajustable y para riel, para retail y residencial.',
-          en: 'Adjustable and track-mounted accent lighting for retail and residential.'
-        }
-      },
-      {
-        id: 'linear-systems-guide',
-        title:       { es: 'Guía de Sistemas Lineales', en: 'Linear Systems Guide' },
-        kind: 'Guide',
-        pages:       { es: '36 pp · PDF', en: '36 pp · PDF' },
-        file: 'assets/pdfs/linear-systems-guide.pdf',
-        description: {
-          es: 'Perfiles de carrera continua, conectores y detalles de suspensión y empotrado.',
-          en: 'Continuous-run profiles, connectors and suspension details for architectural lines.'
         }
       }
     ],
