@@ -876,8 +876,8 @@
     /* ----------------------------------------------------------------------- */
     about: {
       intro: {
-        es: 'LUXA es una marca ficticia de iluminación creada para demostrar cómo las experiencias interactivas de producto pueden transformar los catálogos tradicionales en potentes herramientas de venta.',
-        en: 'LUXA is a fictional lighting brand created to demonstrate how interactive product experiences can transform traditional catalogs into powerful sales tools.'
+        es: 'LUXA es la experiencia digital de iluminación de TD Lighting — una plataforma interactiva que transforma los catálogos tradicionales en herramientas de venta vivas, donde cada luminaria se explora en sus propios términos.',
+        en: 'LUXA is TD Lighting’s digital lighting experience — an interactive platform that transforms traditional catalogs into living sales tools, where every luminaire is explored on its own terms.'
       },
       pillars: [
         {

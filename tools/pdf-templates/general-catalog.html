@@ -1,0 +1,385 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<title>LUXA · Catálogo General 2026</title>
+<base href="../../" />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<style>
+  /* =============================================================================
+     LUXA · TD Lighting Experience — Catálogo General 2026 (print)
+     A4 portrait. Para exportar: abrir en Chrome → Ctrl+P → Guardar como PDF.
+     En el diálogo: márgenes "Ninguno", "Gráficos de fondo" activado.
+     ========================================================================== */
+
+  :root {
+    --bg:        #08080A;
+    --panel:     #15151A;
+    --line:      rgba(255,255,255,0.10);
+    --ink:       #F3F1EC;
+    --ink-dim:   #A7A5A0;
+    --ink-faint: #6E6C68;
+    --gold:      #C9A24B;
+  }
+
+  @page { size: A4 portrait; margin: 0; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { color: var(--ink); -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body { font-family: 'Inter', system-ui, -apple-system, sans-serif; font-weight: 300; }
+
+  .page {
+    width: 210mm; height: 297mm;
+    page-break-after: always;
+    position: relative;
+    overflow: hidden;
+    background: var(--bg);
+  }
+  .page:last-child { page-break-after: auto; }
+
+  /* On-screen preview: center pages, give the body a soft gray bg so each
+     page reads as a card. Has zero effect on the print/PDF output. */
+  @media screen {
+    html, body { background: #2a2a30; }
+    body { padding: 20mm 0; }
+    .page { margin: 0 auto 14mm; box-shadow: 0 8px 40px rgba(0,0,0,0.45); }
+  }
+  @media print {
+    html, body { background: var(--bg); }
+    body { padding: 0; }
+    .page { margin: 0; box-shadow: none; }
+  }
+
+  .serif { font-family: 'Cormorant Garamond', Georgia, serif; }
+  .eyebrow {
+    font-size: 9pt; letter-spacing: 0.32em; text-transform: uppercase;
+    color: var(--gold); font-weight: 500;
+  }
+  .rule { width: 38mm; height: 1px; background: var(--gold); opacity: 0.7; }
+
+  /* -------- Page 1: cover -------- */
+  .cover {
+    background: linear-gradient(135deg, rgba(8,8,10,0.55) 0%, rgba(8,8,10,0.85) 60%, rgba(8,8,10,0.95) 100%),
+                url("assets/Spaces/Living 01/Living 01.jpeg") center/cover no-repeat var(--bg);
+    color: var(--ink);
+    padding: 30mm 22mm 22mm;
+    display: flex; flex-direction: column; justify-content: space-between;
+  }
+  .cover-top { display: flex; justify-content: space-between; align-items: flex-start; }
+  .cover-top .eyebrow { line-height: 1; }
+  .cover-top .meta { font-size: 8pt; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-dim); text-align: right; line-height: 1.6; }
+  .cover-mark {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-weight: 400;
+    font-size: 130pt;
+    line-height: 0.9;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+  }
+  .cover-tag {
+    margin-top: 6mm;
+    font-size: 13pt; font-weight: 300; color: var(--ink-dim);
+    max-width: 130mm;
+  }
+  .cover-foot {
+    display: flex; justify-content: space-between; align-items: flex-end;
+    border-top: 1px solid var(--line);
+    padding-top: 6mm;
+    margin-top: 6mm;
+  }
+  .cover-foot .label { font-size: 8pt; letter-spacing: 0.25em; text-transform: uppercase; color: var(--ink-faint); }
+  .cover-foot .label strong { color: var(--gold); font-weight: 500; }
+
+  /* -------- Pages 2+: shared layout -------- */
+  .page-inner { padding: 22mm 22mm 18mm; height: 100%; display: flex; flex-direction: column; }
+  .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14mm; }
+  .page-header .crumb { font-size: 8pt; letter-spacing: 0.28em; text-transform: uppercase; color: var(--ink-faint); }
+  .page-header .pageno { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 14pt; color: var(--gold); }
+
+  /* -------- Page 2: about -------- */
+  .about-title {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-weight: 400;
+    font-size: 64pt; line-height: 0.95; letter-spacing: -0.01em;
+    margin-bottom: 10mm;
+  }
+  .about-intro {
+    font-size: 14pt; line-height: 1.55; color: var(--ink); font-weight: 300;
+    max-width: 145mm;
+    margin-bottom: 14mm;
+  }
+  .pillars { display: grid; grid-template-columns: 1fr 1fr; gap: 10mm 14mm; margin-top: auto; }
+  .pillar { border-top: 1px solid var(--line); padding-top: 6mm; }
+  .pillar-num { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 14pt; color: var(--gold); margin-bottom: 3mm; }
+  .pillar-title { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 22pt; color: var(--ink); margin-bottom: 3mm; line-height: 1.05; }
+  .pillar-text { font-size: 10pt; color: var(--ink-dim); line-height: 1.55; }
+
+  /* -------- Pages 3-6: product -------- */
+  .product {
+    display: grid;
+    grid-template-columns: 105mm 1fr;
+    height: 100%;
+  }
+  .product-media {
+    background: var(--panel);
+    display: flex; align-items: center; justify-content: center;
+    padding: 22mm 10mm;
+    border-right: 1px solid var(--line);
+  }
+  .product-media img { max-width: 100%; max-height: 230mm; object-fit: contain; }
+  .product-body {
+    padding: 22mm 22mm 18mm 18mm;
+    display: flex; flex-direction: column;
+  }
+  .product-category { font-size: 9pt; letter-spacing: 0.28em; text-transform: uppercase; color: var(--gold); margin-bottom: 8mm; }
+  .product-name {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-weight: 400;
+    font-size: 38pt; line-height: 1.0; letter-spacing: -0.01em;
+    margin-bottom: 3mm;
+  }
+  .product-code { font-size: 9pt; letter-spacing: 0.2em; color: var(--ink-faint); margin-bottom: 10mm; }
+  .product-desc { font-style: italic; font-family: 'Cormorant Garamond', Georgia, serif; font-size: 14pt; line-height: 1.45; color: var(--ink-dim); margin-bottom: 12mm; }
+  .specs { border-top: 1px solid var(--line); padding-top: 6mm; display: grid; grid-template-columns: 1fr 1fr; gap: 4mm 8mm; margin-bottom: 10mm; }
+  .spec dt { font-size: 7.5pt; letter-spacing: 0.22em; text-transform: uppercase; color: var(--ink-faint); margin-bottom: 1.5mm; }
+  .spec dd { font-size: 10.5pt; color: var(--ink); }
+  .application {
+    margin-top: auto;
+    border-top: 1px solid var(--line);
+    padding-top: 5mm;
+  }
+  .application .label { font-size: 8pt; letter-spacing: 0.25em; text-transform: uppercase; color: var(--ink-faint); margin-bottom: 2mm; }
+  .application .value { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 13pt; color: var(--ink-dim); }
+
+  /* -------- Page 7: contact -------- */
+  .contact {
+    background:
+      radial-gradient(60% 50% at 50% 25%, rgba(201,162,75,0.10), transparent 70%),
+      var(--bg);
+    text-align: center;
+    padding: 32mm 22mm 18mm;
+    display: flex; flex-direction: column; justify-content: space-between;
+  }
+  .contact-eyebrow { color: var(--gold); font-size: 10pt; letter-spacing: 0.32em; text-transform: uppercase; }
+  .contact-mark {
+    font-family: 'Cormorant Garamond', Georgia, serif; font-weight: 400;
+    font-size: 110pt; line-height: 0.95; letter-spacing: -0.02em;
+    margin: 8mm 0 6mm;
+  }
+  .contact-tag { font-size: 13pt; color: var(--ink-dim); max-width: 130mm; margin: 0 auto; line-height: 1.55; }
+  .contact-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 6mm; margin: 18mm auto 0; max-width: 150mm; }
+  .contact-card { border: 1px solid var(--line); padding: 8mm; text-align: left; }
+  .contact-card .label { font-size: 8pt; letter-spacing: 0.25em; text-transform: uppercase; color: var(--gold); margin-bottom: 3mm; }
+  .contact-card .value { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 16pt; color: var(--ink); }
+  .contact-card .sub { font-size: 9pt; color: var(--ink-faint); margin-top: 2mm; }
+  .contact-foot {
+    margin-top: auto;
+    display: flex; justify-content: space-between; align-items: center;
+    border-top: 1px solid var(--line); padding-top: 6mm;
+    font-size: 7.5pt; letter-spacing: 0.25em; text-transform: uppercase; color: var(--ink-faint);
+  }
+  .contact-foot strong { color: var(--gold); font-weight: 500; }
+</style>
+</head>
+<body>
+
+<!-- ============================== PAGE 1 — COVER ============================== -->
+<section class="page cover">
+  <div class="cover-top">
+    <span class="eyebrow">TD Lighting Experience</span>
+    <span class="meta">Catálogo General<br/>Edición 2026</span>
+  </div>
+
+  <div>
+    <div class="cover-mark serif">LUXA</div>
+    <p class="cover-tag">Experiencias de iluminación para espacios modernos. Productos, ambientes y recursos técnicos en un solo lugar.</p>
+  </div>
+
+  <div class="cover-foot">
+    <span class="label"><strong>L · U · X · A</strong> &nbsp; · &nbsp; Light, designed</span>
+    <span class="label">2026</span>
+  </div>
+</section>
+
+<!-- ============================== PAGE 2 — ABOUT ============================== -->
+<section class="page">
+  <div class="page-inner">
+    <header class="page-header">
+      <span class="crumb">Acerca · La marca</span>
+      <span class="pageno serif">02</span>
+    </header>
+
+    <h1 class="about-title serif">Sobre LUXA</h1>
+    <p class="about-intro">
+      LUXA es la experiencia digital de iluminación de TD Lighting — una plataforma interactiva que transforma los catálogos tradicionales en herramientas de venta vivas, donde cada luminaria se explora en sus propios términos.
+    </p>
+
+    <div class="pillars">
+      <div class="pillar">
+        <div class="pillar-num serif">01</div>
+        <h3 class="pillar-title serif">Visualización de Producto</h3>
+        <p class="pillar-text">Renders de alta fidelidad presentados como una experiencia, no como un PDF — cada luminaria explorada en sus propios términos.</p>
+      </div>
+      <div class="pillar">
+        <div class="pillar-num serif">02</div>
+        <h3 class="pillar-title serif">Catálogos Interactivos</h3>
+        <p class="pillar-text">Filtrá, guardá y compará en una sola superficie fluida. El catálogo responde; no solo muestra.</p>
+      </div>
+      <div class="pillar">
+        <div class="pillar-num serif">03</div>
+        <h3 class="pillar-title serif">Iluminación en Contexto</h3>
+        <p class="pillar-text">Mirá las luminarias aplicadas en ambientes reales — living, dormitorio, baño — a través de hotspots simples y clickeables.</p>
+      </div>
+      <div class="pillar">
+        <div class="pillar-num serif">04</div>
+        <h3 class="pillar-title serif">Recursos Técnicos</h3>
+        <p class="pillar-text">Fichas técnicas, datos fotométricos y documentos descargables, listos para especificadores y diseñadores.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================== PAGE 3 — PRODUCT: Bolle Orizzontale ============================== -->
+<section class="page">
+  <div class="product">
+    <div class="product-media">
+      <img src="assets/Imagenes/DVA-Bolle Orizzontale Hanging Lamp_corona.jpg" alt="Bolle Orizzontale" />
+    </div>
+    <div class="product-body">
+      <div class="product-category">Pendants</div>
+      <h2 class="product-name serif">Bolle Orizzontale</h2>
+      <div class="product-code">DVA-BOL</div>
+      <p class="product-desc">"Esferas sopladas a mano suspendidas en aparente ingravidez. Un racimo escultórico que se lee como luz hecha materia."</p>
+
+      <dl class="specs">
+        <div class="spec"><dt>Potencia</dt><dd>60 W</dd></div>
+        <div class="spec"><dt>Flujo lumínico</dt><dd>4 200 lm</dd></div>
+        <div class="spec"><dt>Temperatura</dt><dd>2 700 K</dd></div>
+        <div class="spec"><dt>CRI</dt><dd>≥ 90</dd></div>
+        <div class="spec"><dt>Grado IP</dt><dd>IP20</dd></div>
+        <div class="spec"><dt>Dimensiones</dt><dd>Ø 950 × H 700 mm</dd></div>
+      </dl>
+
+      <div class="application">
+        <div class="label">Aplicación</div>
+        <div class="value">Cajas de escalera y dobles alturas</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================== PAGE 4 — PRODUCT: Aballs Chandelier 8 ============================== -->
+<section class="page">
+  <div class="product">
+    <div class="product-media">
+      <img src="assets/Imagenes/DVA-Aballs Chandelier 8_corona.jpg" alt="Aballs Chandelier 8" />
+    </div>
+    <div class="product-body">
+      <div class="product-category">Chandeliers</div>
+      <h2 class="product-name serif">Aballs Chandelier 8</h2>
+      <div class="product-code">DVA-AB8</div>
+      <p class="product-desc">"Ocho esferas opal en una composición orgánica. La familia Aballs llevada a su escala más generosa, sin perder ligereza."</p>
+
+      <dl class="specs">
+        <div class="spec"><dt>Potencia</dt><dd>72 W</dd></div>
+        <div class="spec"><dt>Flujo lumínico</dt><dd>5 800 lm</dd></div>
+        <div class="spec"><dt>Temperatura</dt><dd>2 700 K</dd></div>
+        <div class="spec"><dt>CRI</dt><dd>≥ 90</dd></div>
+        <div class="spec"><dt>Grado IP</dt><dd>IP20</dd></div>
+        <div class="spec"><dt>Dimensiones</dt><dd>Ø 1100 × H 850 mm</dd></div>
+      </dl>
+
+      <div class="application">
+        <div class="label">Aplicación</div>
+        <div class="value">Hall, lobbies y salones de doble altura</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================== PAGE 5 — PRODUCT: Arco Floor ============================== -->
+<section class="page">
+  <div class="product">
+    <div class="product-media">
+      <img src="assets/Imagenes/DVA-Arco Floor Lamp_corona.jpg" alt="Arco Floor" />
+    </div>
+    <div class="product-body">
+      <div class="product-category">Floor Lamps</div>
+      <h2 class="product-name serif">Arco Floor</h2>
+      <div class="product-code">DVA-ARC</div>
+      <p class="product-desc">"El gesto Arco — un brazo curvo que lleva la luz desde el zócalo hasta el centro del ambiente. Un ícono moderno reinterpretado."</p>
+
+      <dl class="specs">
+        <div class="spec"><dt>Potencia</dt><dd>24 W</dd></div>
+        <div class="spec"><dt>Flujo lumínico</dt><dd>1 900 lm</dd></div>
+        <div class="spec"><dt>Temperatura</dt><dd>2 700 K</dd></div>
+        <div class="spec"><dt>CRI</dt><dd>≥ 90</dd></div>
+        <div class="spec"><dt>Grado IP</dt><dd>IP20</dd></div>
+        <div class="spec"><dt>Dimensiones</dt><dd>H 2200 · proy. 2000 mm</dd></div>
+      </dl>
+
+      <div class="application">
+        <div class="label">Aplicación</div>
+        <div class="value">Comedor, living y áreas sociales</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================== PAGE 6 — PRODUCT: Atollo Table ============================== -->
+<section class="page">
+  <div class="product">
+    <div class="product-media">
+      <img src="assets/Imagenes/DVA-Atollo Table Lamp_corona.jpg" alt="Atollo Table" />
+    </div>
+    <div class="product-body">
+      <div class="product-category">Table Lamps</div>
+      <h2 class="product-name serif">Atollo Table</h2>
+      <div class="product-code">DVA-ATO</div>
+      <p class="product-desc">"Una composición de geometrías puras — cilindro, cono y semiesfera. El clásico Atollo, pieza de diseño industrial que es a la vez escultura."</p>
+
+      <dl class="specs">
+        <div class="spec"><dt>Potencia</dt><dd>9 W</dd></div>
+        <div class="spec"><dt>Flujo lumínico</dt><dd>650 lm</dd></div>
+        <div class="spec"><dt>Temperatura</dt><dd>2 700 K</dd></div>
+        <div class="spec"><dt>CRI</dt><dd>≥ 90</dd></div>
+        <div class="spec"><dt>Grado IP</dt><dd>IP20</dd></div>
+        <div class="spec"><dt>Dimensiones</dt><dd>Ø 380 × H 500 mm</dd></div>
+      </dl>
+
+      <div class="application">
+        <div class="label">Aplicación</div>
+        <div class="value">Consolas, aparadores y escritorios</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================== PAGE 7 — CONTACT ============================== -->
+<section class="page contact">
+  <div>
+    <p class="contact-eyebrow">Hablemos</p>
+    <h1 class="contact-mark serif">LUXA</h1>
+    <p class="contact-tag">Tu próxima reunión comercial sin PDF: mostrá un catálogo vivo con productos aplicados en ambientes reales.</p>
+
+    <div class="contact-cards">
+      <div class="contact-card">
+        <div class="label">WhatsApp</div>
+        <div class="value">+54 9 11 6002 9154</div>
+        <div class="sub">TD Lighting · Atención comercial</div>
+      </div>
+      <div class="contact-card">
+        <div class="label">Experiencia</div>
+        <div class="value">luxa.tdlighting.app</div>
+        <div class="sub">Catálogo interactivo</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="contact-foot">
+    <span>© 2026 LUXA · <strong>TD Lighting Experience</strong></span>
+    <span>Edición General · 2026</span>
+  </div>
+</section>
+
+</body>
+</html>
