@@ -429,8 +429,13 @@
     // las roto automáticamente con fade. Para cambiar, editar este array.
     homeHeroImages: [
       'assets/Spaces/Living 01/Living 01.jpeg',
+      'assets/Spaces/Living 01/Living 01 close up 03.jpeg',
       'assets/Spaces/bedroom 01/bedroom 01.jpeg',
-      'assets/Spaces/Kitchen 01/Kitchen 01.jpeg'
+      'assets/Spaces/bedroom 02/bedroom close up 01.jpeg',
+      'assets/Spaces/Kitchen 01/Kitchen 01.jpeg',
+      'assets/Spaces/Kitchen 02/Kitchen 02 Close up 01.jpeg',
+      'assets/Spaces/Dining 03/Dining 03 close up 02.jpeg',
+      'assets/Spaces/Bathroom 01/bathroom 01 close up 01.jpeg'
     ],
 
     /* ----------------------------------------------------------------------- */

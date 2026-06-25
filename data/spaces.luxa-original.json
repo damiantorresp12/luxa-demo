@@ -1,7 +1,7 @@
 {
   "_readme": "Auto-managed by the Space Planner. Save this file as data/spaces.luxa-original.json in the LUXA project root — the app fetches all data/spaces.*.json files at boot and merges them into window.LUXA.spaces. Same id → planner entry replaces curated entry. Product IDs use catalogId from products.json when present.",
   "catalog": "luxa-original",
-  "exportedAt": "2026-06-23T16:16:06.850Z",
+  "exportedAt": "2026-06-25T13:09:11.447Z",
   "entries": [
     {
       "id": "living-aballs-collection-01",
@@ -511,6 +511,40 @@
           "productId": "arum-wall",
           "x": 74.89,
           "y": 31.79
+        }
+      ]
+    },
+    {
+      "id": "office-atollo-bolle-manual-27",
+      "name": {
+        "es": "Colección Oficina Atollo & Bolle",
+        "en": "Office Atollo & Bolle"
+      },
+      "tagline": {
+        "es": "Iluminación funcional y focal para oficina",
+        "en": "Functional and focused office lighting collection"
+      },
+      "description": {
+        "es": "Una oficina enfocada que combina luz general de techo con iluminación focal sobre el escritorio y luz de acento en paredes o estantes.",
+        "en": "A focused office setup combining general overhead light with task lighting at the desk and accent lighting on walls or shelves."
+      },
+      "image": "assets/Spaces/Office 02/Office 02.jpeg",
+      "gallery": [
+        "assets/Spaces/Office 02/Office 02.jpeg"
+      ],
+      "heroProduct": "atollo-table",
+      "hotspots": [
+        {
+          "productId": "atollo-table",
+          "x": 65.21,
+          "y": 70.06,
+          "closeUpImage": "assets/Spaces/Office 02/Office 02 close up 01.jpeg"
+        },
+        {
+          "productId": "bolle-orizzontale",
+          "x": 41.9,
+          "y": 28.09,
+          "closeUpImage": "assets/Spaces/Office 02/Office 02 close up 02.jpeg"
         }
       ]
     }

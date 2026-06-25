@@ -1,7 +1,7 @@
 {
   "_readme": "Producto sidecar para la app LUXA. Generado por el Product Data Generator. Editar a mano sólo si sabés lo que hacés. La lista \"removed\" indica catalogIds que la app debe filtrar del catálogo estático.",
   "catalogId": "luxa-original",
-  "exportedAt": "2026-06-23T16:08:58.316Z",
+  "exportedAt": "2026-06-25T12:19:00.503Z",
   "products": [
     {
       "id": "flat-floor",
@@ -554,7 +554,9 @@
       "name": "Atollo Table",
       "category": "Table Lamps",
       "collection": "Atollo",
-      "spaces": [],
+      "spaces": [
+        "office"
+      ],
       "designer": "LUXA Studio",
       "power": "9 W",
       "lumens": "650 lm",
@@ -709,7 +711,8 @@
       "collection": "Bolle",
       "spaces": [
         "living",
-        "dining"
+        "dining",
+        "office"
       ],
       "designer": "LUXA Studio",
       "power": "36 W",

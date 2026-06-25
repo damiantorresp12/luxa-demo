@@ -435,6 +435,9 @@
     "category": "Table Lamps",
     "type": "table_lamp",
     "collection": "Atollo",
+    "spaces": [
+      "office"
+    ],
     "code": "DVA-ATO",
     "designer": "LUXA Studio",
     "power": "9 W",
@@ -554,7 +557,8 @@
     "style": "decorative",
     "spaces": [
       "living",
-      "dining"
+      "dining",
+      "office"
     ],
     "code": "DVA-BOL",
     "designer": "LUXA Studio",

@@ -518,9 +518,15 @@
   function initHomeHeroSlides(imgs) {
     var wrap = $('#homeHeroSlides');
     var hero = $('#homeHero');
+    var prevBtn = $('#homeHeroPrev');
+    var nextBtn = $('#homeHeroNext');
+    var dotsHost = $('#homeHeroDots');
     if (!wrap || !hero) return;
     if (heroSlideTimer) { clearInterval(heroSlideTimer); heroSlideTimer = null; }
     wrap.innerHTML = '';
+    if (dotsHost) dotsHost.innerHTML = '';
+    if (prevBtn) prevBtn.hidden = true;
+    if (nextBtn) nextBtn.hidden = true;
     if (!imgs.length) { hero.style.backgroundImage = ''; return; }
 
     // Always clear the legacy inline background so the slide layer wins.
@@ -534,14 +540,52 @@
     });
 
     if (imgs.length < 2) return;
+
     var idx = 0;
-    heroSlideTimer = setInterval(function () {
+    if (dotsHost) {
+      imgs.forEach(function (_, i) {
+        var dot = document.createElement('button');
+        dot.type = 'button';
+        dot.className = 'home-hero-dot' + (i === 0 ? ' is-active' : '');
+        dot.setAttribute('role', 'tab');
+        dot.setAttribute('aria-label', 'Slide ' + (i + 1));
+        dot.addEventListener('click', function () { goTo(i); });
+        dotsHost.appendChild(dot);
+      });
+    }
+    if (prevBtn) {
+      prevBtn.hidden = false;
+      prevBtn.onclick = function () { goTo(idx - 1); };
+    }
+    if (nextBtn) {
+      nextBtn.hidden = false;
+      nextBtn.onclick = function () { goTo(idx + 1); };
+    }
+
+    function setActive(newIdx) {
       var slides = wrap.querySelectorAll('.home-hero-slide');
       if (!slides.length) return;
+      var n = slides.length;
+      var next = ((newIdx % n) + n) % n;
       slides[idx].classList.remove('is-active');
-      idx = (idx + 1) % slides.length;
-      slides[idx].classList.add('is-active');
-    }, 5000);
+      slides[next].classList.add('is-active');
+      if (dotsHost) {
+        var dots = dotsHost.querySelectorAll('.home-hero-dot');
+        if (dots[idx]) dots[idx].classList.remove('is-active');
+        if (dots[next]) dots[next].classList.add('is-active');
+      }
+      idx = next;
+    }
+    function startAutoplay() {
+      if (heroSlideTimer) clearInterval(heroSlideTimer);
+      heroSlideTimer = setInterval(function () { setActive(idx + 1); }, 5000);
+    }
+    function goTo(newIdx) {
+      setActive(newIdx);
+      startAutoplay();
+    }
+
+    startAutoplay();
   }
 
   /* =============================================================================
