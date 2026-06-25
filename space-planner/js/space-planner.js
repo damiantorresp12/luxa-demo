@@ -1360,6 +1360,16 @@
         const m = /^assets\/Spaces\/([^/]+)\//.exec(scene.imagePath);
         if (m && Array.from(els.hScene.options).some(o => o.value === m[1])) {
           els.hScene.value = m[1];
+          // Self-heal: if the saved imagePath doesn't end in a valid image
+          // extension (e.g. user typed the folder name without ".jpeg"),
+          // regenerate it from the folder listing so save/publish writes a
+          // valid path. Without this the bad path silently survives across
+          // republishes because the dropdown's change handler won't fire on
+          // re-selecting the same value.
+          const fileName = scene.imagePath.split('/').pop();
+          if (!isImageFile(fileName)) {
+            onScenePicked(m[1]);
+          }
         } else {
           els.hScene.value = '';
         }

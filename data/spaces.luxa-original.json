@@ -1,7 +1,7 @@
 {
   "_readme": "Auto-managed by the Space Planner. Save this file as data/spaces.luxa-original.json in the LUXA project root — the app fetches all data/spaces.*.json files at boot and merges them into window.LUXA.spaces. Same id → planner entry replaces curated entry. Product IDs use catalogId from products.json when present.",
   "catalog": "luxa-original",
-  "exportedAt": "2026-06-25T13:09:11.447Z",
+  "exportedAt": "2026-06-25T14:59:18.242Z",
   "entries": [
     {
       "id": "living-aballs-collection-01",
@@ -150,14 +150,14 @@
           "x": 50,
           "y": 21.38,
           "closeUpImage": "assets/Spaces/Bathroom 01/Bathroom 01 close up 02.jpeg",
-          "transitionVideo": "assets/Transiciones/bathroom 01/bathroom 01 tran 02.mp4"
+          "transitionVideo": "assets/Transiciones/Bathroom 01/bathroom 01 tran 02.mp4"
         },
         {
           "productId": "lighto-a-wall",
           "x": 14.71,
           "y": 52.43,
           "closeUpImage": "assets/Spaces/Bathroom 01/bathroom 01 close up 01.jpeg",
-          "transitionVideo": "assets/Transiciones/bathroom 01/bathroom 01 tran 01.mp4"
+          "transitionVideo": "assets/Transiciones/Bathroom 01/bathroom 01 tran 01.mp4"
         }
       ]
     },
@@ -473,7 +473,7 @@
       ]
     },
     {
-      "id": "office-arum-collection-17",
+      "id": "bedroom-arum-collection-17",
       "name": {
         "es": "Colección Oficina Arum",
         "en": "Office Arum Collection"
@@ -536,14 +536,14 @@
       "hotspots": [
         {
           "productId": "atollo-table",
-          "x": 65.21,
-          "y": 70.06,
+          "x": 65.08,
+          "y": 69.36,
           "closeUpImage": "assets/Spaces/Office 02/Office 02 close up 01.jpeg"
         },
         {
           "productId": "bolle-orizzontale",
           "x": 41.9,
-          "y": 28.09,
+          "y": 26.5,
           "closeUpImage": "assets/Spaces/Office 02/Office 02 close up 02.jpeg"
         }
       ]
