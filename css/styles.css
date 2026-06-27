@@ -414,16 +414,10 @@ svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width:
 .home-hero-arrow-prev { left: clamp(12px, 2vw, 24px); }
 .home-hero-arrow-next { right: clamp(12px, 2vw, 24px); }
 @media (max-width: 640px) {
-  /* On phones the hero text fills the horizontal space; move the arrows
-     down next to the dots so they stop overlapping the title/subtitle. */
-  .home-hero-arrow {
-    width: 38px; height: 38px;
-    top: auto;
-    bottom: 80px;
-    transform: none;
-  }
-  .home-hero-arrow-prev { left: 16px; }
-  .home-hero-arrow-next { right: 16px; }
+  /* On phones the hero text fills the full width and the dots sit at the
+     bottom — there's no room for arrows that don't crowd one of them.
+     Hide the arrows; the dot row already lets the user pick any slide. */
+  .home-hero-arrow { display: none; }
 }
 
 .home-hero-dots {
