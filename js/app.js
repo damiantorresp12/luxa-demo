@@ -841,12 +841,32 @@
     if (!p) return;
     opts = opts || {};
 
+    // When opening from the catalog (no scene context passed), auto-derive
+    // the product's first appearance in a scene so the mini-gallery shows
+    // the Ambiente + En Contexto thumbs alongside the Catálogo render. The
+    // initial view stays on Catálogo — the thumbs are an invitation, not a
+    // redirect. If the product doesn't appear in any scene, opts stays empty
+    // and the detail panel renders catalog-only as before.
+    var startsOnCatalog = false;
+    if (!opts.closeUpImage && !opts.spaceImage) {
+      var fromScene = findSpaceFor(id);
+      if (fromScene) {
+        var hot = (fromScene.hotspots || []).find(function (hh) { return hh.productId === id; });
+        if (hot) {
+          opts.spaceImage   = fromScene.image;
+          opts.closeUpImage = hot.closeUpImage || null;
+          opts.contextLabel = tx(fromScene.name);
+          startsOnCatalog = true;
+        }
+      }
+    }
+
     // Catalog image follows the user's active color choice. The close-up and
     // ambient stills stay as-is — they're scene renders, not catalog renders.
     var catalogImg = getActiveColorImage(p);
     var closeUp    = opts.closeUpImage || null;
     var spaceImg   = opts.spaceImage || null;
-    var mainImg    = closeUp || catalogImg;
+    var mainImg    = (closeUp && !startsOnCatalog) ? closeUp : catalogImg;
 
     $('#detailImg').src = uri(mainImg);
     $('#detailImg').alt = p.name;
@@ -862,8 +882,9 @@
       if (p.colorVariants && p.colorVariants.length) {
         swatchHost.innerHTML = colorSwatchesHTML(p);
         // If the detail opened on a close-up, we start hidden; the thumb
-        // handler will show on catalog click.
-        swatchHost.hidden = !!closeUp;
+        // handler will show on catalog click. Auto-context (catalog entry)
+        // also starts on catalog so swatches stay visible.
+        swatchHost.hidden = !!closeUp && !startsOnCatalog;
         $$('.color-swatch', swatchHost).forEach(function (btn) {
           btn.addEventListener('click', function () {
             var colorId = btn.dataset.color;
@@ -899,11 +920,13 @@
       }
     }
 
-    // In-context caption: shown when a closeUpImage is available
+    // In-context caption: shown when the user is actively viewing the close-up.
+    // Always populate the markup so the thumb click handler can show/hide it,
+    // but keep it hidden initially when the entry is from the catalog.
     var ctx = $('#detailContext');
     if (closeUp && opts.contextLabel) {
       ctx.innerHTML = t('detail.seenIn') + ' <strong>' + opts.contextLabel + '</strong>';
-      ctx.hidden = false;
+      ctx.hidden = !!startsOnCatalog;
     } else {
       ctx.hidden = true;
       ctx.innerHTML = '';
@@ -924,14 +947,14 @@
       }
       if (closeUp) {
         parts.push(
-          '<button data-thumb="close" class="active">' +
+          '<button data-thumb="close"' + (startsOnCatalog ? '' : ' class="active"') + '>' +
             '<img src="' + uri(closeUp) + '" alt="" />' +
             '<span class="thumb-label">' + t('detail.viewClose') + '</span>' +
           '</button>'
         );
       }
       parts.push(
-        '<button data-thumb="catalog"' + (!closeUp ? ' class="active"' : '') + '>' +
+        '<button data-thumb="catalog"' + ((!closeUp || startsOnCatalog) ? ' class="active"' : '') + '>' +
           '<img src="' + uri(catalogImg) + '" alt="" />' +
           '<span class="thumb-label">' + t('detail.viewCatalog') + '</span>' +
         '</button>'
@@ -1587,6 +1610,7 @@
     // anyway after a short wait so the user isn't stuck staring at a still.
     var startFallback = setTimeout(startPlayback, 1200);
 
+    var revealed = false;
     function finishReveal() {
       if (still.src) {
         still.hidden = false;
@@ -1598,6 +1622,7 @@
         overlay.style.backgroundImage = '';
       }
       card.hidden = false;
+      revealed = true;
     }
     function revealCard() {
       try { video.pause(); } catch (e) {}
@@ -1609,11 +1634,17 @@
       setTimeout(function () { clearInterval(poll); finishReveal(); }, 1500);
     }
 
+    // X button (top-right): during the video it skips ahead to the close-up;
+    // once the close-up is on screen it acts as a back-to-the-space close.
+    function onSkipClick() {
+      if (revealed) closeOverlay();
+      else revealCard();
+    }
     function cleanup() {
       clearTimeout(startFallback);
       video.removeEventListener('loadeddata', startPlayback);
       video.removeEventListener('ended', revealCard);
-      skipBtn.removeEventListener('click', revealCard);
+      skipBtn.removeEventListener('click', onSkipClick);
       btnDetail.removeEventListener('click', onDetail);
       btnClose.removeEventListener('click', closeOverlay);
       document.removeEventListener('keydown', onKey);
@@ -1644,7 +1675,7 @@
     }
 
     video.addEventListener('ended', revealCard);
-    skipBtn.addEventListener('click', revealCard);
+    skipBtn.addEventListener('click', onSkipClick);
     btnDetail.addEventListener('click', onDetail);
     btnClose.addEventListener('click', closeOverlay);
     document.addEventListener('keydown', onKey);

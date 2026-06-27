@@ -414,7 +414,16 @@ svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width:
 .home-hero-arrow-prev { left: clamp(12px, 2vw, 24px); }
 .home-hero-arrow-next { right: clamp(12px, 2vw, 24px); }
 @media (max-width: 640px) {
-  .home-hero-arrow { width: 38px; height: 38px; }
+  /* On phones the hero text fills the horizontal space; move the arrows
+     down next to the dots so they stop overlapping the title/subtitle. */
+  .home-hero-arrow {
+    width: 38px; height: 38px;
+    top: auto;
+    bottom: 80px;
+    transform: none;
+  }
+  .home-hero-arrow-prev { left: 16px; }
+  .home-hero-arrow-next { right: 16px; }
 }
 
 .home-hero-dots {
@@ -1518,7 +1527,20 @@ svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width:
     align-items: stretch;
     gap: 8px;
   }
-  .card-quote { justify-content: center; }
+  .card-quote {
+    justify-content: center;
+    font-size: 0.6rem;
+    letter-spacing: 0.1em;
+    padding: 6px 10px;
+  }
+  /* Tighten the "Consultar precio" CTA in detail panel + close-up card so
+     the label doesn't clip on narrow phones. */
+  .detail-quote,
+  .transition-card-quote {
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    padding: 0.85em 1.5em;
+  }
 }
 
 /* =============================================================================
