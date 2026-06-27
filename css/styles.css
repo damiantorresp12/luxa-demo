@@ -1855,8 +1855,14 @@ svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width:
 }
 .space-type-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 18px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 22px;
+}
+@media (max-width: 980px) {
+  .space-type-grid { grid-template-columns: repeat(2, 1fr); gap: 18px; }
+}
+@media (max-width: 560px) {
+  .space-type-grid { grid-template-columns: 1fr; gap: 16px; }
 }
 .space-type-card {
   position: relative;
