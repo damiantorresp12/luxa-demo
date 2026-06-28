@@ -239,6 +239,31 @@
     };
   }
 
+  /* =============================================================================
+     Lights on/off — optional per-scene toggle for scenes that ship "_off" image
+     variants. Convention: "Living 01.jpeg" → "Living 01 off.jpeg" (insert " off"
+     before the extension). The toggle UI is added to the stage only when an off
+     variant is detected at boot. Close-ups inherit the same convention.
+     ========================================================================== */
+  function lightsOffPath(path) {
+    if (!path) return null;
+    return String(path).replace(/(\.[^./]+)$/, ' off$1');
+  }
+  // Cache: original path → off path (if exists) | false (if doesn't)
+  var lightsOffCache = {};
+  function checkLightsOff(path, cb) {
+    if (!path) return cb(null);
+    var key = String(path);
+    if (lightsOffCache[key] !== undefined) {
+      return cb(lightsOffCache[key] || null);
+    }
+    var off = lightsOffPath(path);
+    var probe = new Image();
+    probe.onload  = function () { lightsOffCache[key] = off; cb(off); };
+    probe.onerror = function () { lightsOffCache[key] = false; cb(null); };
+    probe.src = uri(off);
+  }
+
   // Map each productId → its first curated close-up image across all spaces.
   // Used by the home "Tipos de luminaria" collage to pick the most "destacado"
   // (already-curated-in-a-scene) representative image per category.
@@ -1391,6 +1416,51 @@
     var stage = el('div', 'space-stage');
     stage.innerHTML = (bg ? '<img src="' + uri(bg) + '" alt="' + tx(sp.name) + '" />' : '') + hotspotsHtml;
 
+    // If the scene ships an "off" variant of its main image, surface a small
+    // lights toggle in the corner of the stage. When the user flips it off,
+    // we also derive off close-ups for each hotspot on click. Probe is async,
+    // so the toggle gets attached only after we confirm the file exists.
+    if (bg) {
+      checkLightsOff(bg, function (offBg) {
+        if (!offBg) return;
+        // Pre-warm the close-up "off" probes so the hotspot click handler can
+        // synchronously check lightsOffCache and swap to the off variant.
+        (sp.hotspots || []).forEach(function (h) {
+          if (h && h.closeUpImage) checkLightsOff(h.closeUpImage, function () {});
+        });
+        var toggle = document.createElement('button');
+        toggle.className = 'space-lights-toggle';
+        toggle.type = 'button';
+        toggle.setAttribute('aria-pressed', 'true');
+        toggle.dataset.lights = 'on';
+        toggle.title = t('lights.toggle');
+        toggle.innerHTML =
+          '<svg class="lights-icon" viewBox="0 0 24 24" aria-hidden="true">' +
+            '<circle cx="12" cy="12" r="4" class="lights-bulb"/>' +
+            '<g class="lights-rays" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">' +
+              '<line x1="12" y1="2"  x2="12" y2="5"/>' +
+              '<line x1="12" y1="19" x2="12" y2="22"/>' +
+              '<line x1="2"  y1="12" x2="5"  y2="12"/>' +
+              '<line x1="19" y1="12" x2="22" y2="12"/>' +
+              '<line x1="4.9"  y1="4.9"  x2="7"  y2="7"/>' +
+              '<line x1="17" y1="17" x2="19.1" y2="19.1"/>' +
+              '<line x1="4.9"  y1="19.1" x2="7"  y2="17"/>' +
+              '<line x1="17" y1="7"  x2="19.1" y2="4.9"/>' +
+            '</g>' +
+          '</svg>' +
+          '<span class="lights-label"><span class="on">' + t('lights.on') + '</span><span class="off">' + t('lights.off') + '</span></span>';
+        stage.appendChild(toggle);
+        toggle.addEventListener('click', function () {
+          var nextState = toggle.dataset.lights === 'on' ? 'off' : 'on';
+          toggle.dataset.lights = nextState;
+          toggle.setAttribute('aria-pressed', String(nextState === 'on'));
+          stage.dataset.lights = nextState;
+          var img = stage.querySelector('img');
+          if (img) img.src = uri(nextState === 'off' ? offBg : bg);
+        });
+      });
+    }
+
     var productsList = (sp.hotspots || []).map(function (h) {
       var prod = productById(h.productId);
       if (!prod) return '';
@@ -1504,6 +1574,8 @@
     }
     if (still) { still.hidden = true; still.removeAttribute('src'); }
     if (card)  { card.hidden = true; card.classList.remove('is-expanded'); }
+    var stale = overlay.querySelector('.transition-lights-toggle');
+    if (stale) stale.remove();
     overlay.hidden = true;
     overlay.style.backgroundImage = '';
     if (overlay.parentNode !== document.body) document.body.appendChild(overlay);
@@ -1527,6 +1599,11 @@
     // no explicit stage was passed.
     var stage = stageEl || $('.space-stage');
     if (stage && overlay.parentNode !== stage) stage.appendChild(overlay);
+
+    // While the overlay is up, hide the stage's lights toggle (if any) so it
+    // doesn't peek through behind the video / close-up. Restored on close.
+    var stageLightsToggle = stage ? stage.querySelector(':scope > .space-lights-toggle') : null;
+    if (stageLightsToggle) stageLightsToggle.hidden = true;
 
     // Use the current scene image as the overlay's backdrop so the user never
     // sees a black flash while the video is still decoding its first frame.
@@ -1610,6 +1687,49 @@
     // anyway after a short wait so the user isn't stuck staring at a still.
     var startFallback = setTimeout(startPlayback, 1200);
 
+    // Lights on/off toggle for the close-up. Only created when the close-up
+    // ships an "_off" variant. Hidden until reveal; removed on cleanup.
+    var lightsToggleEl = overlay.querySelector('.transition-lights-toggle');
+    if (lightsToggleEl) lightsToggleEl.remove();
+    lightsToggleEl = null;
+    var closeUpOnPath  = h.closeUpImage || null;
+    var closeUpOffPath = null;
+    if (closeUpOnPath) {
+      checkLightsOff(closeUpOnPath, function (off) {
+        if (!off) return;
+        closeUpOffPath = off;
+        lightsToggleEl = document.createElement('button');
+        lightsToggleEl.className = 'space-lights-toggle transition-lights-toggle';
+        lightsToggleEl.type = 'button';
+        lightsToggleEl.setAttribute('aria-pressed', 'true');
+        lightsToggleEl.dataset.lights = 'on';
+        lightsToggleEl.title = t('lights.toggle');
+        lightsToggleEl.innerHTML =
+          '<svg class="lights-icon" viewBox="0 0 24 24" aria-hidden="true">' +
+            '<circle cx="12" cy="12" r="4" class="lights-bulb"/>' +
+            '<g class="lights-rays" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">' +
+              '<line x1="12" y1="2"  x2="12" y2="5"/>' +
+              '<line x1="12" y1="19" x2="12" y2="22"/>' +
+              '<line x1="2"  y1="12" x2="5"  y2="12"/>' +
+              '<line x1="19" y1="12" x2="22" y2="12"/>' +
+              '<line x1="4.9"  y1="4.9"  x2="7"  y2="7"/>' +
+              '<line x1="17" y1="17" x2="19.1" y2="19.1"/>' +
+              '<line x1="4.9"  y1="19.1" x2="7"  y2="17"/>' +
+              '<line x1="17" y1="7"  x2="19.1" y2="4.9"/>' +
+            '</g>' +
+          '</svg>' +
+          '<span class="lights-label"><span class="on">' + t('lights.on') + '</span><span class="off">' + t('lights.off') + '</span></span>';
+        lightsToggleEl.hidden = !revealed; // only show after the close-up is on screen
+        overlay.appendChild(lightsToggleEl);
+        lightsToggleEl.addEventListener('click', function () {
+          var nextState = lightsToggleEl.dataset.lights === 'on' ? 'off' : 'on';
+          lightsToggleEl.dataset.lights = nextState;
+          lightsToggleEl.setAttribute('aria-pressed', String(nextState === 'on'));
+          still.src = uri(nextState === 'off' ? closeUpOffPath : closeUpOnPath);
+        });
+      });
+    }
+
     var revealed = false;
     function finishReveal() {
       if (still.src) {
@@ -1623,6 +1743,9 @@
       }
       card.hidden = false;
       revealed = true;
+      // Show the lights toggle now that the close-up is on screen (if it was
+      // created — only happens when an "_off" variant exists for this close-up).
+      if (lightsToggleEl) lightsToggleEl.hidden = false;
     }
     function revealCard() {
       try { video.pause(); } catch (e) {}
@@ -1661,6 +1784,8 @@
       overlay.hidden = true;
       overlay.style.backgroundImage = '';
       card.hidden = true;
+      if (lightsToggleEl) { lightsToggleEl.remove(); lightsToggleEl = null; }
+      if (stageLightsToggle) stageLightsToggle.hidden = false;
       if (overlay.parentNode !== document.body) document.body.appendChild(overlay);
     }
     function onDetail() {

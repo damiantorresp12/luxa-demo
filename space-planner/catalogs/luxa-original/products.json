@@ -255,6 +255,9 @@
     "catalogId": "albus-twisted-table",
     "category": "Table Lamps",
     "type": "table_lamp",
+    "spaces": [
+      "living"
+    ],
     "code": "DVA-ALB",
     "designer": "LUXA Studio",
     "power": "6 W",
@@ -281,6 +284,9 @@
     "category": "Floor Lamps",
     "type": "floor_lamp",
     "collection": "Arco",
+    "spaces": [
+      "living"
+    ],
     "code": "DVA-ARC",
     "designer": "LUXA Studio",
     "power": "22 W",
@@ -494,6 +500,11 @@
     "catalogId": "bitpop-downlight",
     "category": "Downlights",
     "type": "downlight",
+    "collection": "Bitpop",
+    "spaces": [
+      "living",
+      "bedroom"
+    ],
     "code": "DVA-BIT",
     "designer": "LUXA Studio",
     "power": "9 W",

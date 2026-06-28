@@ -1,7 +1,7 @@
 {
   "_readme": "Auto-managed by the Space Planner. Save this file as data/spaces.luxa-original.json in the LUXA project root — the app fetches all data/spaces.*.json files at boot and merges them into window.LUXA.spaces. Same id → planner entry replaces curated entry. Product IDs use catalogId from products.json when present.",
   "catalog": "luxa-original",
-  "exportedAt": "2026-06-25T14:59:18.242Z",
+  "exportedAt": "2026-06-28T01:39:39.819Z",
   "entries": [
     {
       "id": "living-aballs-collection-01",
@@ -454,7 +454,8 @@
           "productId": "orb-floor-lamp",
           "x": 21.56,
           "y": 62.65,
-          "closeUpImage": "assets/Spaces/Dining 03/Dining 03 close up 03.jpeg"
+          "closeUpImage": "assets/Spaces/Dining 03/Dining 03 close up 03.jpeg",
+          "transitionVideo": "assets/Transiciones/Dining 03/Dining 03 tran 03.mp4"
         },
         {
           "productId": "orb-pendant",
@@ -538,13 +539,119 @@
           "productId": "atollo-table",
           "x": 65.08,
           "y": 69.36,
-          "closeUpImage": "assets/Spaces/Office 02/Office 02 close up 01.jpeg"
+          "closeUpImage": "assets/Spaces/Office 02/Office 02 close up 01.jpeg",
+          "transitionVideo": "assets/Transiciones/Office 02/Office tran 01.mp4"
         },
         {
           "productId": "bolle-orizzontale",
           "x": 41.9,
           "y": 26.5,
-          "closeUpImage": "assets/Spaces/Office 02/Office 02 close up 02.jpeg"
+          "closeUpImage": "assets/Spaces/Office 02/Office 02 close up 02.jpeg",
+          "transitionVideo": "assets/Transiciones/Office 02/Office tran 02.mp4"
+        }
+      ]
+    },
+    {
+      "id": "bedroom-bedroom-bitpop-flat-collection-manual-28",
+      "name": {
+        "es": "Colección Dormitorio bitpop & Flat",
+        "en": "Bedroom bitpop & Flat Collection"
+      },
+      "tagline": {
+        "es": "Iluminación suave y serena para dormitorio",
+        "en": "Soft and quiet bedroom lighting collection"
+      },
+      "description": {
+        "es": "Un dormitorio suave que combina luz general, de lectura y de mesa de luz para una atmósfera residencial tranquila.",
+        "en": "A soft bedroom setup mixing general, reading and bedside lighting for a quiet residential atmosphere."
+      },
+      "image": "assets/Spaces/bedroom 03/bedroom 03.jpeg",
+      "gallery": [
+        "assets/Spaces/bedroom 03/bedroom 03.jpeg"
+      ],
+      "heroProduct": "flat-floor",
+      "hotspots": [
+        {
+          "productId": "flat-floor",
+          "x": 86.74,
+          "y": 69,
+          "closeUpImage": "assets/Spaces/bedroom 03/bedroom 03 close up 02.jpeg"
+        },
+        {
+          "productId": "flat-table",
+          "x": 17.6,
+          "y": 89.11,
+          "closeUpImage": "assets/Spaces/bedroom 03/bedroom 03 close up 03.jpeg"
+        },
+        {
+          "productId": "bitpop-downlight",
+          "x": 64.62,
+          "y": 17.33,
+          "closeUpImage": "assets/Spaces/bedroom 03/bedroom 03 close up 01.jpeg"
+        }
+      ]
+    },
+    {
+      "id": "living-living-albus-arco-collection-manual-29",
+      "name": {
+        "es": "Colección Living Albus & Arco",
+        "en": "Living Albus & Arco Collection"
+      },
+      "tagline": {
+        "es": "Iluminación cálida para residencial",
+        "en": "Warm residential lighting collection"
+      },
+      "description": {
+        "es": "Un living cálido que combina luz de techo, aplique de pared y decorativa en una composición residencial balanceada.",
+        "en": "A warm living setup combining ceiling, wall and decorative lighting in a balanced residential composition."
+      },
+      "image": "assets/Spaces/Living 04/Living 04.jpeg",
+      "gallery": [
+        "assets/Spaces/Living 04/Living 04.jpeg"
+      ],
+      "heroProduct": "albus-twisted-table",
+      "hotspots": [
+        {
+          "productId": "albus-twisted-table",
+          "x": 80.68,
+          "y": 72.71
+        },
+        {
+          "productId": "arco-floor",
+          "x": 8.26,
+          "y": 79.59
+        }
+      ]
+    },
+    {
+      "id": "living-lighto-collection-manual-30",
+      "name": {
+        "es": "Colección Living Lighto",
+        "en": "Living Lighto Collection"
+      },
+      "tagline": {
+        "es": "Iluminación cálida para residencial",
+        "en": "Warm residential lighting collection"
+      },
+      "description": {
+        "es": "Un living cálido que combina luz de techo, aplique de pared y decorativa en una composición residencial balanceada.",
+        "en": "A warm living setup combining ceiling, wall and decorative lighting in a balanced residential composition."
+      },
+      "image": "assets/Spaces/Living 05/Living 05.jpeg",
+      "gallery": [
+        "assets/Spaces/Living 05/Living 05.jpeg"
+      ],
+      "heroProduct": "lighto-t-suspension",
+      "hotspots": [
+        {
+          "productId": "lighto-t-suspension",
+          "x": 44.47,
+          "y": 50.13
+        },
+        {
+          "productId": "lightolight-p-floor",
+          "x": 74.36,
+          "y": 37.43
         }
       ]
     }

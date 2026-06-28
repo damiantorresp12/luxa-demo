@@ -1,7 +1,7 @@
 {
   "_readme": "Producto sidecar para la app LUXA. Generado por el Product Data Generator. Editar a mano sólo si sabés lo que hacés. La lista \"removed\" indica catalogIds que la app debe filtrar del catálogo estático.",
   "catalogId": "luxa-original",
-  "exportedAt": "2026-06-25T12:19:00.503Z",
+  "exportedAt": "2026-06-28T00:48:00.721Z",
   "products": [
     {
       "id": "flat-floor",
@@ -323,7 +323,9 @@
       "name": "Albus Twisted Table",
       "category": "Table Lamps",
       "collection": "",
-      "spaces": [],
+      "spaces": [
+        "living"
+      ],
       "designer": "LUXA Studio",
       "power": "6 W",
       "lumens": "420 lm",
@@ -359,7 +361,9 @@
       "name": "Arco Floor",
       "category": "Floor Lamps",
       "collection": "Arco",
-      "spaces": [],
+      "spaces": [
+        "living"
+      ],
       "designer": "LUXA Studio",
       "power": "22 W",
       "lumens": "1600 lm",
@@ -630,8 +634,11 @@
       "code": "DVA-BIT",
       "name": "Bitpop C 2.2 Downlight",
       "category": "Downlights",
-      "collection": "",
-      "spaces": [],
+      "collection": "Bitpop",
+      "spaces": [
+        "living",
+        "bedroom"
+      ],
       "designer": "LUXA Studio",
       "power": "9 W",
       "lumens": "780 lm",
