@@ -1,7 +1,7 @@
 {
   "_readme": "Auto-managed by the Space Planner. Save this file as data/spaces.luxa-original.json in the LUXA project root — the app fetches all data/spaces.*.json files at boot and merges them into window.LUXA.spaces. Same id → planner entry replaces curated entry. Product IDs use catalogId from products.json when present.",
   "catalog": "luxa-original",
-  "exportedAt": "2026-06-29T20:24:53.630Z",
+  "exportedAt": "2026-06-29T20:38:02.029Z",
   "entries": [
     {
       "id": "living-aballs-collection-01",
@@ -432,49 +432,6 @@
       ]
     },
     {
-      "id": "living-orb-collection-07",
-      "name": {
-        "es": "Colección Comedor Orb",
-        "en": "Dining Orb Collection"
-      },
-      "tagline": {
-        "es": "Iluminación focal para comedor",
-        "en": "Dining focused lighting collection"
-      },
-      "description": {
-        "es": "Un comedor con luz focal sobre la mesa, acompañada de aplique de pared y luz de acento.",
-        "en": "A warm living setup combining ceiling, wall and decorative lighting in a balanced residential composition."
-      },
-      "image": "assets/Spaces/Dining 03/Dining 03.jpeg",
-      "gallery": [
-        "assets/Spaces/Dining 03/Dining 03.jpeg"
-      ],
-      "heroProduct": "orb-floor-lamp",
-      "hotspots": [
-        {
-          "productId": "orb-floor-lamp",
-          "x": 21.56,
-          "y": 62.65,
-          "closeUpImage": "assets/Spaces/Dining 03/Dining 03 close up 03.jpeg",
-          "transitionVideo": "assets/Transiciones/Dining 03/Dining 03 tran 03.mp4"
-        },
-        {
-          "productId": "orb-pendant",
-          "x": 36.3,
-          "y": 7.98,
-          "closeUpImage": "assets/Spaces/Dining 03/Dining 03 close up 02.jpeg",
-          "transitionVideo": "assets/Transiciones/Dining 03/Dining 03 tran 01.mp4"
-        },
-        {
-          "productId": "orb-table-lamp",
-          "x": 84.37,
-          "y": 66.53,
-          "closeUpImage": "assets/Spaces/Dining 03/Dining 03 close up 01.jpeg",
-          "transitionVideo": "assets/Transiciones/Dining 03/Dining 03 tran 02.mp4"
-        }
-      ]
-    },
-    {
       "id": "bedroom-arum-collection-17",
       "name": {
         "es": "Colección Oficina Arum",
@@ -662,6 +619,49 @@
           "y": 37.43,
           "closeUpImage": "assets/Spaces/Living 05/Living 05 close up 02.jpeg",
           "transitionVideo": "assets/Transiciones/Living 05/Living 05 tran 02.mp4"
+        }
+      ]
+    },
+    {
+      "id": "living-orb-collection-07",
+      "name": {
+        "es": "Colección Living Orb",
+        "en": "Living Orb Collection"
+      },
+      "tagline": {
+        "es": "Iluminación cálida para residencial",
+        "en": "Warm residential lighting collection"
+      },
+      "description": {
+        "es": "Un living cálido que combina luz de techo, aplique de pared y decorativa en una composición residencial balanceada.",
+        "en": "A warm living setup combining ceiling, wall and decorative lighting in a balanced residential composition."
+      },
+      "image": "assets/Spaces/Dining 03/Dining 03.jpeg",
+      "gallery": [
+        "assets/Spaces/Dining 03/Dining 03.jpeg"
+      ],
+      "heroProduct": "orb-floor-lamp",
+      "hotspots": [
+        {
+          "productId": "orb-pendant",
+          "x": 29.68,
+          "y": 7.54,
+          "closeUpImage": "assets/Spaces/Dining 03/Dining 03 close up 02.jpeg",
+          "transitionVideo": "assets/Transiciones/Dining 03/Dining 03 tran 01.mp4"
+        },
+        {
+          "productId": "orb-floor-lamp",
+          "x": 24.13,
+          "y": 65.33,
+          "closeUpImage": "assets/Spaces/Dining 03/Dining 03 close up 03.jpeg",
+          "transitionVideo": "assets/Transiciones/Dining 03/Dining 03 tran 03.mp4"
+        },
+        {
+          "productId": "orb-table-lamp",
+          "x": 84.84,
+          "y": 66.39,
+          "closeUpImage": "assets/Spaces/Dining 03/Dining 03 close up 03.jpeg",
+          "transitionVideo": "assets/Transiciones/Dining 03/Dining 03 tran 02.mp4"
         }
       ]
     }
