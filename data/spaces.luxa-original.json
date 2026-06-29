@@ -1,7 +1,7 @@
 {
   "_readme": "Auto-managed by the Space Planner. Save this file as data/spaces.luxa-original.json in the LUXA project root — the app fetches all data/spaces.*.json files at boot and merges them into window.LUXA.spaces. Same id → planner entry replaces curated entry. Product IDs use catalogId from products.json when present.",
   "catalog": "luxa-original",
-  "exportedAt": "2026-06-29T13:14:45.441Z",
+  "exportedAt": "2026-06-29T16:37:32.812Z",
   "entries": [
     {
       "id": "living-aballs-collection-01",
@@ -426,7 +426,8 @@
           "productId": "awa-suspended",
           "x": 50.13,
           "y": 42.9,
-          "closeUpImage": "assets/Spaces/bathroom 02/Bathroom 02 close up 1.jpeg"
+          "closeUpImage": "assets/Spaces/bathroom 02/Bathroom 02 close up 1.jpeg",
+          "transitionVideo": "assets/Transiciones/Bathroom 02/Bathroom 02 tran 01.mp4"
         }
       ]
     },
@@ -454,8 +455,7 @@
           "productId": "orb-floor-lamp",
           "x": 21.56,
           "y": 62.65,
-          "closeUpImage": "assets/Spaces/Dining 03/Dining 03 close up 03.jpeg",
-          "transitionVideo": "assets/Transiciones/Dining 03/Dining 03 tran 03.mp4"
+          "closeUpImage": "assets/Spaces/Dining 03/Dining 03 close up 03.jpeg"
         },
         {
           "productId": "orb-pendant",
@@ -617,7 +617,8 @@
           "productId": "albus-twisted-table",
           "x": 80.68,
           "y": 72.71,
-          "closeUpImage": "assets/Spaces/Living 04/Living 04 close up 01.jpeg"
+          "closeUpImage": "assets/Spaces/Living 04/Living 04 close up 01.jpeg",
+          "transitionVideo": "assets/Transiciones/Living 04/Living 04 tran 01.mp4"
         },
         {
           "productId": "arco-floor",
@@ -651,13 +652,15 @@
           "productId": "lighto-t-suspension",
           "x": 44.47,
           "y": 50.13,
-          "closeUpImage": "assets/Spaces/Living 05/Living 05 close up 01.jpeg"
+          "closeUpImage": "assets/Spaces/Living 05/Living 05 close up 01.jpeg",
+          "transitionVideo": "assets/Transiciones/Living 05/Living 05 tran 01.mp4"
         },
         {
           "productId": "lightolight-p-floor",
           "x": 74.36,
           "y": 37.43,
-          "closeUpImage": "assets/Spaces/Living 05/Living 05 close up 02.jpeg"
+          "closeUpImage": "assets/Spaces/Living 05/Living 05 close up 02.jpeg",
+          "transitionVideo": "assets/Transiciones/Living 05/Living 05 tran 02.mp4"
         }
       ]
     }
