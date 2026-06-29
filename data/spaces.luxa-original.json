@@ -1,7 +1,7 @@
 {
   "_readme": "Auto-managed by the Space Planner. Save this file as data/spaces.luxa-original.json in the LUXA project root — the app fetches all data/spaces.*.json files at boot and merges them into window.LUXA.spaces. Same id → planner entry replaces curated entry. Product IDs use catalogId from products.json when present.",
   "catalog": "luxa-original",
-  "exportedAt": "2026-06-29T16:37:32.812Z",
+  "exportedAt": "2026-06-29T20:24:53.630Z",
   "entries": [
     {
       "id": "living-aballs-collection-01",
@@ -427,7 +427,7 @@
           "x": 50.13,
           "y": 42.9,
           "closeUpImage": "assets/Spaces/bathroom 02/Bathroom 02 close up 1.jpeg",
-          "transitionVideo": "assets/Transiciones/Bathroom 02/Bathroom 02 tran 01.mp4"
+          "transitionVideo": "assets/Transiciones/bathroom 02/Bathroom 02 tran 01.mp4"
         }
       ]
     },
