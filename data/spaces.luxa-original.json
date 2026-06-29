@@ -623,18 +623,18 @@
       ]
     },
     {
-      "id": "living-orb-collection-07",
+      "id": "dining-orb-collection-07",
       "name": {
-        "es": "Colección Living Orb",
-        "en": "Living Orb Collection"
+        "es": "Colección Comedor Orb",
+        "en": "Dining Orb Collection"
       },
       "tagline": {
-        "es": "Iluminación cálida para residencial",
-        "en": "Warm residential lighting collection"
+        "es": "Iluminación focal para comedor",
+        "en": "Dining focused lighting collection"
       },
       "description": {
-        "es": "Un living cálido que combina luz de techo, aplique de pared y decorativa en una composición residencial balanceada.",
-        "en": "A warm living setup combining ceiling, wall and decorative lighting in a balanced residential composition."
+        "es": "Un comedor con luz focal sobre la mesa, acompañada de aplique de pared y luz de acento.",
+        "en": "A focused dining lighting setup with a centered pendant and supporting wall and accent lights."
       },
       "image": "assets/Spaces/Dining 03/Dining 03.jpeg",
       "gallery": [
