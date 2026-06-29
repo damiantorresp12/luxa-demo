@@ -1,7 +1,7 @@
 {
   "_readme": "Auto-managed by the Space Planner. Save this file as data/spaces.luxa-original.json in the LUXA project root — the app fetches all data/spaces.*.json files at boot and merges them into window.LUXA.spaces. Same id → planner entry replaces curated entry. Product IDs use catalogId from products.json when present.",
   "catalog": "luxa-original",
-  "exportedAt": "2026-06-29T20:40:31.152Z",
+  "exportedAt": "2026-06-29T21:08:34.332Z",
   "entries": [
     {
       "id": "living-aballs-collection-01",
@@ -623,7 +623,7 @@
       ]
     },
     {
-      "id": "dining-orb-collection-07",
+      "id": "living-orb-collection-07",
       "name": {
         "es": "Colección Comedor Orb",
         "en": "Dining Orb Collection"
@@ -644,22 +644,22 @@
       "hotspots": [
         {
           "productId": "orb-pendant",
-          "x": 29.68,
-          "y": 7.54,
+          "x": 29.94,
+          "y": 8.24,
           "closeUpImage": "assets/Spaces/Dining 03/Dining 03 close up 02.jpeg",
           "transitionVideo": "assets/Transiciones/Dining 03/Dining 03 tran 01.mp4"
         },
         {
           "productId": "orb-floor-lamp",
-          "x": 24.13,
-          "y": 65.33,
+          "x": 24.27,
+          "y": 65.51,
           "closeUpImage": "assets/Spaces/Dining 03/Dining 03 close up 03.jpeg",
           "transitionVideo": "assets/Transiciones/Dining 03/Dining 03 tran 03.mp4"
         },
         {
           "productId": "orb-table-lamp",
-          "x": 84.84,
-          "y": 66.39,
+          "x": 84.44,
+          "y": 67.45,
           "closeUpImage": "assets/Spaces/Dining 03/Dining 03 close up 01.jpeg",
           "transitionVideo": "assets/Transiciones/Dining 03/Dining 03 tran 02.mp4"
         }
