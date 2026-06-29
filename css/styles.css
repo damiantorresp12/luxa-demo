@@ -2006,12 +2006,14 @@ svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width:
 
 @media (max-width: 560px) {
   .space-lights-toggle {
-    height: 32px;
-    padding: 0 12px 0 8px;
-    font-size: 0.6rem;
-    letter-spacing: 0.14em;
+    height: 28px;
+    padding: 0 10px 0 6px;
+    gap: 6px;
+    font-size: 0.55rem;
+    letter-spacing: 0.12em;
+    top: 10px; right: 10px;
   }
-  .space-lights-toggle .lights-icon { width: 16px; height: 16px; }
+  .space-lights-toggle .lights-icon { width: 14px; height: 14px; }
 }
 
 /* Inside the close-up transition overlay: position on the top-left so it
@@ -2102,6 +2104,12 @@ svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width:
   transition: all 0.3s var(--ease);
 }
 .hotspot:hover .hotspot-label { opacity: 1; transform: translateX(-50%) translateY(0); }
+@media (max-width: 560px) {
+  .hotspot { width: 20px; height: 20px; }
+  .hotspot::before { width: 4px; height: 4px; }
+  .hotspot::after { inset: -5px; }
+  .hotspot-label { font-size: 0.6rem; padding: 3px 8px; }
+}
 
 /* =============================================================================
    PANEL: DOWNLOADS — resource library

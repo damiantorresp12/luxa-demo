@@ -1,7 +1,7 @@
 {
   "_readme": "Auto-managed by the Space Planner. Save this file as data/spaces.luxa-original.json in the LUXA project root — the app fetches all data/spaces.*.json files at boot and merges them into window.LUXA.spaces. Same id → planner entry replaces curated entry. Product IDs use catalogId from products.json when present.",
   "catalog": "luxa-original",
-  "exportedAt": "2026-06-28T01:39:39.819Z",
+  "exportedAt": "2026-06-29T13:14:45.441Z",
   "entries": [
     {
       "id": "living-aballs-collection-01",
@@ -575,13 +575,15 @@
           "productId": "flat-floor",
           "x": 86.74,
           "y": 69,
-          "closeUpImage": "assets/Spaces/bedroom 03/bedroom 03 close up 02.jpeg"
+          "closeUpImage": "assets/Spaces/bedroom 03/bedroom 03 close up 02.jpeg",
+          "transitionVideo": "assets/Transiciones/bedroom 03/bedroom 02  tran 02.mp4"
         },
         {
           "productId": "flat-table",
           "x": 17.6,
           "y": 89.11,
-          "closeUpImage": "assets/Spaces/bedroom 03/bedroom 03 close up 03.jpeg"
+          "closeUpImage": "assets/Spaces/bedroom 03/bedroom 03 close up 03.jpeg",
+          "transitionVideo": "assets/Transiciones/bedroom 03/bedroom 02  tran 01.mp4"
         },
         {
           "productId": "bitpop-downlight",
@@ -614,12 +616,14 @@
         {
           "productId": "albus-twisted-table",
           "x": 80.68,
-          "y": 72.71
+          "y": 72.71,
+          "closeUpImage": "assets/Spaces/Living 04/Living 04 close up 01.jpeg"
         },
         {
           "productId": "arco-floor",
           "x": 8.26,
-          "y": 79.59
+          "y": 79.59,
+          "closeUpImage": "assets/Spaces/Living 04/Living 04 close up 02.jpeg"
         }
       ]
     },
@@ -646,12 +650,14 @@
         {
           "productId": "lighto-t-suspension",
           "x": 44.47,
-          "y": 50.13
+          "y": 50.13,
+          "closeUpImage": "assets/Spaces/Living 05/Living 05 close up 01.jpeg"
         },
         {
           "productId": "lightolight-p-floor",
           "x": 74.36,
-          "y": 37.43
+          "y": 37.43,
+          "closeUpImage": "assets/Spaces/Living 05/Living 05 close up 02.jpeg"
         }
       ]
     }

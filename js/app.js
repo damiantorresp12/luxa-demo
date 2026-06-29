@@ -809,7 +809,7 @@
         '<button class="fav-btn' + (isFav(p.id) ? ' is-fav' : '') + '" data-id="' + p.id + '" aria-label="Toggle favorite" aria-pressed="' + isFav(p.id) + '">' +
           '<span class="heart-empty">♡</span><span class="heart-full">♥</span>' +
         '</button>' +
-        '<img loading="lazy" src="' + uri(getActiveColorImage(p)) + '" alt="' + p.name + '" />' +
+        '<img decoding="async" src="' + uri(getActiveColorImage(p)) + '" alt="' + p.name + '" />' +
         colorSwatchesHTML(p) +
       '</div>' +
       '<div class="card-body">' +
@@ -830,14 +830,22 @@
     });
     card.addEventListener('keydown', function (e) { if (e.key === 'Enter') openDetail(p.id); });
     $('.fav-btn', card).addEventListener('click', function (e) { e.stopPropagation(); toggleFav(p.id); });
-    // Swatch clicks: swap the visible image and re-mark the active button.
+    // Swatch clicks: preload the new image off-screen before assigning it to
+    // the visible <img>. Without the preload the browser would keep the old
+    // image rendered while downloading the new one (the "ghost image" effect).
     $$('.color-swatch', card).forEach(function (btn) {
       btn.addEventListener('click', function (e) {
         e.stopPropagation();
         var colorId = btn.dataset.color;
         activeColorByProduct[p.id] = colorId;
         var img = $('.card-media img', card);
-        if (img) img.src = uri(getActiveColorImage(p));
+        var nextSrc = uri(getActiveColorImage(p));
+        if (img && nextSrc) {
+          var preload = new Image();
+          preload.onload  = function () { img.src = nextSrc; };
+          preload.onerror = function () { img.src = nextSrc; };
+          preload.src = nextSrc;
+        }
         $$('.color-swatch', card).forEach(function (b) {
           b.classList.toggle('is-active', b.dataset.color === colorId);
         });
