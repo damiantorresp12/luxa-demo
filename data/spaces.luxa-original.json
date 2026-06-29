@@ -455,7 +455,8 @@
           "productId": "orb-floor-lamp",
           "x": 21.56,
           "y": 62.65,
-          "closeUpImage": "assets/Spaces/Dining 03/Dining 03 close up 03.jpeg"
+          "closeUpImage": "assets/Spaces/Dining 03/Dining 03 close up 03.jpeg",
+          "transitionVideo": "assets/Transiciones/Dining 03/Dining 03 tran 03.mp4"
         },
         {
           "productId": "orb-pendant",
