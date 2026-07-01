@@ -432,7 +432,8 @@
         openDetail(p.id, {
           closeUpImage: closeUp,
           contextLabel: contextLabel,
-          spaceImage: sp && sp.image ? sp.image : null
+          spaceImage: sp && sp.image ? sp.image : null,
+          spaceId: sp ? sp.id : null
         });
       });
     } else {
@@ -881,6 +882,7 @@
     // redirect. If the product doesn't appear in any scene, opts stays empty
     // and the detail panel renders catalog-only as before.
     var startsOnCatalog = false;
+    var contextSpaceId = opts.spaceId || null;
     if (!opts.closeUpImage && !opts.spaceImage) {
       var fromScene = findSpaceFor(id);
       if (fromScene) {
@@ -889,6 +891,7 @@
           opts.spaceImage   = fromScene.image;
           opts.closeUpImage = hot.closeUpImage || null;
           opts.contextLabel = tx(fromScene.name);
+          contextSpaceId    = contextSpaceId || fromScene.id;
           startsOnCatalog = true;
         }
       }
@@ -1061,8 +1064,15 @@
     var viewSpaceBtn = $('[data-action="view-space"]', $('#detailBody'));
     if (viewSpaceBtn) viewSpaceBtn.addEventListener('click', function () {
       closeDetail();
-      var sp = findSpaceFor(p.id);
-      if (sp) setActiveSpace(sp.id);
+      // Prefer the scene the user came from (hotspot / product-list / home
+      // bridge). Fall back to findSpaceFor() only when we have no context —
+      // e.g. entered from the catalog grid.
+      var targetId = contextSpaceId;
+      if (!targetId) {
+        var sp = findSpaceFor(p.id);
+        if (sp) targetId = sp.id;
+      }
+      if (targetId) setActiveSpace(targetId);
       go('spaces', { preserveSpace: true });
     });
     $('[data-action="download-sheet"]', $('#detailBody')).addEventListener('click', function () {
@@ -1284,15 +1294,19 @@
 
   function setActiveSpace(id) {
     activeSpace = id;
-    // Magazine view: if no filter is set yet, derive the room type from the
-    // selected scene so the list shows other scenes of the same type instead
-    // of the full catalog. The user can still widen via the side filter.
-    if (!activeSpaceFilters.spaces.length) {
-      var sp = (DATA.spaces || []).filter(function (s) { return s.id === id; })[0];
-      if (sp) {
-        var tag = parseSceneTags(sp).space;
-        if (tag) activeSpaceFilters.spaces = [tag];
-      }
+    // Magazine view: snap the filter to this scene's room type when
+    //  · no filter is set yet (catalog / home entry — start on scenes of the
+    //    same type as an invitation to explore related ambients), OR
+    //  · the current filter would hide the target scene (user was browsing a
+    //    different room type before opening the detail; without this the
+    //    "Ver en ambiente" click would land on the correct activeSpace but
+    //    the stale filter would leave that scene off-screen).
+    var sp = (DATA.spaces || []).filter(function (s) { return s.id === id; })[0];
+    var targetHidden = sp && visibleSpaces().indexOf(sp) === -1;
+    if (!activeSpaceFilters.spaces.length || targetHidden) {
+      var tag = sp ? parseSceneTags(sp).space : '';
+      activeSpaceFilters.spaces = tag ? [tag] : [];
+      activeSpaceFilters.collections = [];
     }
     renderSpaceSide();
     renderActiveSpace();
@@ -1501,8 +1515,8 @@
         var pid = node.dataset.id;
         var h = (sp.hotspots || []).filter(function (x) { return x.productId === pid; })[0];
         var opts = (h && h.closeUpImage)
-          ? { closeUpImage: h.closeUpImage, contextLabel: tx(sp.name), spaceImage: sp.image }
-          : (sp.image ? { spaceImage: sp.image, contextLabel: tx(sp.name) } : null);
+          ? { closeUpImage: h.closeUpImage, contextLabel: tx(sp.name), spaceImage: sp.image, spaceId: sp.id }
+          : (sp.image ? { spaceImage: sp.image, contextLabel: tx(sp.name), spaceId: sp.id } : { spaceId: sp.id });
         var isHotspot = node.classList.contains('hotspot');
         if (isHotspot && h && h.transitionVideo && $('#transitionOverlay')) {
           // Anchor the cinematic to THIS section's stage (not the first one
@@ -1798,8 +1812,8 @@
     }
     function onDetail() {
       var opts = h.closeUpImage
-        ? { closeUpImage: h.closeUpImage, contextLabel: tx(sp.name), spaceImage: sp.image }
-        : (sp.image ? { spaceImage: sp.image, contextLabel: tx(sp.name) } : null);
+        ? { closeUpImage: h.closeUpImage, contextLabel: tx(sp.name), spaceImage: sp.image, spaceId: sp.id }
+        : (sp.image ? { spaceImage: sp.image, contextLabel: tx(sp.name), spaceId: sp.id } : { spaceId: sp.id });
       closeOverlay();
       openDetail(pid, opts);
     }
