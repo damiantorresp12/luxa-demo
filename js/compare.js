@@ -63,13 +63,22 @@
     if (panel && !panel.hidden) renderView();
   }
 
-  /* Chip persistente en la topbar. Sólo visible con al menos 1 producto.
-     Con 1 → informativo (hint al click). Con 2 → cliqueable, abre la vista. */
+  /* Chip persistente en la topbar. Sólo aparece cuando hay al menos 1 producto
+     Y el usuario está en una ruta donde comparar tiene sentido (Productos,
+     Ambientes, o la vista Compare misma). En Home / Descargas / Tu Proyecto /
+     Acerca queda oculto — esas rutas son de descubrimiento o contenido, no
+     de exploración de catálogo. */
+  var CHIP_ROUTES = { products: 1, spaces: 1, compare: 1 };
+  function currentRoute() {
+    var h = (location.hash || '').replace('#', '');
+    return h || 'home';
+  }
   function updateChip() {
     var chip = document.getElementById('compareChip');
     if (!chip) return;
     var n = count();
-    chip.hidden = n === 0;
+    var routeOk = !!CHIP_ROUTES[currentRoute()];
+    chip.hidden = (n === 0) || !routeOk;
     var ready = n >= MAX;
     chip.classList.toggle('is-ready', ready);
     chip.setAttribute('aria-disabled', ready ? 'false' : 'true');

@@ -169,6 +169,11 @@
 
     var panels = $('.panels');
     if (panels) panels.scrollTop = 0;
+
+    // Chip global: se re-evalúa DESPUÉS de que el hash refleja la ruta nueva
+    // (updateChip lee location.hash para decidir si estamos en una ruta de
+    // exploración — Productos / Ambientes / Compare — o no).
+    if (window.LUXA_Compare) window.LUXA_Compare.sync();
   }
 
   function syncTopbar(route) {
