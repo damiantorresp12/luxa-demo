@@ -2493,3 +2493,393 @@ svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width:
   .transition-card-actions { gap: 8px; }
   .transition-card-actions .btn { padding: 8px 14px; font-size: 0.78rem; }
 }
+
+/* =============================================================================
+   COMPARE PRODUCTS — botón en cards, chip global en topbar, toast, vista
+   ========================================================================== */
+
+/* Botón "Comparar" en la card del catálogo — vive junto al fav-btn arriba a la
+   izquierda para no pisarlo. Estilo consistente con .fav-btn (mismo tamaño,
+   mismo tratamiento glass). */
+.card-compare {
+  position: absolute; top: 10px; left: 10px;
+  width: 34px; height: 34px;
+  display: grid; place-items: center;
+  border-radius: 50%;
+  background: rgba(8,8,10,0.55);
+  border: 1px solid var(--line);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  color: var(--ink-dim);
+  transition: all 0.3s var(--ease);
+  z-index: 3;
+}
+.card-compare:hover { border-color: var(--brass); transform: scale(1.08); }
+.card-compare svg { width: 16px; height: 16px; stroke-width: 1.5; }
+.card-compare.is-in {
+  color: var(--brass);
+  background: var(--brass-soft);
+  border-color: rgba(201,162,75,0.55);
+}
+.card-compare.is-in svg { fill: rgba(201,162,75,0.18); stroke: var(--brass); }
+
+/* Chip persistente en la topbar. Estilo pill dorado sutil, con icono + label + contador.
+   is-ready = 2 productos, cliqueable con hover destacado. */
+.compare-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0.55em 1em 0.55em 0.85em;
+  border-radius: 100px;
+  background: var(--brass-soft);
+  border: 1px solid rgba(201,162,75,0.35);
+  color: var(--brass);
+  font-family: var(--sans);
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.3s var(--ease);
+}
+.compare-chip[aria-disabled="true"] { cursor: default; opacity: 0.72; }
+.compare-chip.is-ready { opacity: 1; }
+.compare-chip.is-ready:hover {
+  background: rgba(201,162,75,0.22);
+  border-color: var(--brass);
+  transform: translateY(-1px);
+}
+.compare-chip-ico { width: 15px; height: 15px; stroke: currentColor; stroke-width: 1.6; fill: none; }
+.compare-chip-count {
+  display: inline-grid; place-items: center;
+  min-width: 20px; height: 20px;
+  padding: 0 6px;
+  border-radius: 100px;
+  background: var(--brass);
+  color: var(--black);
+  font-size: 0.68rem;
+  letter-spacing: 0;
+  font-weight: 600;
+}
+@keyframes compareShake {
+  0%,100% { transform: translateX(0); }
+  20%,60% { transform: translateX(-4px); }
+  40%,80% { transform: translateX(4px); }
+}
+.compare-chip.is-shake { animation: compareShake 0.45s var(--ease); }
+
+/* Toast global — fixed top-center, aparece con is-shown */
+.compare-toast {
+  position: fixed;
+  top: calc(var(--topbar-h) + 14px);
+  left: 50%;
+  transform: translateX(-50%) translateY(-8px);
+  padding: 12px 22px;
+  border-radius: 100px;
+  background: rgba(20,20,24,0.96);
+  border: 1px solid var(--line-strong);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: var(--ink);
+  font-size: 0.82rem;
+  letter-spacing: 0.02em;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s var(--ease), transform 0.3s var(--ease);
+  z-index: 500;
+  max-width: min(520px, calc(100vw - 32px));
+  text-align: center;
+}
+.compare-toast.is-shown {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* Botón compare dentro del detail actions row y del hotspot card:
+   comparte estructura con otros .btn.btn-ghost, sólo cambia el estado is-in. */
+.compare-btn.btn.is-in {
+  border-color: var(--brass);
+  color: var(--brass);
+  background: var(--brass-soft);
+}
+.compare-btn.btn svg {
+  width: 14px; height: 14px; margin-right: 6px;
+  vertical-align: -2px;
+  stroke: currentColor;
+}
+
+/* =============================================================================
+   COMPARE VIEW — panel-compare
+   ========================================================================== */
+.panel-compare {
+  padding: 32px var(--gutter) 60px;
+  color: var(--ink);
+}
+.compare-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-bottom: 26px;
+  padding-bottom: 22px;
+  border-bottom: 1px solid var(--line-soft);
+}
+.compare-head-titles { display: flex; flex-direction: column; gap: 6px; }
+.compare-title {
+  font-family: var(--serif);
+  font-size: clamp(1.6rem, 2.2vw, 2rem);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  line-height: 1.1;
+}
+.compare-sub {
+  font-size: 0.86rem;
+  color: var(--ink-dim);
+  max-width: 640px;
+}
+.compare-head-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.compare-head-actions .btn { padding: 10px 18px; font-size: 0.78rem; }
+.compare-back-arrow { margin-right: 6px; }
+
+/* Columnas — 2 productos lado a lado */
+.compare-cols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-bottom: 32px;
+}
+.compare-col {
+  position: relative;
+  background: var(--panel);
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius);
+  padding: 20px 22px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.compare-col-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+.compare-col-cat {
+  font-size: 0.62rem;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--brass);
+  font-weight: 500;
+}
+.compare-col-remove {
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  background: rgba(8,8,10,0.4);
+  color: var(--ink-dim);
+  font-size: 1.2rem;
+  line-height: 1;
+  transition: all 0.3s var(--ease);
+}
+.compare-col-remove:hover { border-color: var(--brass); color: var(--brass); }
+.compare-col-media {
+  aspect-ratio: 4 / 3;
+  background: radial-gradient(120% 120% at 50% 20%, #232328, #0d0d0f 75%);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  display: grid; place-items: center;
+}
+.compare-col-media img {
+  width: 100%; height: 100%;
+  object-fit: contain;
+  padding: 16px;
+}
+.compare-col-name {
+  font-family: var(--serif);
+  font-size: 1.4rem;
+  font-weight: 500;
+  line-height: 1.15;
+}
+.compare-col-designer {
+  font-size: 0.76rem;
+  color: var(--ink-faint);
+  letter-spacing: 0.04em;
+}
+.compare-col-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
+.compare-col-actions .btn { padding: 8px 14px; font-size: 0.72rem; letter-spacing: 0.12em; }
+.compare-col-fav .heart-empty { display: inline; }
+.compare-col-fav .heart-full  { display: none; }
+.compare-col-fav.is-fav { color: #ff5a5f; border-color: rgba(255,90,95,0.5); }
+.compare-col-fav.is-fav .heart-empty { display: none; }
+.compare-col-fav.is-fav .heart-full  { display: inline; }
+.compare-col-fav svg { display: none; }
+.compare-col-fav .heart-empty, .compare-col-fav .heart-full { font-size: 0.95rem; margin-right: 4px; }
+
+/* Placeholder cuando falta el segundo producto */
+.compare-col-empty {
+  min-height: 420px;
+  display: grid;
+  place-items: center;
+  background: repeating-linear-gradient(
+    -8deg,
+    rgba(255,255,255,0.015) 0 12px,
+    transparent 12px 26px
+  ), var(--panel);
+  border-style: dashed;
+  border-color: var(--line);
+}
+.compare-empty-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  text-align: center;
+  padding: 24px;
+}
+.compare-empty-plus {
+  font-size: 2.4rem;
+  color: var(--brass);
+  font-weight: 300;
+  line-height: 1;
+  margin-bottom: 6px;
+}
+.compare-empty-title {
+  font-family: var(--serif);
+  font-size: 1.2rem;
+  font-weight: 500;
+}
+.compare-empty-sub {
+  font-size: 0.82rem;
+  color: var(--ink-dim);
+  max-width: 320px;
+  line-height: 1.5;
+}
+.compare-empty-cta { margin-top: 6px; padding: 10px 20px; font-size: 0.76rem; }
+
+/* Tabla de specs — cada fila con label a la izquierda y 2 valores a la derecha.
+   Filas donde ambos valores coinciden = tenue; distintos = fondo dorado sutil. */
+.compare-specs {
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: var(--panel);
+}
+.compare-specs.is-pending {
+  opacity: 0.55;
+}
+.compare-row {
+  display: grid;
+  grid-template-columns: minmax(140px, 200px) 1fr 1fr;
+  gap: 20px;
+  padding: 14px 22px;
+  border-bottom: 1px solid var(--line-soft);
+  transition: background 0.25s var(--ease);
+}
+.compare-row:last-child { border-bottom: 0; }
+.compare-row-label {
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  font-weight: 500;
+  align-self: center;
+}
+.compare-row-val {
+  font-size: 0.92rem;
+  color: var(--ink);
+  align-self: center;
+}
+.compare-dash { color: var(--ink-faint); }
+
+/* Diferencias — fondo dorado tenue y label en dorado. Es la señal decisional. */
+.compare-row.is-diff {
+  background: linear-gradient(90deg, var(--brass-soft), transparent 85%);
+}
+.compare-row.is-diff .compare-row-label { color: var(--brass); }
+.compare-row.is-diff .compare-row-val { color: var(--ink); font-weight: 400; }
+
+/* Coincidencias — texto y label más discretos */
+.compare-row.is-same .compare-row-label { color: var(--ink-faint); opacity: 0.75; }
+.compare-row.is-same .compare-row-val { color: var(--ink-dim); }
+
+/* Legend (leyenda) al pie */
+.compare-legend {
+  margin-top: 18px;
+  font-size: 0.72rem;
+  color: var(--ink-dim);
+  display: flex;
+  gap: 22px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.compare-legend-dot {
+  display: inline-block;
+  width: 14px; height: 8px;
+  border-radius: 3px;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+.compare-legend-dot.is-diff { background: var(--brass); }
+.compare-legend-dot.is-same { background: var(--line-strong); }
+
+/* ---------- Responsive ---------- */
+
+/* Tablet: mantiene 2 columnas de productos pero ajusta paddings */
+@media (max-width: 960px) {
+  .compare-cols { gap: 16px; }
+  .compare-col { padding: 16px 18px 18px; }
+  .compare-col-name { font-size: 1.2rem; }
+  .compare-row {
+    grid-template-columns: minmax(120px, 160px) 1fr 1fr;
+    gap: 14px;
+    padding: 12px 16px;
+  }
+}
+
+/* Mobile: cada fila de spec pasa a mostrar el label arriba y los 2 valores
+   abajo lado a lado. Las columnas de producto también se apilan verticalmente
+   con el nombre sticky para no perder referencia al scrollear. */
+@media (max-width: 680px) {
+  .panel-compare { padding: 20px 16px 40px; }
+  .compare-head { flex-direction: column; align-items: flex-start; gap: 14px; }
+  .compare-head-actions { width: 100%; justify-content: space-between; }
+  .compare-cols { grid-template-columns: 1fr; gap: 12px; }
+  .compare-col-media { aspect-ratio: 16 / 10; }
+  .compare-col-empty { min-height: 220px; }
+
+  .compare-row {
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+      "label label"
+      "a b";
+    gap: 8px 14px;
+    padding: 14px 16px;
+  }
+  .compare-row-label { grid-area: label; font-size: 0.68rem; }
+  .compare-row-val[data-slot="0"] { grid-area: a; }
+  .compare-row-val[data-slot="1"] { grid-area: b; }
+  .compare-row-val { font-size: 0.86rem; }
+
+  /* En mobile el chip pierde el texto y queda ícono + contador para no
+     saturar la topbar (que ya carga hamburger + título). */
+  .compare-chip { padding: 0.5em 0.7em; letter-spacing: 0.1em; gap: 6px; }
+  .compare-chip-label { display: none; }
+}
+
+/* Mobile chico: chip sin borde de énfasis para no chocar con el resto */
+@media (max-width: 420px) {
+  .compare-chip { font-size: 0.68rem; }
+  .compare-col-actions .btn { flex: 1 1 auto; min-width: 100px; }
+}
+

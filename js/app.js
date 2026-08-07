@@ -27,6 +27,8 @@
     spaces:    { eyebrowKey: 'topbar.spaces.eyebrow',    titleKey: 'topbar.spaces.title' },
     downloads: { eyebrowKey: 'topbar.downloads.eyebrow', titleKey: 'topbar.downloads.title' },
     favorites: { eyebrowKey: 'topbar.favorites.eyebrow', titleKey: 'topbar.favorites.title' },
+    // Ruta sin nav-item en el sidebar. Puerta única: chip global en la topbar.
+    compare:   { eyebrowKey: 'topbar.compare.eyebrow',   titleKey: 'topbar.compare.title' },
     about:     { eyebrowKey: 'topbar.about.eyebrow',     titleKey: 'topbar.about.title' }
   };
   var currentRoute = 'home';
@@ -125,6 +127,8 @@
     renderAll();
     // refresh topbar (eyebrow/title + actions) en la ruta actual
     syncTopbar(currentRoute);
+    // Compare chip + botones "Agregar/Quitar" traen su propio texto
+    if (window.LUXA_Compare) window.LUXA_Compare.sync();
   }
   function updateLangToggle() {
     $$('.lang-btn').forEach(function (b) {
@@ -148,6 +152,7 @@
 
     if (route === 'favorites') renderFavorites();
     if (route === 'home')      refreshHomeMetas();
+    if (route === 'compare' && window.LUXA_Compare) window.LUXA_Compare.render();
     if (route === 'spaces' && !opts.preserveSpace) {
       // Generic navigation into Spaces lands on the room-type chooser.
       // Callers that already targeted a specific scene pass preserveSpace: true.
@@ -805,10 +810,14 @@
           WA_ICON_SVG + '<span>' + t('quote.cta') + '</span>' +
         '</a>'
       : '';
+    var inCompare = !!(window.LUXA_Compare && window.LUXA_Compare.isIn(p.id));
     card.innerHTML =
       '<div class="card-media">' +
         '<button class="fav-btn' + (isFav(p.id) ? ' is-fav' : '') + '" data-id="' + p.id + '" aria-label="Toggle favorite" aria-pressed="' + isFav(p.id) + '">' +
           '<span class="heart-empty">♡</span><span class="heart-full">♥</span>' +
+        '</button>' +
+        '<button class="compare-btn card-compare' + (inCompare ? ' is-in' : '') + '" data-id="' + p.id + '" aria-pressed="' + inCompare + '" aria-label="' + t(inCompare ? 'compare.remove' : 'compare.add') + '" title="' + t(inCompare ? 'compare.remove' : 'compare.add') + '" type="button">' +
+          '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="8" height="14" rx="1.5"/><rect x="13" y="5" width="8" height="14" rx="1.5"/></svg>' +
         '</button>' +
         '<img decoding="async" src="' + uri(getActiveColorImage(p)) + '" alt="' + p.name + '" />' +
         colorSwatchesHTML(p) +
@@ -827,10 +836,16 @@
       if (e.target.closest('.fav-btn')) return;
       if (e.target.closest('.card-quote')) return;
       if (e.target.closest('.color-swatch')) return;
+      if (e.target.closest('.compare-btn')) return;
       openDetail(p.id);
     });
     card.addEventListener('keydown', function (e) { if (e.key === 'Enter') openDetail(p.id); });
     $('.fav-btn', card).addEventListener('click', function (e) { e.stopPropagation(); toggleFav(p.id); });
+    var cmpBtn = $('.compare-btn', card);
+    if (cmpBtn) cmpBtn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      if (window.LUXA_Compare) window.LUXA_Compare.toggle(p.id);
+    });
     // Swatch clicks: preload the new image off-screen before assigning it to
     // the visible <img>. Without the preload the browser would keep the old
     // image rendered while downloading the new one (the "ghost image" effect).
@@ -1057,6 +1072,10 @@
           ? '<button class="btn btn-ghost" data-action="view-space">' + t('detail.viewInSpace') + '</button>'
           : '') +
         '<button class="btn btn-ghost" data-action="download-sheet">' + t('detail.downloadSheet') + '</button>' +
+        '<button class="btn btn-ghost compare-btn detail-compare' + ((window.LUXA_Compare && window.LUXA_Compare.isIn(p.id)) ? ' is-in' : '') + '" data-id="' + p.id + '" data-action="compare" type="button" aria-pressed="' + ((window.LUXA_Compare && window.LUXA_Compare.isIn(p.id)) ? 'true' : 'false') + '">' +
+          '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="8" height="14" rx="1.5"/><rect x="13" y="5" width="8" height="14" rx="1.5"/></svg>' +
+          '<span class="compare-btn-label">' + t((window.LUXA_Compare && window.LUXA_Compare.isIn(p.id)) ? 'compare.remove' : 'compare.add') + '</span>' +
+        '</button>' +
         '<button class="btn btn-ghost detail-fav" data-action="fav">' +
           (isFav(p.id) ? t('detail.saved') : t('detail.favorite')) + '</button>' +
       '</div>';
@@ -1083,6 +1102,10 @@
     favBtn.addEventListener('click', function () {
       var added = toggleFav(p.id);
       favBtn.textContent = added ? t('detail.saved') : t('detail.favorite');
+    });
+    var cmpDetailBtn = $('[data-action="compare"]', $('#detailBody'));
+    if (cmpDetailBtn) cmpDetailBtn.addEventListener('click', function () {
+      if (window.LUXA_Compare) window.LUXA_Compare.toggle(p.id);
     });
 
     $('#detailOverlay').hidden = false;
@@ -1613,8 +1636,16 @@
     var card    = $('#transitionCard');
     var skipBtn = $('#transitionSkip');
     var btnDetail = $('#transitionCardDetail');
+    var btnCompare = $('#transitionCardCompare');
     var btnClose  = $('#transitionCardClose');
     if (!overlay || !video || !card) return;
+    if (btnCompare) {
+      btnCompare.dataset.id = pid;
+      var inCmp = !!(window.LUXA_Compare && window.LUXA_Compare.isIn(pid));
+      btnCompare.classList.toggle('is-in', inCmp);
+      var cmpLbl = btnCompare.querySelector('.compare-btn-label');
+      if (cmpLbl) cmpLbl.textContent = t(inCmp ? 'compare.remove' : 'compare.add');
+    }
 
     // Anchor the overlay to the stage the user clicked from (each scene has
     // its own .space-stage in magazine view). Fall back to the first one if
@@ -1825,6 +1856,11 @@
     skipBtn.addEventListener('click', onSkipClick);
     btnDetail.addEventListener('click', onDetail);
     btnClose.addEventListener('click', closeOverlay);
+    // onclick (not addEventListener) para evitar acumular listeners entre
+    // aperturas sucesivas del hotspot card (mismo DOM reutilizado).
+    if (btnCompare) btnCompare.onclick = function () {
+      if (window.LUXA_Compare) window.LUXA_Compare.toggle(pid);
+    };
     document.addEventListener('keydown', onKey);
   }
 
@@ -2293,7 +2329,17 @@
       renderProducts();
       renderHomeTypes();
       updateProductCount();
-    }
+    },
+    // Helpers expuestos para compare.js (herramienta contextual autónoma).
+    // Mantener chico este contrato — si compare crece, extraerlo a un objeto.
+    t: t,
+    tx: tx,
+    productById: productById,
+    isFav: isFav,
+    toggleFav: toggleFav,
+    openDetail: openDetail,
+    closeDetail: closeDetail,
+    go: go
   };
 
   // Walk window.LUXA.products and (re-)attach colorVariants from the manifest
