@@ -2825,9 +2825,10 @@ svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width:
 .compare-row.is-same .compare-row-label { color: var(--ink-faint); opacity: 0.75; }
 .compare-row.is-same .compare-row-val { color: var(--ink-dim); }
 
-/* Legend (leyenda) al pie */
+/* Legend (leyenda) arriba de la tabla — orienta al usuario ANTES de leer
+   las filas, así entiende qué significa cada color mientras las mira. */
 .compare-legend {
-  margin-top: 18px;
+  margin: 0 0 14px;
   font-size: 0.72rem;
   color: var(--ink-dim);
   display: flex;

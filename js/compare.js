@@ -262,7 +262,7 @@
         '<span class="compare-legend-dot is-same"></span>' + escapeHTML(t('compare.legend.same')) + '</p>'
       : '';
 
-    return head + cols + specs + legend;
+    return head + cols + legend + specs;
   }
 
   function wireViewEvents(panel) {
