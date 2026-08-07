@@ -2692,8 +2692,12 @@ svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width:
   transition: all 0.3s var(--ease);
 }
 .compare-col-remove:hover { border-color: var(--brass); color: var(--brass); }
+/* Frame de la imagen: misma proporción 4/5 (portrait) que las cards del
+   catálogo — la mayoría de las luminarias son verticales (colgantes,
+   apliques, lámparas de pie) y esa proporción las contiene bien sin
+   dejar aire de sobra arriba y abajo. */
 .compare-col-media {
-  aspect-ratio: 4 / 3;
+  aspect-ratio: 4 / 5;
   background: radial-gradient(120% 120% at 50% 20%, #232328, #0d0d0f 75%);
   border-radius: var(--radius-sm);
   overflow: hidden;
@@ -2702,7 +2706,7 @@ svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width:
 .compare-col-media img {
   width: 100%; height: 100%;
   object-fit: contain;
-  padding: 16px;
+  padding: 20px;
 }
 .compare-col-name {
   font-family: var(--serif);
