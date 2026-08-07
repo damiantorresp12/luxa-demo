@@ -174,7 +174,6 @@
       '</article>';
     }
     var favClass = isFav(p.id) ? ' is-fav' : '';
-    var favLabel = isFav(p.id) ? t('detail.saved') : t('detail.favorite');
     return '<article class="compare-col" data-slot="' + slot + '" data-id="' + escapeHTML(p.id) + '">' +
       '<header class="compare-col-head">' +
         '<span class="compare-col-cat">' + escapeHTML(t('category.' + p.category)) + '</span>' +
@@ -189,9 +188,8 @@
         '<button class="btn btn-ghost compare-col-detail" data-action="detail" data-id="' + escapeHTML(p.id) + '" type="button">' +
           escapeHTML(t('compare.viewDetail')) +
         '</button>' +
-        '<button class="btn btn-ghost compare-col-fav fav-btn' + favClass + '" data-id="' + escapeHTML(p.id) + '" data-action="fav" type="button" aria-pressed="' + (isFav(p.id) ? 'true' : 'false') + '">' +
-          '<span class="heart-empty">♡</span><span class="heart-full">♥</span>' +
-          '<span class="compare-col-fav-label">' + escapeHTML(favLabel) + '</span>' +
+        '<button class="btn btn-ghost compare-col-fav' + favClass + '" data-id="' + escapeHTML(p.id) + '" data-action="fav" type="button" aria-pressed="' + (isFav(p.id) ? 'true' : 'false') + '" aria-label="' + escapeHTML(t(isFav(p.id) ? 'detail.saved' : 'detail.favorite')) + '" title="' + escapeHTML(t(isFav(p.id) ? 'detail.saved' : 'detail.favorite')) + '">' +
+          '<span class="heart-empty" aria-hidden="true">♡</span><span class="heart-full" aria-hidden="true">♥</span>' +
         '</button>' +
         '<button class="btn btn-ghost compare-col-replace" data-action="replace" data-id="' + escapeHTML(p.id) + '" type="button">' +
           escapeHTML(t('compare.replace')) +

@@ -108,7 +108,7 @@
     if (meta) meta.textContent = n === 0 ? t('shortcut.meta.noneYet') : t('shortcut.meta.saved', { n: n });
   }
   function syncFavButtons(id) {
-    $$('.fav-btn[data-id="' + id + '"]').forEach(function (b) {
+    $$('.fav-btn[data-id="' + id + '"], .compare-col-fav[data-id="' + id + '"]').forEach(function (b) {
       b.classList.toggle('is-fav', isFav(id));
       b.setAttribute('aria-pressed', isFav(id));
     });

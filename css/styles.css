@@ -2718,13 +2718,21 @@ svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width:
   margin-top: 4px;
 }
 .compare-col-actions .btn { padding: 8px 14px; font-size: 0.72rem; letter-spacing: 0.12em; }
+/* Fav en el compare: mismo lenguaje que otros ghost buttons, pero sólo con
+   el ícono del corazón (sin texto — el símbolo se entiende igual que en la card). */
+.compare-col-fav {
+  display: inline-grid;
+  place-items: center;
+  min-width: 40px;
+  padding: 8px 12px;
+  font-size: 1rem;
+  line-height: 1;
+}
 .compare-col-fav .heart-empty { display: inline; }
 .compare-col-fav .heart-full  { display: none; }
 .compare-col-fav.is-fav { color: #ff5a5f; border-color: rgba(255,90,95,0.5); }
 .compare-col-fav.is-fav .heart-empty { display: none; }
 .compare-col-fav.is-fav .heart-full  { display: inline; }
-.compare-col-fav svg { display: none; }
-.compare-col-fav .heart-empty, .compare-col-fav .heart-full { font-size: 0.95rem; margin-right: 4px; }
 
 /* Placeholder cuando falta el segundo producto */
 .compare-col-empty {
