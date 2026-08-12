@@ -469,6 +469,13 @@
     return 'https://wa.me/' + num + '?text=' + encodeURIComponent(msg);
   }
 
+  /* Casita: el mismo trazo que el item "Ambientes" del menu lateral, para que
+     el boton de la card se lea como "esto te lleva ahi". */
+  var SPACE_ICON_SVG =
+    '<svg viewBox="0 0 24 24" aria-hidden="true" class="ico-space">' +
+      '<path d="M3 10 12 3l9 7v11H3zM10 21v-6h4v6"/>' +
+    '</svg>';
+
   /* SVG inline del icono WhatsApp — mismo trazo que usa el CTA del home. */
   var WA_ICON_SVG =
     '<svg viewBox="0 0 24 24" aria-hidden="true" class="ico-wa">' +
@@ -823,9 +830,9 @@
        vuelve la etiqueta de siempre para no dejar el pie vacío. */
     var cardSpace = findSpaceFor(p.id);
     var cardSpaceLink = cardSpace
-      ? '<button class="card-view card-view-space" data-action="card-space" type="button" ' +
+      ? '<button class="card-space" data-action="card-space" type="button" ' +
           'aria-label="' + t('detail.viewInSpace') + ' — ' + p.name + '">' +
-          t('detail.viewInSpace') +
+          SPACE_ICON_SVG + '<span>' + t('detail.viewInSpace') + '</span>' +
         '</button>'
       : '<span class="card-view">' + t('products.viewDetails') + '</span>';
 

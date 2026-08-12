@@ -1449,19 +1449,38 @@ svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width:
 .card-view::after { content: '→'; }
 
 /* Cuando la pieza está en una escena, "Ver detalle" se convierte en
-   "Ver en ambiente" y pasa a ser un botón real (antes era sólo una etiqueta:
-   la card entera ya abría la ficha). Hereda el mismo aspecto. */
-button.card-view-space {
+   "Ver en ambiente": pasa de etiqueta decorativa a botón real (la card entera
+   ya abría la ficha). Misma píldora que "Consultar precio" pero en tinta
+   neutra — el latón queda reservado para la acción comercial. */
+.card-space {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 100px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--ink-dim);
   font-family: inherit;
-  background: none;
-  border: 0;
-  padding: 0;
+  font-size: 0.66rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  white-space: nowrap;
   cursor: pointer;
-  text-align: left;
+  transition: background 0.2s var(--ease), border-color 0.2s var(--ease), color 0.2s var(--ease);
 }
-button.card-view-space:hover,
-button.card-view-space:focus-visible { color: var(--brass); gap: 12px; }
-button.card-view-space:focus-visible { outline: 1px solid var(--brass); outline-offset: 4px; }
+.card-space .ico-space {
+  width: 13px; height: 13px; flex-shrink: 0;
+  fill: none; stroke: currentColor;
+  stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;
+}
+.card-space:hover,
+.card-space:focus-visible {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: var(--ink);
+  color: var(--ink);
+  outline: none;
+}
 
 .card-foot {
   margin-top: 12px;
@@ -1469,6 +1488,10 @@ button.card-view-space:focus-visible { outline: 1px solid var(--brass); outline-
   align-items: center;
   justify-content: space-between;
   gap: 10px;
+  /* Con dos píldoras ("Ver en ambiente" + "Consultar precio") no entran las
+     dos en el ancho de card del escritorio, así que se apilan — igual que en
+     ATMO. Cuando sólo hay una, space-between mantiene el diseño de siempre. */
+  flex-wrap: wrap;
 }
 .card-quote {
   display: inline-flex;
@@ -1536,11 +1559,19 @@ button.card-view-space:focus-visible { outline: 1px solid var(--brass); outline-
     align-items: stretch;
     gap: 8px;
   }
-  .card-quote {
+  /* En 2 columnas a 375px el pie tiene ~128px y estas etiquetas piden ~152:
+     con nowrap se salían de la card y quedaban cortadas. Se les permite pasar
+     a dos renglones dentro de la píldora en vez de achicar la letra hasta lo
+     ilegible. Afecta a las dos por igual para que se vean como un par. */
+  .card-quote,
+  .card-space {
     justify-content: center;
+    text-align: center;
     font-size: 0.6rem;
     letter-spacing: 0.1em;
     padding: 6px 10px;
+    white-space: normal;
+    line-height: 1.3;
   }
   /* Tighten the "Consultar precio" CTA in detail panel + close-up card so
      the label doesn't clip on narrow phones. */
