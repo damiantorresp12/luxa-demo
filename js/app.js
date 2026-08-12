@@ -2355,6 +2355,11 @@
       renderCatalogFilter();
       renderSpaceTabs();
       renderActiveSpace();
+      // Las cards ahora muestran "Ver en ambiente", que sale de findSpaceFor()
+      // y por lo tanto depende de DATA.spaces. Si la grilla se dibujó antes de
+      // que llegara este JSON, quedaba sin el botón hasta la próxima navegación
+      // — y como es una carrera entre dos cargas, aparecía o no según el día.
+      renderProducts();
       // Home cards también dependen de DATA.spaces (cargado async)
       renderHomeSpaces();
       // Bridge necesita findSpaceFor() para el caption "En contexto"
