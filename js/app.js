@@ -815,6 +815,20 @@
           WA_ICON_SVG + '<span>' + t('quote.cta') + '</span>' +
         '</a>'
       : '';
+
+    /* Los ambientes son el argumento de venta de LUXA, pero hasta ahora la
+       conexión producto → escena vivía dentro de la ficha, un clic más abajo.
+       Acá reemplaza a "Ver detalle", que era decorativo: la card entera ya
+       abre la ficha al tocarla. Si la pieza no está en ninguna escena todavía,
+       vuelve la etiqueta de siempre para no dejar el pie vacío. */
+    var cardSpace = findSpaceFor(p.id);
+    var cardSpaceLink = cardSpace
+      ? '<button class="card-view card-view-space" data-action="card-space" type="button" ' +
+          'aria-label="' + t('detail.viewInSpace') + ' — ' + p.name + '">' +
+          t('detail.viewInSpace') +
+        '</button>'
+      : '<span class="card-view">' + t('products.viewDetails') + '</span>';
+
     var inCompare = !!(window.LUXA_Compare && window.LUXA_Compare.isIn(p.id));
     card.innerHTML =
       '<div class="card-media">' +
@@ -832,7 +846,7 @@
         '<h3 class="card-name">' + p.name + '</h3>' +
         '<span class="card-specs">' + p.power + t('card.specsSep') + p.temperature + '</span>' +
         '<div class="card-foot">' +
-          '<span class="card-view">' + t('products.viewDetails') + '</span>' +
+          cardSpaceLink +
           quoteBtn +
         '</div>' +
       '</div>';
@@ -842,9 +856,22 @@
       if (e.target.closest('.card-quote')) return;
       if (e.target.closest('.color-swatch')) return;
       if (e.target.closest('.compare-btn')) return;
+      /* "Ver en ambiente" va a la escena en vez de abrir la ficha. */
+      if (e.target.closest('[data-action="card-space"]')) {
+        e.stopPropagation();
+        if (cardSpace) setActiveSpace(cardSpace.id);
+        go('spaces', { preserveSpace: true });
+        return;
+      }
       openDetail(p.id);
     });
-    card.addEventListener('keydown', function (e) { if (e.key === 'Enter') openDetail(p.id); });
+    /* Enter sobre el botón de ambiente ya dispara su propio clic; sin esta
+       guarda la card abría además la ficha y se hacían las dos cosas. */
+    card.addEventListener('keydown', function (e) {
+      if (e.key !== 'Enter') return;
+      if (e.target.closest('[data-action="card-space"]')) return;
+      openDetail(p.id);
+    });
     $('.fav-btn', card).addEventListener('click', function (e) { e.stopPropagation(); toggleFav(p.id); });
     var cmpBtn = $('.compare-btn', card);
     if (cmpBtn) cmpBtn.addEventListener('click', function (e) {
