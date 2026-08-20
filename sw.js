@@ -144,6 +144,7 @@ function guardarPesados(lista) {
   var total      = pendientes.length;
   var listos     = 0;
   var fallados   = 0;
+  var sinEspacio = false;
 
   avance = { guardados: 0, total: total, terminado: false };
 
@@ -152,14 +153,17 @@ function guardarPesados(lista) {
 
       function siguiente() {
         if (!pendientes.length) {
-          avance = { guardados: listos, total: total, terminado: true };
-          avisar({
-            tipo: 'offline-listo',
-            guardados: listos,
-            fallados: fallados,
-            total: total
-          });
-          fin();
+          /* NO se canta victoria por haber recorrido la lista: hay que
+             confirmar que los archivos están guardados de verdad. Si el
+             dispositivo no tenía espacio, cada intento fallo en silencio y
+             decir "listo" seria mentirle al que lo va a usar en una reunion. */
+          estadoReal().then(function (real) {
+            avance = { guardados: real.guardados, total: real.total, terminado: real.terminado };
+            avisar(real.terminado
+              ? { tipo: 'offline-listo',      guardados: real.guardados, total: real.total, fallados: fallados }
+              : { tipo: 'offline-incompleto', guardados: real.guardados, total: real.total, sinEspacio: sinEspacio }
+            );
+          }).catch(function () {}).then(fin);
           return;
         }
 
@@ -173,15 +177,23 @@ function guardarPesados(lista) {
             if (!r || r.status !== 200) throw new Error(ruta);
             return cajon.put(ruta, r);
           }).then(function () { listos++; });
-        }).catch(function () {
+        }).catch(function (e) {
           // Un archivo que falla no arruina la bajada entera.
           fallados++;
+          // Quedarse sin espacio no es "un archivo que fallo": van a fallar
+          // todos. Se anota para poder avisar con claridad al final.
+          if (e && (e.name === 'QuotaExceededError' || /quota/i.test(String(e.message || '')))) {
+            sinEspacio = true;
+          }
         }).then(function () {
-          avance.guardados = listos + fallados;
-          if (avance.guardados % 10 === 0) {
+          // El avance cuenta SOLO lo que quedo guardado. Antes sumaba tambien
+          // los fallidos, asi que la barra llegaba al 100 por ciento sin haber
+          // guardado nada.
+          avance.guardados = listos;
+          if ((listos + fallados) % 10 === 0) {
             avisar({
               tipo: 'offline-progreso',
-              guardados: avance.guardados,
+              guardados: listos,
               total: total
             });
           }

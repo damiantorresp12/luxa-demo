@@ -44,6 +44,19 @@
         console.log('[offline] listo: ' + m.guardados + ' de ' + m.total +
                     ' archivos guardados' + (m.fallados ? ' (' + m.fallados + ' fallaron)' : '') +
                     '. El showroom ya funciona sin internet.');
+
+      } else if (m.tipo === 'offline-incompleto') {
+        /* Se recorrió toda la lista pero los archivos no quedaron guardados.
+           Pasa cuando el dispositivo no tiene espacio, o en una ventana de
+           incógnito, donde el navegador da muy poco lugar y lo borra al
+           cerrar. Decirlo, en vez de mentir con un "listo". */
+        var txt = m.sinEspacio
+          ? TEXTOS[idioma()].sinEspacio
+          : TEXTOS[idioma()].parcial
+              .replace('{n}', m.guardados).replace('{total}', m.total);
+        mostrarEstado(txt, false);
+        console.warn('[offline] no se pudo guardar todo: ' + m.guardados + ' de ' + m.total +
+                     (m.sinEspacio ? ' — el dispositivo no tiene espacio suficiente.' : '.'));
       }
     });
   }
@@ -122,14 +135,18 @@
     es: {
       instalar:  'Instalar app',
       apple:     'Para instalar: tocá el botón Compartir y elegí “Agregar a inicio”.',
-      guardando: 'Guardando para uso sin internet · {pct}%',
-      listo:     '✓ Listo para usar sin internet'
+      guardando: 'Guardando catálogo · {pct}%',
+      listo:     '✓ Catálogo guardado en este dispositivo',
+      parcial:    'Guardado a medias · {n} de {total}',
+      sinEspacio: 'No hay espacio para guardar el catálogo acá'
     },
     en: {
       instalar:  'Install app',
       apple:     'To install: tap the Share button and choose “Add to Home Screen”.',
-      guardando: 'Saving for offline use · {pct}%',
-      listo:     '✓ Ready for offline use'
+      guardando: 'Saving catalog · {pct}%',
+      listo:     '✓ Catalog saved on this device',
+      parcial:    'Partially saved · {n} of {total}',
+      sinEspacio: 'Not enough space to save the catalog here'
     }
   };
 
