@@ -111,12 +111,17 @@
       } else if (m.tipo === 'offline-listo') {
         completo = true;
         pararConsultas();
-        mostrarEstado(t('listo'), true);
+        /* El cartel SOLO se muestra si la persona tocó el botón. Si el
+           catálogo ya estaba guardado de antes y ella no pidió nada,
+           anunciarlo confunde: no hizo nada para que eso pasara, y ve dos
+           mensajes juntos sin haber tocado la pantalla. */
+        if (yaPidio()) mostrarEstado(t('listo'), true);
         // El catálogo ya está; el botón se queda solo si falta instalar.
         refrescarBoton();
         console.log('[offline] listo: ' + m.guardados + ' de ' + m.total + ' archivos guardados.');
 
       } else if (m.tipo === 'offline-incompleto') {
+        if (!yaPidio()) return;   // no lo pidió: no se le informa nada
         /* Se recorrió toda la lista pero los archivos no quedaron guardados.
            Pasa cuando el dispositivo no tiene espacio, o en una ventana de
            incógnito, donde el navegador da muy poco lugar y lo borra al
@@ -225,12 +230,17 @@
       mostrarInstruccion(t('apple'));
     }
 
-    // 2. Y el catálogo, si todavía no está guardado
+    /* Desde acá en adelante sí corresponde informar: la persona pidió algo. */
+    marcarPedido();
+
+    // 2. Y el catálogo
     if (faltaGuardar()) {
-      marcarPedido();
       preguntar(true);
       arrancarConsultas();
       mostrarEstado(t('guardando').replace('{pct}', 0), false);
+    } else {
+      // Ya estaba guardado de antes: se confirma, no se vuelve a bajar nada.
+      mostrarEstado(t('listo'), true);
     }
 
     refrescarBoton();
@@ -281,8 +291,9 @@
   document.addEventListener('DOMContentLoaded', function () {
     if (!puedeGuardar) return;
 
-    // Si ya pidió guardar en otra visita, se retoma en silencio y se informa.
-    if (yaPidio()) mostrarEstado(t('guardando').replace('{pct}', 0), false);
+    /* No se pinta ningún cartel de entrada: el guardián contesta enseguida con
+       el estado real y ese es el que manda. Adelantarse haría parpadear un
+       "0%" que después se corrige solo. */
 
     /* El botón se decide acá y se vuelve a decidir cada vez que cambia algo
        (llega el aviso de instalación, se instala, se desinstala, termina de
