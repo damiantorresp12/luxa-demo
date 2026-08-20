@@ -32,15 +32,14 @@
   var boton      = null;
   var estadoEl   = null;
   var consultas  = null;
-  var pesoMB     = null;        // cuánto pesa el catálogo, sale de la lista
   var completo   = false;
 
   /* --- Textos ------------------------------------------------------------- */
 
   var TEXTOS = {
     es: {
-      instalarYGuardar: '⤓ Instalar y guardar',
-      soloGuardar:      '⤓ Guardar para usar sin internet',
+      instalarYGuardar: 'Instalar app',
+      soloGuardar:      'Guardar catálogo',
       apple:            'Para instalar el ícono: tocá Compartir y elegí “Agregar a inicio”. Mientras tanto, el catálogo se está guardando.',
       guardando:        'Guardando catálogo · {pct}%',
       listo:            '✓ Catálogo guardado en este dispositivo',
@@ -48,8 +47,8 @@
       sinEspacio:       'No hay espacio para guardar el catálogo acá'
     },
     en: {
-      instalarYGuardar: '⤓ Install and save',
-      soloGuardar:      '⤓ Save for offline use',
+      instalarYGuardar: 'Install app',
+      soloGuardar:      'Save catalog',
       apple:            'To install the icon: tap Share and choose “Add to Home Screen”. The catalog is being saved meanwhile.',
       guardando:        'Saving catalog · {pct}%',
       listo:            '✓ Catalog saved on this device',
@@ -173,9 +172,10 @@
   /* --- El botón ------------------------------------------------------------ */
 
   function etiqueta() {
-    // Si ya tiene el ícono puesto, el botón solo ofrece guardar el catálogo.
-    var base = yaEstaInstalada() ? t('soloGuardar') : t('instalarYGuardar');
-    return pesoMB ? (base + ' · ' + pesoMB + ' MB') : base;
+    /* El botón dice solo "Instalar app", sin el peso. Decisión de Damian:
+       el número asusta más de lo que informa. Si ya tiene el ícono puesto,
+       lo único que queda por ofrecer es guardar el catálogo. */
+    return yaEstaInstalada() ? t('soloGuardar') : t('instalarYGuardar');
   }
 
   function crearBoton() {
@@ -249,15 +249,6 @@
 
   document.addEventListener('DOMContentLoaded', function () {
     if (!puedeGuardar) return;
-
-    // Cuánto pesa el catálogo, para poder decirlo en el botón.
-    fetch('offline-files.json', { cache: 'no-store' })
-      .then(function (r) { return r.ok ? r.json() : null; })
-      .then(function (j) {
-        if (j && j.pesoMB) pesoMB = j.pesoMB;
-        if (boton) boton.textContent = etiqueta();
-      })
-      .catch(function () {});
 
     // Si ya lo pidió antes, no se le vuelve a ofrecer: se retoma y se informa.
     if (yaPidio()) mostrarEstado(t('guardando').replace('{pct}', 0), false);
