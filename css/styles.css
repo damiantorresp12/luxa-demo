@@ -2964,29 +2964,35 @@ svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width:
   }
 }
 
-/* Mobile: cada fila de spec pasa a mostrar el label arriba y los 2 valores
-   abajo lado a lado. Las columnas de producto también se apilan verticalmente
-   con el nombre sticky para no perder referencia al scrollear. */
+/* Mobile: mantenemos SIEMPRE las 2 columnas lado a lado — comparar en
+   vertical (apilado) hace perder de vista al segundo producto mientras
+   leés el primero, que es lo contrario a lo que la vista debería hacer.
+   El compromiso es que cada columna se achica: font más chico, botones
+   más compactos, y el botón "Reemplazar" desaparece (redundante con la
+   × arriba y menos crítico en pantalla chica). */
 @media (max-width: 680px) {
-  .panel-compare { padding: 20px 16px 40px; }
+  .panel-compare { padding: 20px 12px 40px; }
   .compare-head { flex-direction: column; align-items: flex-start; gap: 14px; }
   .compare-head-actions { width: 100%; justify-content: space-between; }
-  .compare-cols { grid-template-columns: 1fr; gap: 12px; }
-  .compare-col-media { aspect-ratio: 16 / 10; }
-  .compare-col-empty { min-height: 220px; }
+  .compare-cols { gap: 10px; }
+  .compare-col { padding: 12px 12px 14px; gap: 8px; }
+  .compare-col-cat { font-size: 0.56rem; letter-spacing: 0.2em; }
+  .compare-col-remove { width: 26px; height: 26px; font-size: 1rem; }
+  .compare-col-media img { padding: 12px; }
+  .compare-col-name { font-size: 1rem; line-height: 1.15; }
+  .compare-col-designer { font-size: 0.68rem; }
+  .compare-col-actions { gap: 6px; }
+  .compare-col-actions .btn { padding: 6px 10px; font-size: 0.62rem; letter-spacing: 0.08em; }
+  .compare-col-replace { display: none; }
+  .compare-col-empty { min-height: 320px; }
 
   .compare-row {
-    grid-template-columns: 1fr 1fr;
-    grid-template-areas:
-      "label label"
-      "a b";
-    gap: 8px 14px;
-    padding: 14px 16px;
+    grid-template-columns: minmax(80px, 100px) 1fr 1fr;
+    gap: 8px 10px;
+    padding: 10px 12px;
   }
-  .compare-row-label { grid-area: label; font-size: 0.68rem; }
-  .compare-row-val[data-slot="0"] { grid-area: a; }
-  .compare-row-val[data-slot="1"] { grid-area: b; }
-  .compare-row-val { font-size: 0.86rem; }
+  .compare-row-label { font-size: 0.62rem; letter-spacing: 0.12em; }
+  .compare-row-val { font-size: 0.78rem; }
 
   /* En mobile el chip pierde el texto y queda ícono + contador para no
      saturar la topbar (que ya carga hamburger + título). */
@@ -2994,9 +3000,18 @@ svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width:
   .compare-chip-label { display: none; }
 }
 
-/* Mobile chico: chip sin borde de énfasis para no chocar con el resto */
+/* Mobile chico: reducimos aún más para que entre todo sin scroll horizontal */
 @media (max-width: 420px) {
   .compare-chip { font-size: 0.68rem; }
-  .compare-col-actions .btn { flex: 1 1 auto; min-width: 100px; }
+  .compare-col { padding: 10px; }
+  .compare-col-media img { padding: 8px; }
+  .compare-col-name { font-size: 0.9rem; }
+  .compare-col-actions .btn { padding: 5px 8px; font-size: 0.58rem; letter-spacing: 0.06em; }
+  .compare-row {
+    grid-template-columns: minmax(70px, 90px) 1fr 1fr;
+    gap: 6px 8px;
+    padding: 8px 10px;
+  }
+  .compare-row-val { font-size: 0.72rem; }
 }
 
