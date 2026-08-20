@@ -117,20 +117,26 @@ var avance = { guardados: 0, total: 0, terminado: false };
    volvió a encender al guardián. */
 function estadoReal() {
   return leerLista().then(function (lista) {
-    var total = (lista.pesados || []).length;
+    var pesados = lista.pesados || [];
+    var total   = pesados.length;
+
     return caches.open(nombreCajon(lista.version)).then(function (cajon) {
-      return cajon.keys();
-    }).then(function (guardadas) {
-      // Las claves guardadas incluyen el armazón; solo interesan los pesados.
-      var tengo = Object.create(null);
-      guardadas.forEach(function (p) { tengo[p.url] = true; });
+      /* Se le pregunta al navegador archivo por archivo, con cajon.match().
 
-      var listos = 0;
-      (lista.pesados || []).forEach(function (rel) {
-        if (tengo[new URL(rel, self.location.origin).href]) listos++;
+         ANTES esto comparaba direcciones como texto, y estaba mal: 243 de
+         estas rutas tienen espacios (y diez tienen espacios dobles), y cada
+         navegador los codifica a su manera. En Chrome coincidían y en Firefox
+         no, así que ahí nunca se daba por terminada la descarga aunque
+         estuviera completa. Preguntándole al navegador, la comparación la
+         hace el mismo que guardó los archivos y no puede desalinearse. */
+      return Promise.all(pesados.map(function (rel) {
+        return cajon.match(rel).then(function (r) { return !!r; })
+                               .catch(function () { return false; });
+      })).then(function (resultados) {
+        var listos = 0;
+        resultados.forEach(function (esta) { if (esta) listos++; });
+        return { guardados: listos, total: total, terminado: listos >= total, lista: lista };
       });
-
-      return { guardados: listos, total: total, terminado: listos >= total, lista: lista };
     });
   });
 }
@@ -160,11 +166,22 @@ function guardarPesados(lista) {
              decir "listo" seria mentirle al que lo va a usar en una reunion. */
           estadoReal().then(function (real) {
             avance = { guardados: real.guardados, total: real.total, terminado: real.terminado };
-            avisar(real.terminado
+            return real.terminado
               ? { tipo: 'offline-listo',      guardados: real.guardados, total: real.total, fallados: fallados }
-              : { tipo: 'offline-incompleto', guardados: real.guardados, total: real.total, sinEspacio: sinEspacio }
-            );
-          }).catch(function () {}).then(fin);
+              : { tipo: 'offline-incompleto', guardados: real.guardados, total: real.total, sinEspacio: sinEspacio };
+          }).catch(function () {
+            /* NUNCA quedarse callado. Si la comprobación falla, se contesta
+               con lo que contaron los contadores. Tragarse el error dejaba la
+               pantalla clavada en el último porcentaje para siempre: la
+               persona veía llegar a 100 y después nada. */
+            avance = { guardados: listos, total: total, terminado: fallados === 0 };
+            return fallados === 0
+              ? { tipo: 'offline-listo',      guardados: listos, total: total, fallados: 0 }
+              : { tipo: 'offline-incompleto', guardados: listos, total: total, sinEspacio: sinEspacio };
+          }).then(function (mensaje) {
+            avisar(mensaje);
+            fin();
+          });
           return;
         }
 
@@ -264,9 +281,11 @@ function responderPorRango(pedido, guardado) {
 }
 
 function avisar(mensaje) {
-  self.clients.matchAll().then(function (clientes) {
+  // includeUncontrolled: en la primera visita la pestaña todavía no está bajo
+  // el guardián, y sin esto no recibiría ningún aviso.
+  self.clients.matchAll({ includeUncontrolled: true }).then(function (clientes) {
     clientes.forEach(function (c) { c.postMessage(mensaje); });
-  });
+  }).catch(function () {});
 }
 
 /* La página pregunta "¿cómo venís?" al abrirse, y el guardián le contesta con
@@ -299,7 +318,18 @@ self.addEventListener('message', function (evento) {
          cada vez que la vuelve a abrir, retoma sola. */
       if (debeBajar && !real.terminado) return guardarPesados(real.lista);
       return null;
-    }).catch(function () { /* sin señal: se retoma la próxima vez */ })
+    }).catch(function () {
+      /* Sin señal no se puede leer la lista, así que no hay forma de saber
+         cuánto falta. Se contesta con lo último que se sabía en vez de dejar
+         a la página esperando una respuesta que no va a llegar. */
+      if (evento.source && evento.source.postMessage && avance.total) {
+        evento.source.postMessage(
+          avance.terminado
+            ? { tipo: 'offline-listo',    guardados: avance.guardados, total: avance.total, fallados: 0 }
+            : { tipo: 'offline-progreso', guardados: avance.guardados, total: avance.total }
+        );
+      }
+    })
   );
 });
 
