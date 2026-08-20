@@ -26,6 +26,9 @@ $armazon = @(
   './',
   'index.html',
   'manifest.webmanifest',
+  # La lista se guarda a si misma: sin senal el guardian la necesita para
+  # saber que deberia tener guardado.
+  'offline-files.json',
   'css/styles.css',
   'css/fonts.css',
   'js/brand.config.js',
@@ -83,9 +86,29 @@ $armazon = $armazon | Select-Object -Unique
 $pesados = $pesados | Where-Object { $_ } | Select-Object -Unique
 
 # ---- 3. Escribir la lista ---------------------------------------------------
-# La "version" hace que los navegadores que ya tienen la app guardada se den
-# cuenta de que hay una version nueva y la reemplacen.
-$version = Get-Date -Format 'yyyyMMdd-HHmm'
+# La "version" identifica al CONTENIDO, no al momento en que se corrio esto.
+#
+# Es importante que sea asi: cuando la version cambia, el celular del cliente
+# tira los 108 MB que tenia guardados y baja todo de nuevo. Si la version fuera
+# la fecha y hora, cada publicacion -aunque solo cambiara una linea de codigo-
+# le costaria al cliente una descarga completa.
+#
+# Se arma con el nombre y el peso de los archivos PESADOS unicamente. El codigo
+# queda afuera a proposito: la app lo busca siempre por internet y la copia es
+# solo su respaldo, asi que un cambio de codigo no tiene por que costarle al
+# cliente volver a bajar todos los renders.
+$huella = New-Object Text.StringBuilder
+foreach ($rel in ($pesados | Sort-Object)) {
+  if ($rel -eq './') { continue }
+  $f = Join-Path $root ($rel -replace '/', '\')
+  if (Test-Path $f -PathType Leaf) {
+    [void]$huella.Append($rel).Append(':').Append((Get-Item $f).Length).Append('|')
+  }
+}
+
+$md5   = [Security.Cryptography.MD5]::Create()
+$bytes = $md5.ComputeHash([Text.Encoding]::UTF8.GetBytes($huella.ToString()))
+$version = ([BitConverter]::ToString($bytes) -replace '-', '').Substring(0, 12).ToLower()
 
 $sb = New-Object Text.StringBuilder
 [void]$sb.AppendLine('{')

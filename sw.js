@@ -42,8 +42,16 @@ function nombreCajon(version) { return PREFIJO + version; }
 
 function leerLista() {
   return fetch(LISTA, { cache: 'no-store' }).then(function (r) {
-    if (!r.ok) throw new Error('no se pudo leer ' + LISTA);
+    if (!r.ok) throw new Error('sin lista');
     return r.json();
+  }).catch(function () {
+    /* Sin señal, la lista sale de la copia guardada (viaja en el armazón).
+       Sin esto, offline el guardián no sabe ni qué debería tener, y el cartel
+       del menú no aparece. */
+    return caches.match(LISTA, IGNORAR_VERSION).then(function (guardada) {
+      if (!guardada) throw new Error('no se pudo leer ' + LISTA);
+      return guardada.json();
+    });
   });
 }
 
@@ -95,14 +103,42 @@ self.addEventListener('activate', function (evento) {
    ------------------------------------------------------------------------ */
 var bajando = false;
 
-/* Cómo viene la descarga, para poder contestar cuando la página pregunte.
-   Sin esto el cartel del menú solo aparecería la primera vez, porque los
-   avisos se mandan durante la instalación y después nunca más. */
+/* Cómo viene la descarga.
+
+   OJO: este contador vive solo mientras el guardián está despierto, y el
+   celular lo apaga apenas salís de la app. Por eso NO se puede confiar en él
+   para saber si falta bajar algo: hay que contar lo que hay guardado de
+   verdad. Para eso está estadoReal(). */
 var avance = { guardados: 0, total: 0, terminado: false };
 
+/* Cuenta lo que REALMENTE está guardado, mirando la copia en vez del
+   contador. Es la única fuente confiable después de que el celular apagó y
+   volvió a encender al guardián. */
+function estadoReal() {
+  return leerLista().then(function (lista) {
+    var total = (lista.pesados || []).length;
+    return caches.open(nombreCajon(lista.version)).then(function (cajon) {
+      return cajon.keys();
+    }).then(function (guardadas) {
+      // Las claves guardadas incluyen el armazón; solo interesan los pesados.
+      var tengo = Object.create(null);
+      guardadas.forEach(function (p) { tengo[p.url] = true; });
+
+      var listos = 0;
+      (lista.pesados || []).forEach(function (rel) {
+        if (tengo[new URL(rel, self.location.origin).href]) listos++;
+      });
+
+      return { guardados: listos, total: total, terminado: listos >= total, lista: lista };
+    });
+  });
+}
+
+/* Devuelve una promesa que termina cuando termina la bajada. Es importante que
+   la devuelva: quien la llama la mete en waitUntil() y eso mantiene despierto
+   al guardián mientras trabaja. */
 function guardarPesados(lista) {
-  if (bajando) return;
-  bajando = true;
+  if (bajando) return bajando;
 
   var pendientes = (lista.pesados || []).slice();
   var total      = pendientes.length;
@@ -111,49 +147,57 @@ function guardarPesados(lista) {
 
   avance = { guardados: 0, total: total, terminado: false };
 
-  caches.open(nombreCajon(lista.version)).then(function (cajon) {
+  bajando = caches.open(nombreCajon(lista.version)).then(function (cajon) {
+    return new Promise(function (fin) {
 
-    function siguiente() {
-      if (!pendientes.length) {
-        bajando = false;
-        avance = { guardados: listos, total: total, terminado: true };
-        avisar({
-          tipo: 'offline-listo',
-          guardados: listos,
-          fallados: fallados,
-          total: total
-        });
-        return;
-      }
-
-      var ruta = pendientes.shift();
-
-      // Si ya está guardado de una versión anterior de esta misma bajada,
-      // no lo pide de nuevo.
-      cajon.match(ruta).then(function (yaEsta) {
-        if (yaEsta) { listos++; return null; }
-        return fetch(ruta, { cache: 'no-store' }).then(function (r) {
-          if (!r || !r.ok) throw new Error(ruta);
-          return cajon.put(ruta, r);
-        }).then(function () { listos++; });
-      }).catch(function () {
-        // Un archivo que falla no arruina la bajada entera.
-        fallados++;
-      }).then(function () {
-        avance.guardados = listos + fallados;
-        if (avance.guardados % 20 === 0) {
+      function siguiente() {
+        if (!pendientes.length) {
+          avance = { guardados: listos, total: total, terminado: true };
           avisar({
-            tipo: 'offline-progreso',
-            guardados: avance.guardados,
+            tipo: 'offline-listo',
+            guardados: listos,
+            fallados: fallados,
             total: total
           });
+          fin();
+          return;
         }
-        siguiente();
-      });
-    }
 
-    siguiente();
+        var ruta = pendientes.shift();
+
+        // Lo que ya está guardado no se vuelve a pedir. Esto es lo que hace
+        // barata la reanudación: al retomar, pasa volando por lo que ya bajó.
+        cajon.match(ruta).then(function (yaEsta) {
+          if (yaEsta) { listos++; return null; }
+          return fetch(ruta, { cache: 'no-store' }).then(function (r) {
+            if (!r || r.status !== 200) throw new Error(ruta);
+            return cajon.put(ruta, r);
+          }).then(function () { listos++; });
+        }).catch(function () {
+          // Un archivo que falla no arruina la bajada entera.
+          fallados++;
+        }).then(function () {
+          avance.guardados = listos + fallados;
+          if (avance.guardados % 10 === 0) {
+            avisar({
+              tipo: 'offline-progreso',
+              guardados: avance.guardados,
+              total: total
+            });
+          }
+          siguiente();
+        });
+      }
+
+      siguiente();
+    });
+  }).then(function () {
+    bajando = false;
+  }).catch(function () {
+    bajando = false;
   });
+
+  return bajando;
 }
 
 /* ---------------------------------------------------------------------------
@@ -219,13 +263,25 @@ self.addEventListener('message', function (evento) {
   var m = evento.data || {};
   if (m.tipo !== 'estado') return;
 
-  var respuesta = avance.terminado
-    ? { tipo: 'offline-listo',    guardados: avance.guardados, total: avance.total, fallados: 0 }
-    : { tipo: 'offline-progreso', guardados: avance.guardados, total: avance.total };
+  /* waitUntil mantiene al guardián despierto mientras trabaja. Sin esto el
+     celular lo apaga a los pocos segundos y la descarga se corta. */
+  evento.waitUntil(
+    estadoReal().then(function (real) {
+      if (evento.source && evento.source.postMessage) {
+        evento.source.postMessage(
+          real.terminado
+            ? { tipo: 'offline-listo',    guardados: real.guardados, total: real.total, fallados: 0 }
+            : { tipo: 'offline-progreso', guardados: real.guardados, total: real.total }
+        );
+      }
 
-  if (evento.source && evento.source.postMessage) {
-    evento.source.postMessage(respuesta);
-  }
+      /* SI FALTA ALGO, SEGUIR BAJANDO DESDE DONDE QUEDÓ.
+         Esto es lo que hace que la descarga sobreviva a que el cliente cierre
+         la app: cada vez que la vuelve a abrir, retoma. */
+      if (!real.terminado) return guardarPesados(real.lista);
+      return null;
+    }).catch(function () { /* sin señal: se retoma la próxima vez */ })
+  );
 });
 
 /* ---------------------------------------------------------------------------

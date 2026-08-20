@@ -23,13 +23,7 @@
     window.addEventListener('load', function () {
       navigator.serviceWorker.register('sw.js').then(function (reg) {
         console.log('[offline] guardián activo', reg.scope);
-        /* Preguntarle cómo viene la descarga. Si no se le pregunta, el cartel
-           del menú solo aparecería la primera vez que se instala. */
-        navigator.serviceWorker.ready.then(function () {
-          if (navigator.serviceWorker.controller) {
-            navigator.serviceWorker.controller.postMessage({ tipo: 'estado' });
-          }
-        });
+        navigator.serviceWorker.ready.then(arrancarConsultas);
       }).catch(function (e) {
         console.warn('[offline] no se pudo activar:', e && e.message);
       });
@@ -46,7 +40,7 @@
         console.log('[offline] guardando… ' + m.guardados + ' de ' + m.total);
       } else if (m.tipo === 'offline-listo') {
         mostrarEstado(TEXTOS[idioma()].listo, true);
-        try { localStorage.setItem('luxa.offline.listo', '1'); } catch (e) {}
+        pararConsultas();
         console.log('[offline] listo: ' + m.guardados + ' de ' + m.total +
                     ' archivos guardados' + (m.fallados ? ' (' + m.fallados + ' fallaron)' : '') +
                     '. El showroom ya funciona sin internet.');
@@ -54,17 +48,41 @@
     });
   }
 
+  /* --- Preguntarle al guardián cómo viene ---------------------------------
+     Además de actualizar el cartel, cada consulta lo despierta y hace que
+     retome la descarga donde la había dejado. En el celular esto es lo que
+     hace que los 108 MB terminen de bajar: el sistema apaga al guardián
+     apenas salís de la app, y sin estas consultas la bajada nunca seguiría. */
+
+  var consultas = null;
+
+  function preguntar() {
+    if (navigator.serviceWorker.controller) {
+      navigator.serviceWorker.controller.postMessage({ tipo: 'estado' });
+    }
+  }
+
+  function arrancarConsultas() {
+    preguntar();
+    if (consultas) return;
+    consultas = setInterval(preguntar, 15000);
+  }
+
+  function pararConsultas() {
+    if (consultas) { clearInterval(consultas); consultas = null; }
+  }
+
+  /* Al volver a la app después de tenerla en segundo plano, retomar enseguida
+     en vez de esperar los 15 segundos. */
+  document.addEventListener('visibilitychange', function () {
+    if (!document.hidden) preguntar();
+  });
+
   /* --- El cartelito de estado -------------------------------------------- */
 
   var estadoEl = null;
-  /* Una vez que dijo "listo", no vuelve atrás en esta visita. Cuando el
-     guardián se reinicia repasa los archivos que ya tenía y volvería a
-     contar desde cero, y ver "0%" cuando ya está todo guardado asusta. */
-  var yaDijoListo = false;
 
   function mostrarEstado(texto, completo) {
-    if (yaDijoListo && !completo) return;
-    if (completo) yaDijoListo = true;
     if (!estadoEl) {
       var destino = document.getElementById('sidebarFootCopy');
       if (!destino || !destino.parentNode) return;
@@ -172,11 +190,6 @@
   document.addEventListener('DOMContentLoaded', function () {
     if (esApple() && !yaEstaInstalada()) crearBoton();
 
-    /* Si en una visita anterior ya se había guardado todo, decirlo de entrada
-       en vez de esperar a que el guardián termine de repasar los archivos. */
-    var yaGuardado = false;
-    try { yaGuardado = localStorage.getItem('luxa.offline.listo') === '1'; } catch (e) {}
-    if (yaGuardado && puedeGuardar) mostrarEstado(TEXTOS[idioma()].listo, true);
   });
 
   window.addEventListener('appinstalled', function () {
