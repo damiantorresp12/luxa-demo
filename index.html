@@ -3,6 +3,16 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- =========================================================================
+       ▼▼▼ PERSONALIZACIÓN DEL CLIENTE — VISTA PREVIA AL COMPARTIR EL LINK ▼▼▼
+
+       Estas son las ÚNICAS líneas de marca que hay que cambiar a mano. Son las
+       que lee WhatsApp / Instagram / LinkedIn para armar la tarjetita con imagen
+       y título cuando alguien pega el link. Esas apps no abren la página, solo
+       leen esto, por eso no puede salir de js/brand.config.js.
+
+       Todo lo demás de la marca se configura en js/brand.config.js.
+       ====================================================================== -->
   <title>LUXA · Lighting Experience</title>
   <meta name="description" content="LUXA — experiencia interactiva de iluminación por TD Lighting Experience." />
   <link rel="icon" type="image/svg+xml" href="assets/favicon.svg?v=5" />
@@ -20,13 +30,23 @@
   <meta name="twitter:title" content="LUXA · TD Lighting Experience" />
   <meta name="twitter:description" content="Experiencias de iluminación para espacios modernos — cada luminaria explorada en sus propios términos." />
   <meta name="twitter:image" content="https://luxa.tdrender.com/assets/og-preview.jpg" />
+  <!-- ▲▲▲ FIN DE LA PERSONALIZACIÓN A MANO ▲▲▲ ---------------------------- -->
 
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <!-- Ficha de instalación: nombre, ícono y colores con los que el showroom se
+       guarda en el celular. Se genera con tools/aplicar-marca.ps1. -->
+  <link rel="manifest" href="manifest.webmanifest?v=11" />
+  <meta name="theme-color" content="#08080A" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <link rel="apple-touch-icon" href="assets/icon-192.png" />
+
+  <!-- Las tipografías viven en el proyecto (assets/fonts/), no se piden a Google.
+       Así la app se ve igual sin internet y carga más rápido. -->
+  <link rel="stylesheet" href="css/fonts.css?v=11" />
   <!-- Bump ?v= al pushear cambios grandes de CSS/JS para invalidar el caché de los navegadores de los usuarios.
        Todos los assets versionan a la par para evitar mezclas HTML/CSS/JS de builds distintos. -->
-  <link rel="stylesheet" href="css/styles.css?v=10" />
+  <link rel="stylesheet" href="css/styles.css?v=11" />
 </head>
 <body>
 
@@ -34,11 +54,14 @@
 
   <!-- ===================== SIDEBAR ===================== -->
   <aside class="sidebar" id="sidebar" aria-label="Primary navigation">
-    <a class="brand" href="#home" data-route="home" aria-label="LUXA home">
-      <span class="brand-mark">L</span>
+    <!-- El nombre, la bajada y el logo salen de js/brand.config.js.
+         El texto que está escrito acá abajo es solo el que se ve por un
+         instante mientras carga la página. -->
+    <a class="brand" href="#home" data-route="home" id="brandLink">
+      <span class="brand-mark" id="brandMark">L</span>
       <span class="brand-text">
-        <span class="brand-name">LUXA</span>
-        <span class="brand-by">TD Lighting Experience</span>
+        <span class="brand-name" id="brandName">LUXA</span>
+        <span class="brand-by" id="brandBy">TD Lighting Experience</span>
       </span>
     </a>
 
@@ -138,8 +161,8 @@
           </button>
           <div class="home-hero-dots" id="homeHeroDots" role="tablist" aria-label="Slides"></div>
           <div class="home-hero-text">
-            <p class="eyebrow">TD Lighting Experience</p>
-            <h2 class="home-hero-title"><span class="serif-xl">LUXA</span></h2>
+            <p class="eyebrow" id="heroEyebrow">TD Lighting Experience</p>
+            <h2 class="home-hero-title"><span class="serif-xl" id="heroBrand">LUXA</span></h2>
             <p class="home-hero-tag" data-i18n-html="home.tag">Experiencias de iluminación<br/>para espacios modernos</p>
             <p class="home-hero-sub" data-i18n="home.sub">Explorá productos, ambientes y recursos técnicos en un catálogo interactivo.</p>
             <button class="btn btn-primary home-hero-cta" data-route="products" data-i18n="home.cta">Ingresar al catálogo</button>
@@ -364,8 +387,13 @@
   </aside>
 </div>
 
-<script src="js/catalog.data.js?v=10"></script>
-<script src="js/app.js?v=10"></script>
-<script src="js/compare.js?v=10"></script>
+<!-- brand.config.js va PRIMERO: el resto de la app lee la marca de ahí. -->
+<script src="js/brand.config.js?v=11"></script>
+<script src="js/catalog.data.js?v=11"></script>
+<script src="js/app.js?v=11"></script>
+<script src="js/compare.js?v=11"></script>
+<!-- Instalación en el dispositivo y modo sin internet. Va último: si algo de
+     esto falla, la app funciona igual, solo que sin la copia guardada. -->
+<script src="js/pwa.js?v=11"></script>
 </body>
 </html>

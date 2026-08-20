@@ -18,6 +18,12 @@ _scroll-preview.html
 # momento decidís ofrecerlos como descarga real (mejor: storage aparte).
 assets/models/
 
+# Originales de los renders, antes de pasarlos por optimizar-imagenes.ps1.
+# Son ~270 MB que nadie descarga: la app usa las copias livianas. Quedan solo
+# en la computadora de Damian, como respaldo por si hay que rehacer la
+# optimización con otra calidad.
+assets/_originales/
+
 # Backups del Space Planner
 space-planner/**/*.bak.json
 space-planner/**/*.pre-cleanup.bak.json

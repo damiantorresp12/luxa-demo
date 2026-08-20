@@ -9,6 +9,18 @@
   var DATA = window.LUXA;
   if (!DATA) { console.error('LUXA data not loaded'); return; }
 
+  /* La marca del cliente vive en js/brand.config.js. Estos dos helpers son la
+     única puerta de entrada: nadie más escribe el nombre de la marca a mano. */
+  function getBrandName() {
+    var B = window.BRAND || {};
+    return B.name || (DATA.brand && DATA.brand.name) || 'Showroom';
+  }
+  function getBrandBy() {
+    var B = window.BRAND || {};
+    var v = (B.by != null) ? B.by : (DATA.brand && DATA.brand.by);
+    return v || '';
+  }
+
   var FAV_KEY     = 'luxa.favorites';
   var LANG_KEY    = 'luxa.lang';
   var PROJECT_KEY = 'luxa.project.title';
@@ -58,12 +70,20 @@
     if (s == null) s = en[key];
     if (s == null) s = key;
     if (vars) Object.keys(vars).forEach(function (k) { s = s.replace('{' + k + '}', vars[k]); });
+    /* Cualquier texto del diccionario puede escribir {brand} o {by} y le entra
+       solo el nombre del cliente. Así ningún texto tiene la marca escrita. */
+    if (s.indexOf('{brand}') !== -1) s = s.split('{brand}').join(getBrandName());
+    if (s.indexOf('{by}')    !== -1) s = s.split('{by}').join(getBrandBy());
     return s;
   }
   function tx(obj) {
     if (obj == null) return '';
-    if (typeof obj === 'string') return obj;
-    return obj[lang] || obj.en || obj.es || '';
+    var s = (typeof obj === 'string') ? obj : (obj[lang] || obj.en || obj.es || '');
+    /* Mismo criterio que t(): los textos de contenido también pueden nombrar
+       a la marca con {brand} / {by} sin escribirla a mano. */
+    if (s.indexOf('{brand}') !== -1) s = s.split('{brand}').join(getBrandName());
+    if (s.indexOf('{by}')    !== -1) s = s.split('{by}').join(getBrandBy());
+    return s;
   }
 
   /* Cantidades con plural simple ES/EN: count + key.singular/key.plural */
@@ -489,6 +509,61 @@
   // Sidebar foot social row: muestra cada icono solo si hay URL real en
   // brand.contact. WhatsApp arma su URL con wa.me; FB/IG usan la URL completa
   // que Damian ponga en catalog.data.js.
+  /* Vuelca la marca de js/brand.config.js sobre la página: título de la pestaña,
+     logo y nombre del menú lateral, portada, pie de página y color de acento.
+     Es lo único que hay que tocar para que el showroom sea de otro cliente. */
+  function applyBrand() {
+    var B    = window.BRAND || {};
+    var name = getBrandName();
+    var by   = getBrandBy();
+
+    /* Pestaña del navegador */
+    document.title = by ? (name + ' · ' + by) : name;
+
+    /* Color de acento de la marca */
+    if (B.accent) {
+      document.documentElement.style.setProperty('--brass', B.accent);
+      document.documentElement.style.setProperty('--gold',  B.accent);
+    }
+
+    /* Menú lateral: logo + nombre + bajada */
+    var link = $('#brandLink');
+    if (link) link.setAttribute('aria-label', name);
+
+    var mark = $('#brandMark');
+    if (mark) {
+      var logo = B.logo || {};
+      if (logo.image) {
+        mark.innerHTML = '';
+        var img = document.createElement('img');
+        img.src = uri(logo.image);
+        img.alt = name;
+        mark.appendChild(img);
+        mark.classList.add('has-image');
+      } else {
+        mark.textContent = logo.mark || name.charAt(0).toUpperCase();
+        mark.classList.remove('has-image');
+      }
+    }
+
+    var nameEl = $('#brandName');
+    if (nameEl) nameEl.textContent = name;
+
+    var byEl = $('#brandBy');
+    if (byEl) { byEl.textContent = by; byEl.hidden = !by; }
+
+    /* Portada */
+    var heroBrand = $('#heroBrand');
+    if (heroBrand) heroBrand.textContent = name;
+
+    var heroEyebrow = $('#heroEyebrow');
+    if (heroEyebrow) { heroEyebrow.textContent = by; heroEyebrow.hidden = !by; }
+
+    /* Pie del menú lateral. El año se calcula solo, no hay que actualizarlo. */
+    var copy = $('#sidebarFootCopy');
+    if (copy) copy.textContent = '© ' + new Date().getFullYear() + ' ' + name;
+  }
+
   function initSidebarSocial() {
     var c = (DATA.brand && DATA.brand.contact) || {};
     var fb = $('#socialFacebook');
@@ -2072,8 +2147,8 @@
       year: 'numeric', month: 'long', day: 'numeric'
     });
     var origin = window.location.origin + window.location.pathname.replace(/\/[^\/]*$/, '/');
-    var brandAccent = (DATA.brand && DATA.brand.accent) || '#c9a24b';
-    var brandName = (DATA.brand && DATA.brand.name) || 'LUXA';
+    var brandAccent = (window.BRAND && window.BRAND.accent) || (DATA.brand && DATA.brand.accent) || '#c9a24b';
+    var brandName = getBrandName();
 
     var cards = items.map(function (p) {
       var img = origin + uri(getActiveColorImage(p));
@@ -2333,6 +2408,7 @@
   function init() {
     activeSpace = (DATA.spaces && DATA.spaces[0] && DATA.spaces[0].id) || null;
 
+    applyBrand();
     applyStaticI18n();
     updateLangToggle();
     renderAll();

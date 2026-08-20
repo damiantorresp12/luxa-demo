@@ -52,7 +52,7 @@
         'topbar.compare.eyebrow':   'Herramienta',
         'topbar.compare.title':     'Comparar productos',
         'topbar.about.eyebrow':     'La marca',
-        'topbar.about.title':       'Sobre LUXA',
+        'topbar.about.title':       'Sobre {brand}',
 
         // Compare (herramienta global — chip topbar, botones, vista, toasts)
         'compare.chip.label':       'Comparar',
@@ -125,7 +125,7 @@
         'homeCta.title':       'Tu próxima reunión comercial sin PDF',
         'homeCta.sub':         'Mostrale a tu cliente un catálogo vivo, con productos aplicados en ambientes reales. Una URL que reemplaza al PDF en showroom, reuniones y WhatsApp.',
         'homeCta.whatsapp':    'Hablemos por WhatsApp',
-        'homeCta.whatsappMsg': 'Hola, vi la demo de LUXA y me gustaría conversar sobre el proyecto.',
+        'homeCta.whatsappMsg': 'Hola, vi la demo de {brand} y me gustaría conversar sobre el proyecto.',
         'quote.cta':           'Consultar precio',
         'quote.ctaShort':      'Precio',
         'quote.msg':           'Hola, quiero consultar el precio del producto {name} ({code}).',
@@ -231,7 +231,7 @@
         'project.downloadPdf':      'Descargar PDF',
         'project.sendWhatsapp':     'Enviar por WhatsApp',
         'project.untitled':         'Proyecto sin nombre',
-        'project.pdf.brand':        'LUXA · TD Lighting Experience',
+        'project.pdf.brand':        '{brand} · {by}',
         'project.pdf.subtitle':     'Selección de luminarias',
         'project.pdf.generatedOn':  'Generado el {date}',
         'project.pdf.itemsCount':   '{n} luminarias seleccionadas',
@@ -239,7 +239,7 @@
         'project.pdf.category':     'Categoría',
         'project.pdf.power':        'Potencia',
         'project.pdf.temp':         'Temperatura',
-        'project.pdf.footer':       'Catálogo interactivo LUXA · Para cotización y consultas, contactanos por WhatsApp.',
+        'project.pdf.footer':       'Catálogo interactivo {brand} · Para cotización y consultas, contactanos por WhatsApp.',
         'project.wa.intro':         'Hola, te paso mi proyecto:',
         'project.wa.introTitled':   'Hola, te paso mi proyecto "{title}":',
         'project.wa.outro':         'Quedo a la espera de tu cotización. ¡Gracias!'
@@ -266,7 +266,7 @@
         'topbar.compare.eyebrow':   'Tool',
         'topbar.compare.title':     'Compare products',
         'topbar.about.eyebrow':     'The brand',
-        'topbar.about.title':       'About LUXA',
+        'topbar.about.title':       'About {brand}',
 
         'compare.chip.label':       'Compare',
         'compare.add':              'Add to compare',
@@ -336,7 +336,7 @@
         'homeCta.title':       'Your next sales meeting without the PDF',
         'homeCta.sub':         'Show your client a living catalog with products applied in real spaces. A URL that replaces the PDF in showrooms, meetings and WhatsApp.',
         'homeCta.whatsapp':    'Chat on WhatsApp',
-        'homeCta.whatsappMsg': 'Hi, I saw the LUXA demo and would like to talk about the project.',
+        'homeCta.whatsappMsg': 'Hi, I saw the {brand} demo and would like to talk about the project.',
         'quote.cta':           'Ask for price',
         'quote.ctaShort':      'Price',
         'quote.msg':           'Hi, I would like to ask the price of {name} ({code}).',
@@ -435,7 +435,7 @@
         'project.downloadPdf':      'Download PDF',
         'project.sendWhatsapp':     'Send via WhatsApp',
         'project.untitled':         'Untitled project',
-        'project.pdf.brand':        'LUXA · TD Lighting Experience',
+        'project.pdf.brand':        '{brand} · {by}',
         'project.pdf.subtitle':     'Selected fixtures',
         'project.pdf.generatedOn':  'Generated on {date}',
         'project.pdf.itemsCount':   '{n} fixtures selected',
@@ -443,7 +443,7 @@
         'project.pdf.category':     'Category',
         'project.pdf.power':        'Power',
         'project.pdf.temp':         'Color temp.',
-        'project.pdf.footer':       'LUXA interactive catalog · For quotes and questions, reach us on WhatsApp.',
+        'project.pdf.footer':       '{brand} interactive catalog · For quotes and questions, reach us on WhatsApp.',
         'project.wa.intro':         'Hi, here is my project:',
         'project.wa.introTitled':   'Hi, here is my project "{title}":',
         'project.wa.outro':         'Looking forward to your quote. Thanks!'
@@ -451,19 +451,20 @@
     },
 
     /* ----------------------------------------------------------------------- */
-    brand: {
-      name: 'LUXA',
-      by: 'TD Lighting Experience',
-      accent: '#C9A24B',
-      contact: {
-        /* WhatsApp en formato internacional sin '+' ni espacios.
-           Origen: +54 9 11 6002-9154 (Argentina · móvil) */
-        whatsapp: '5491160029154',
-        /* URLs completas de redes sociales. Dejá '' para esconder el icono. */
-        facebook:  '',
-        instagram: ''
-      }
-    },
+    /* LA MARCA NO SE EDITA ACÁ — se edita en js/brand.config.js.
+       Esto solo copia lo que hay en ese archivo para que el resto del código la
+       encuentre donde siempre estuvo. */
+    brand: (function () {
+      var B = window.BRAND || {};
+      return {
+        name:    B.name || 'Showroom',
+        by:      B.by || '',
+        accent:  B.accent || '#C9A24B',
+        logo:    B.logo || { mark: '', image: '' },
+        site:    B.site || {},
+        contact: B.contact || { whatsapp: '', facebook: '', instagram: '' }
+      };
+    })(),
 
     /* Bridge editorial Home: producto destacado mostrado dos veces — catálogo + contexto.
        Cambia productId/closeUpImage para rotar la pieza del bridge sin tocar código. */
@@ -497,30 +498,6 @@
     products: [
       // ---------- PENDANTS -------------------------------------------------
       {
-        id: 'tempo-pendant', code: 'DVA-5776', name: 'Tempo Pendant', category: 'Pendants',
-        designer: 'LUXA Studio', power: '18 W', lumens: '1280 lm', temperature: '2700 K',
-        cri: '≥ 90', ip: 'IP20', dimensions: 'Ø 320 × H 280 mm', finish: 'Spun aluminium · Matte black',
-        application: { es: 'Mesas de comedor e islas de cocina', en: 'Dining tables and kitchen islands' },
-        description: {
-          es: 'Un colgante de precisión silenciosa. La pantalla hilada pliega la luz en un haz suave, ideal sobre una mesa donde la calidez importa más que el alcance.',
-          en: 'A quietly precise pendant. The spun shade folds light into a soft pool, ideal over a table where warmth matters more than throw.'
-        },
-        featured: true,
-        assets: asset('DVA-5776 Tempo Pendant Lamp_corona')
-      },
-      {
-        id: 'aim-led-pendant', code: 'DVA-AIM', name: 'Aim LED Pendant', category: 'Pendants',
-        designer: 'LUXA Studio', power: '24 W', lumens: '1750 lm', temperature: '3000 K',
-        cri: '≥ 90', ip: 'IP20', dimensions: 'Ø 240 × H 320 mm', finish: 'Aluminium · Polished',
-        application: { es: 'Mesadas, mesas auxiliares, rincones de lectura', en: 'Counters, side tables, reading corners' },
-        description: {
-          es: 'La alimentación flexible permite orientar el cabezal exactamente donde la luz hace falta. Arquitectura y gesto en una sola luminaria.',
-          en: 'The flexible feed lets the head be aimed exactly where light is needed. Architecture and gesture in a single fixture.'
-        },
-        featured: true,
-        assets: asset('DVA-Aim LED Pendant Lamp_vray')
-      },
-      {
         id: 'bolle-orizzontale', code: 'DVA-BOL', name: 'Bolle Orizzontale', category: 'Pendants',
         designer: 'LUXA Studio', power: '36 W', lumens: '2400 lm', temperature: '2700 K',
         cri: '≥ 95', ip: 'IP20', dimensions: 'L 900 × H 450 mm', finish: 'Hand-blown glass · Brushed brass',
@@ -531,30 +508,6 @@
         },
         featured: true,
         assets: asset('DVA-Bolle Orizzontale Hanging Lamp_corona')
-      },
-      {
-        id: 'aplomb-suspension', code: 'DVA-APL', name: 'Aplomb Suspension', category: 'Pendants',
-        designer: 'LUXA Studio', power: '20 W', lumens: '1500 lm', temperature: '3000 K',
-        cri: '≥ 90', ip: 'IP65', dimensions: 'Ø 180 × H 230 mm', finish: 'Cast concrete · Natural grey',
-        application: { es: 'Bares, baños e interiores aptos para exterior', en: 'Bars, bathrooms and outdoor-rated interiors' },
-        description: {
-          es: 'Fundida en hormigón, cruda y a la vez refinada. El cuerpo mate absorbe el deslumbramiento y ancla la luz con honestidad material.',
-          en: 'Cast in concrete, raw yet refined. The matte body absorbs glare and grounds the light with material honesty.'
-        },
-        featured: false,
-        assets: asset('DVA-Aplomb Suspension Light_corona')
-      },
-      {
-        id: 'arena-suspension', code: 'DVA-ARN', name: 'Arena Suspension 150', category: 'Pendants',
-        designer: 'LUXA Studio', power: '48 W', lumens: '3600 lm', temperature: '3000 K',
-        cri: '≥ 90', ip: 'IP20', dimensions: 'Ø 1500 × H 60 mm', finish: 'Anodised aluminium ring',
-        application: { es: 'Mesas de reunión y lobbies', en: 'Conference tables and lobbies' },
-        description: {
-          es: 'Un anillo luminoso fino que flota sobre el ambiente. La luz ascendente roza el techo mientras un baño descendente define la superficie debajo.',
-          en: 'A thin luminous ring that floats above the room. Uplight grazes the ceiling while a soft downward wash defines the surface below.'
-        },
-        featured: false,
-        assets: asset('DVA-Arena Suspension Lamp 150_corona')
       },
       {
         id: 'awa-suspended', code: 'DVA-AWA', name: 'Awa Suspended', category: 'Pendants',
@@ -631,30 +584,6 @@
         },
         featured: true,
         assets: asset('DVA-Arco Floor Lamp_corona')
-      },
-      {
-        id: 'apollo-floor', code: 'DVA-APO', name: 'Apollo Floor', category: 'Floor Lamps',
-        designer: 'LUXA Studio', power: '14 W', lumens: '1000 lm', temperature: '2700 K',
-        cri: '≥ 90', ip: 'IP20', dimensions: 'Ø 250 × H 1750 mm', finish: 'Matte white · Bronze detail',
-        application: { es: 'Rincones de lectura y mesas de luz', en: 'Reading corners and bedsides' },
-        description: {
-          es: 'Una semiesfera pivota para bañar una pared o concentrarse en una página. Silenciosa, arquitectónica, infinitamente ajustable.',
-          en: 'A half-dome head pivots to wash a wall or focus on a page. Quiet, architectural, endlessly adjustable.'
-        },
-        featured: false,
-        assets: asset('DVA-Apollo Floor Lamp_corona')
-      },
-      {
-        id: 'ayno-floor', code: 'DVA-AYN', name: 'Ayno Floor', category: 'Floor Lamps',
-        designer: 'LUXA Studio', power: '11 W', lumens: '820 lm', temperature: '2700 K',
-        cri: '≥ 90', ip: 'IP20', dimensions: 'Base 300 × H 1900 mm', finish: 'Powder-coated steel · Leather strap',
-        application: { es: 'Estudios y rincones de lectura', en: 'Home offices and reading nooks' },
-        description: {
-          es: 'Un cable tensado y una correa de cuero convierten el vástago en una luz de tarea precisa. Lógica industrial, calidez doméstica.',
-          en: 'A tensioned cord and leather strap turn the stem into a precise task light. Industrial logic, domestic warmth.'
-        },
-        featured: false,
-        assets: asset('DVA-Ayno Large Floor Lamp_corona')
       },
       {
         id: 'flat-floor', code: 'DVA-5945', name: 'Flat Floor', category: 'Floor Lamps',
@@ -744,30 +673,6 @@
       },
 
       // ---------- WALL LIGHTS ----------------------------------------------
-      {
-        id: 'tempo-wall', code: 'DVA-5756', name: 'Tempo Wall', category: 'Wall Lights',
-        designer: 'LUXA Studio', power: '12 W', lumens: '850 lm', temperature: '2700 K',
-        cri: '≥ 90', ip: 'IP44', dimensions: 'Ø 200 × D 110 mm', finish: 'Spun aluminium · Matte black',
-        application: { es: 'Pasillos y paredes de mesa de luz', en: 'Hallways and bedside walls' },
-        description: {
-          es: 'La pantalla Tempo girada hacia la pared. Baño hacia arriba y hacia abajo con el mismo carácter suave y sin deslumbre que su hermana colgante.',
-          en: 'The Tempo shade turned to the wall. Up-and-down wash with the same gentle, glare-free character as its pendant sibling.'
-        },
-        featured: true,
-        assets: asset('DVA-5756 Tempo Wall Lamp_corona')
-      },
-      {
-        id: '265-wall', code: 'DVA-265', name: '265 Wall', category: 'Wall Lights',
-        designer: 'LUXA Studio', power: '10 W', lumens: '700 lm', temperature: '2700 K',
-        cri: '≥ 90', ip: 'IP20', dimensions: 'Reach 1150 mm · Adjustable arm', finish: 'Painted steel · White',
-        application: { es: 'Paredes de lectura y montajes de galería', en: 'Reading walls and gallery hangs' },
-        description: {
-          es: 'Un brazo contrapesado lleva la luz adonde se la quiera. Un clásico minimalista del aplique ajustable.',
-          en: 'A counterweighted arm sweeps light wherever it is wanted. A minimalist classic of adjustable wall lighting.'
-        },
-        featured: false,
-        assets: asset('DVA-265 Wall Lamp_corona')
-      },
       {
         id: 'aballs-a-wall', code: 'DVA-ABW', name: 'Aballs A Wall', category: 'Wall Lights',
         designer: 'LUXA Studio', power: '8 W', lumens: '560 lm', temperature: '2700 K',
@@ -882,7 +787,7 @@
     downloads: [
       {
         id: 'general-catalog',
-        title:       { es: 'Catálogo General 2026', en: 'LUXA General Catalog 2026' },
+        title:       { es: 'Catálogo General 2026', en: '{brand} General Catalog 2026' },
         kind: 'Catalog',
         pages:       { es: '7 pp · PDF', en: '7 pp · PDF' },
         file: 'assets/pdfs/luxa-general-catalog-2026.pdf',
@@ -896,8 +801,8 @@
     /* ----------------------------------------------------------------------- */
     about: {
       intro: {
-        es: 'LUXA es la experiencia digital de iluminación de TD Lighting — una plataforma interactiva que transforma los catálogos tradicionales en herramientas de venta vivas, donde cada luminaria se explora en sus propios términos.',
-        en: 'LUXA is TD Lighting’s digital lighting experience — an interactive platform that transforms traditional catalogs into living sales tools, where every luminaire is explored on its own terms.'
+        es: '{brand} es la experiencia digital de iluminación de TD Lighting — una plataforma interactiva que transforma los catálogos tradicionales en herramientas de venta vivas, donde cada luminaria se explora en sus propios términos.',
+        en: '{brand} is TD Lighting’s digital lighting experience — an interactive platform that transforms traditional catalogs into living sales tools, where every luminaire is explored on its own terms.'
       },
       pillars: [
         {
