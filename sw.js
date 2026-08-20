@@ -89,11 +89,12 @@ self.addEventListener('activate', function (evento) {
         }));
       }).then(function () {
         return self.clients.claim();
-      }).then(function () {
-        // La bajada de lo pesado NO va dentro del waitUntil: si tardara,
-        // el navegador podría matar al guardián por demorarse demasiado.
-        guardarPesados(lista);
       });
+      /* OJO: acá NO se baja nada pesado.
+         Guardar el catálogo entero son más de 100 MB, y nadie los pidió por
+         el solo hecho de abrir un link — con datos del celular eso sería una
+         falta de respeto. La descarga arranca únicamente cuando la persona
+         toca el botón, y la página avisa con un mensaje 'guardar'. */
     })
   );
 });
@@ -273,7 +274,13 @@ function avisar(mensaje) {
    solo la primera. */
 self.addEventListener('message', function (evento) {
   var m = evento.data || {};
-  if (m.tipo !== 'estado') return;
+  /* 'estado'  → solo informar cómo viene.
+     'guardar' → informar Y bajar (o retomar donde haya quedado). Lo manda la
+                 página cuando la persona tocó el botón, y en cada visita
+                 posterior mientras falte, para que la descarga sobreviva a
+                 que cierre la app. */
+  if (m.tipo !== 'estado' && m.tipo !== 'guardar') return;
+  var debeBajar = (m.tipo === 'guardar');
 
   /* waitUntil mantiene al guardián despierto mientras trabaja. Sin esto el
      celular lo apaga a los pocos segundos y la descarga se corta. */
@@ -287,10 +294,10 @@ self.addEventListener('message', function (evento) {
         );
       }
 
-      /* SI FALTA ALGO, SEGUIR BAJANDO DESDE DONDE QUEDÓ.
-         Esto es lo que hace que la descarga sobreviva a que el cliente cierre
-         la app: cada vez que la vuelve a abrir, retoma. */
-      if (!real.terminado) return guardarPesados(real.lista);
+      /* SI FALTA ALGO Y LA PERSONA YA LO PIDIÓ, SEGUIR DESDE DONDE QUEDÓ.
+         Esto es lo que hace que la descarga sobreviva a que cierre la app:
+         cada vez que la vuelve a abrir, retoma sola. */
+      if (debeBajar && !real.terminado) return guardarPesados(real.lista);
       return null;
     }).catch(function () { /* sin señal: se retoma la próxima vez */ })
   );

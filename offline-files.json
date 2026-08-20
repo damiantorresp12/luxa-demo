@@ -1,6 +1,7 @@
 {
   "_readme": "Generado por tools/build-offline-list.ps1. NO editar a mano: se reescribe entero. Es la lista de archivos que la app guarda para andar sin internet.",
   "version": "04de881cc4a7",
+  "pesoMB": 108,
   "armazon": [
     "./",
     "index.html",

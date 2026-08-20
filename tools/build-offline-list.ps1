@@ -110,10 +110,25 @@ $md5   = [Security.Cryptography.MD5]::Create()
 $bytes = $md5.ComputeHash([Text.Encoding]::UTF8.GetBytes($huella.ToString()))
 $version = ([BitConverter]::ToString($bytes) -replace '-', '').Substring(0, 12).ToLower()
 
+# El peso se guarda en la lista para que el boton de la app pueda decir
+# cuantos MB va a bajar, sin que nadie tenga que escribir el numero a mano.
+function Peso-De {
+  param([string[]]$Lista)
+  $total = 0
+  foreach ($rel in $Lista) {
+    if ($rel -eq './') { continue }
+    $f = Join-Path $root ($rel -replace '/', '\')
+    if (Test-Path $f -PathType Leaf) { $total += (Get-Item $f).Length }
+  }
+  return $total
+}
+$pesoTotalMB = [int][Math]::Round(((Peso-De $armazon) + (Peso-De $pesados)) / 1MB)
+
 $sb = New-Object Text.StringBuilder
 [void]$sb.AppendLine('{')
 [void]$sb.AppendLine('  "_readme": "Generado por tools/build-offline-list.ps1. NO editar a mano: se reescribe entero. Es la lista de archivos que la app guarda para andar sin internet.",')
 [void]$sb.AppendLine(('  "version": "{0}",' -f $version))
+[void]$sb.AppendLine(('  "pesoMB": {0},' -f $pesoTotalMB))
 [void]$sb.AppendLine('  "armazon": [')
 [void]$sb.AppendLine((($armazon | ForEach-Object { '    "' + ($_ -replace '"','\"') + '"' }) -join ",`r`n"))
 [void]$sb.AppendLine('  ],')
@@ -126,17 +141,6 @@ $destino = Join-Path $root 'offline-files.json'
 [IO.File]::WriteAllText($destino, $sb.ToString(), (New-Object Text.UTF8Encoding($false)))
 
 # ---- 4. Informe -------------------------------------------------------------
-function Peso-De {
-  param([string[]]$Lista)
-  $total = 0
-  foreach ($rel in $Lista) {
-    if ($rel -eq './') { continue }
-    $f = Join-Path $root ($rel -replace '/', '\')
-    if (Test-Path $f -PathType Leaf) { $total += (Get-Item $f).Length }
-  }
-  return $total
-}
-
 $pesoArmazon = Peso-De $armazon
 $pesoPesados = Peso-De $pesados
 

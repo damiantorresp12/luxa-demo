@@ -1,101 +1,163 @@
 /* =============================================================================
-   INSTALACIÓN Y MODO SIN INTERNET — pwa.js
+   INSTALAR EN EL DISPOSITIVO Y GUARDAR EL CATÁLOGO — pwa.js
    -----------------------------------------------------------------------------
-   Tres cosas:
-     1. Enciende el "guardián" (sw.js), que guarda el showroom en el dispositivo.
-     2. Muestra el botón "Instalar" cuando el navegador lo permite.
-     3. En iPhone y iPad, donde no existe ese botón, explica cómo hacerlo a mano.
+   EL ORDEN DE LAS COSAS, QUE ES LO IMPORTANTE ACÁ:
 
-   El nombre y el ícono que se ven al instalar salen de manifest.webmanifest,
-   que se genera con tools/aplicar-marca.ps1 a partir de js/brand.config.js.
+     1. Al entrar solo se ve un botón. NO se descarga nada.
+     2. La persona lo toca: en Android se instala el ícono; en iPhone se le
+        muestra el paso a mano (Apple no permite instalar por botón). En los
+        dos casos, ahí recién arranca la descarga del catálogo.
+     3. Aparece el porcentaje mientras baja.
+     4. Al terminar: "Catálogo guardado en este dispositivo".
+
+   Por qué no se baja solo: son más de 100 MB. Nadie los pidió por abrir un
+   link, y con datos del celular sería una falta de respeto. Se ofrece, no se
+   impone.
+
+   El nombre y el ícono con los que se instala salen de manifest.webmanifest,
+   que se genera con tools/aplicar-marca.ps1 desde js/brand.config.js.
    ========================================================================== */
 
 (function () {
   'use strict';
 
-  /* El guardián necesita una conexión segura. En el celular de Damian abriendo
-     por http://localhost anda igual; en internet, el sitio ya va por https. */
+  /* Guardar el catálogo necesita una conexión segura. Abriendo por
+     http://localhost anda igual; en internet el sitio ya va por https. */
   var puedeGuardar = ('serviceWorker' in navigator) &&
                      (location.protocol === 'https:' || location.hostname === 'localhost');
 
-  /* --- 1. Encender el guardián ------------------------------------------- */
+  var PEDIDO_KEY = 'luxa.offline.pedido';   // la persona ya tocó el botón
+
+  var promesaInstalar = null;   // la ofrece el navegador, se usa una sola vez
+  var boton      = null;
+  var estadoEl   = null;
+  var consultas  = null;
+  var pesoMB     = null;        // cuánto pesa el catálogo, sale de la lista
+  var completo   = false;
+
+  /* --- Textos ------------------------------------------------------------- */
+
+  var TEXTOS = {
+    es: {
+      instalarYGuardar: '⤓ Instalar y guardar',
+      soloGuardar:      '⤓ Guardar para usar sin internet',
+      apple:            'Para instalar el ícono: tocá Compartir y elegí “Agregar a inicio”. Mientras tanto, el catálogo se está guardando.',
+      guardando:        'Guardando catálogo · {pct}%',
+      listo:            '✓ Catálogo guardado en este dispositivo',
+      parcial:          'Guardado a medias · {n} de {total}',
+      sinEspacio:       'No hay espacio para guardar el catálogo acá'
+    },
+    en: {
+      instalarYGuardar: '⤓ Install and save',
+      soloGuardar:      '⤓ Save for offline use',
+      apple:            'To install the icon: tap Share and choose “Add to Home Screen”. The catalog is being saved meanwhile.',
+      guardando:        'Saving catalog · {pct}%',
+      listo:            '✓ Catalog saved on this device',
+      parcial:          'Partially saved · {n} of {total}',
+      sinEspacio:       'Not enough space to save the catalog here'
+    }
+  };
+
+  function idioma() {
+    try {
+      var l = localStorage.getItem('luxa.lang');
+      return (l === 'en') ? 'en' : 'es';
+    } catch (e) { return 'es'; }
+  }
+  function t(k) { return TEXTOS[idioma()][k]; }
+
+  function yaPidio() {
+    try { return localStorage.getItem(PEDIDO_KEY) === '1'; } catch (e) { return false; }
+  }
+  function marcarPedido() {
+    try { localStorage.setItem(PEDIDO_KEY, '1'); } catch (e) {}
+  }
+
+  function yaEstaInstalada() {
+    return window.matchMedia('(display-mode: standalone)').matches ||
+           window.navigator.standalone === true;
+  }
+
+  function esApple() {
+    return /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+           // El iPad moderno se hace pasar por Mac; se delata por el tacto.
+           (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  }
+
+  /* --- Encender el guardián ----------------------------------------------- */
+
   if (puedeGuardar) {
     window.addEventListener('load', function () {
-      navigator.serviceWorker.register('sw.js').then(function (reg) {
-        console.log('[offline] guardián activo', reg.scope);
-        navigator.serviceWorker.ready.then(arrancarConsultas);
+      navigator.serviceWorker.register('sw.js').then(function () {
+        return navigator.serviceWorker.ready;
+      }).then(function () {
+        /* Si ya lo había pedido en otra visita, retomar donde quedó. Si no,
+           solo preguntar cómo está la cosa, sin bajar nada. */
+        preguntar(yaPidio());
+        if (yaPidio()) arrancarConsultas();
       }).catch(function (e) {
         console.warn('[offline] no se pudo activar:', e && e.message);
       });
     });
 
-    /* El guardián avisa cómo viene la descarga. Se muestra en el pie del menú
-       para saber CUÁNDO ya se puede cortar internet sin perder nada — sobre
-       todo los videos, que son lo último en bajarse. */
     navigator.serviceWorker.addEventListener('message', function (ev) {
       var m = ev.data || {};
+
       if (m.tipo === 'offline-progreso') {
+        if (!yaPidio()) return;   // aún no lo pidió: no mostrar nada
         var pct = m.total ? Math.round((m.guardados / m.total) * 100) : 0;
-        mostrarEstado(TEXTOS[idioma()].guardando.replace('{pct}', pct), false);
+        mostrarEstado(t('guardando').replace('{pct}', pct), false);
         console.log('[offline] guardando… ' + m.guardados + ' de ' + m.total);
+
       } else if (m.tipo === 'offline-listo') {
-        mostrarEstado(TEXTOS[idioma()].listo, true);
+        completo = true;
         pararConsultas();
-        console.log('[offline] listo: ' + m.guardados + ' de ' + m.total +
-                    ' archivos guardados' + (m.fallados ? ' (' + m.fallados + ' fallaron)' : '') +
-                    '. El showroom ya funciona sin internet.');
+        quitarBoton();
+        mostrarEstado(t('listo'), true);
+        console.log('[offline] listo: ' + m.guardados + ' de ' + m.total + ' archivos guardados.');
 
       } else if (m.tipo === 'offline-incompleto') {
         /* Se recorrió toda la lista pero los archivos no quedaron guardados.
            Pasa cuando el dispositivo no tiene espacio, o en una ventana de
            incógnito, donde el navegador da muy poco lugar y lo borra al
            cerrar. Decirlo, en vez de mentir con un "listo". */
-        var txt = m.sinEspacio
-          ? TEXTOS[idioma()].sinEspacio
-          : TEXTOS[idioma()].parcial
-              .replace('{n}', m.guardados).replace('{total}', m.total);
-        mostrarEstado(txt, false);
+        mostrarEstado(
+          m.sinEspacio ? t('sinEspacio')
+                       : t('parcial').replace('{n}', m.guardados).replace('{total}', m.total),
+          false
+        );
         console.warn('[offline] no se pudo guardar todo: ' + m.guardados + ' de ' + m.total +
                      (m.sinEspacio ? ' — el dispositivo no tiene espacio suficiente.' : '.'));
       }
     });
   }
 
-  /* --- Preguntarle al guardián cómo viene ---------------------------------
-     Además de actualizar el cartel, cada consulta lo despierta y hace que
-     retome la descarga donde la había dejado. En el celular esto es lo que
-     hace que los 108 MB terminen de bajar: el sistema apaga al guardián
-     apenas salís de la app, y sin estas consultas la bajada nunca seguiría. */
+  /* --- Hablar con el guardián ---------------------------------------------
+     Cada consulta además lo despierta: el celular lo apaga apenas salís de la
+     app, y sin estas consultas la descarga nunca seguiría donde quedó. */
 
-  var consultas = null;
-
-  function preguntar() {
+  function preguntar(bajando) {
     if (navigator.serviceWorker.controller) {
-      navigator.serviceWorker.controller.postMessage({ tipo: 'estado' });
+      navigator.serviceWorker.controller.postMessage({ tipo: bajando ? 'guardar' : 'estado' });
     }
   }
 
   function arrancarConsultas() {
-    preguntar();
     if (consultas) return;
-    consultas = setInterval(preguntar, 15000);
+    consultas = setInterval(function () { preguntar(true); }, 15000);
   }
 
   function pararConsultas() {
     if (consultas) { clearInterval(consultas); consultas = null; }
   }
 
-  /* Al volver a la app después de tenerla en segundo plano, retomar enseguida
-     en vez de esperar los 15 segundos. */
   document.addEventListener('visibilitychange', function () {
-    if (!document.hidden) preguntar();
+    if (!document.hidden && yaPidio() && !completo) preguntar(true);
   });
 
-  /* --- El cartelito de estado -------------------------------------------- */
+  /* --- El cartelito de estado --------------------------------------------- */
 
-  var estadoEl = null;
-
-  function mostrarEstado(texto, completo) {
+  function mostrarEstado(texto, esListo) {
     if (!estadoEl) {
       var destino = document.getElementById('sidebarFootCopy');
       if (!destino || !destino.parentNode) return;
@@ -105,53 +167,19 @@
       destino.parentNode.insertBefore(estadoEl, destino);
     }
     estadoEl.textContent = texto;
-    estadoEl.classList.toggle('is-listo', !!completo);
+    estadoEl.classList.toggle('is-listo', !!esListo);
   }
 
-  /* --- 2. El botón "Instalar" -------------------------------------------- */
+  /* --- El botón ------------------------------------------------------------ */
 
-  var promesaInstalar = null;   // la guarda el navegador, se usa una sola vez
-  var boton = null;
-
-  function yaEstaInstalada() {
-    return window.matchMedia('(display-mode: standalone)').matches ||
-           window.navigator.standalone === true;
+  function etiqueta() {
+    // Si ya tiene el ícono puesto, el botón solo ofrece guardar el catálogo.
+    var base = yaEstaInstalada() ? t('soloGuardar') : t('instalarYGuardar');
+    return pesoMB ? (base + ' · ' + pesoMB + ' MB') : base;
   }
-
-  function esApple() {
-    return /iPad|iPhone|iPod/.test(navigator.userAgent) ||
-           // iPad moderno se hace pasar por Mac; se delata por el tacto.
-           (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-  }
-
-  function idioma() {
-    try {
-      var l = localStorage.getItem('luxa.lang');
-      return (l === 'en') ? 'en' : 'es';
-    } catch (e) { return 'es'; }
-  }
-
-  var TEXTOS = {
-    es: {
-      instalar:  'Instalar app',
-      apple:     'Para instalar: tocá el botón Compartir y elegí “Agregar a inicio”.',
-      guardando: 'Guardando catálogo · {pct}%',
-      listo:     '✓ Catálogo guardado en este dispositivo',
-      parcial:    'Guardado a medias · {n} de {total}',
-      sinEspacio: 'No hay espacio para guardar el catálogo acá'
-    },
-    en: {
-      instalar:  'Install app',
-      apple:     'To install: tap the Share button and choose “Add to Home Screen”.',
-      guardando: 'Saving catalog · {pct}%',
-      listo:     '✓ Catalog saved on this device',
-      parcial:    'Partially saved · {n} of {total}',
-      sinEspacio: 'Not enough space to save the catalog here'
-    }
-  };
 
   function crearBoton() {
-    if (boton || yaEstaInstalada()) return;
+    if (boton || completo || !puedeGuardar) return;
 
     var destino = document.getElementById('sidebarFootCopy');
     if (!destino || !destino.parentNode) return;
@@ -160,23 +188,29 @@
     boton.type = 'button';
     boton.id = 'btnInstalar';
     boton.className = 'install-btn';
-    boton.textContent = TEXTOS[idioma()].instalar;
+    boton.textContent = etiqueta();
     destino.parentNode.insertBefore(boton, destino);
 
     boton.addEventListener('click', function () {
+      marcarPedido();
+
+      // 1. El ícono en la pantalla de inicio
       if (promesaInstalar) {
         promesaInstalar.prompt();
-        promesaInstalar.userChoice.then(function (r) {
-          if (r && r.outcome === 'accepted') ocultarBoton();
-          promesaInstalar = null;
-        });
-      } else if (esApple()) {
-        mostrarInstruccion(TEXTOS[idioma()].apple);
+        promesaInstalar.userChoice.then(function () { promesaInstalar = null; });
+      } else if (esApple() && !yaEstaInstalada()) {
+        mostrarInstruccion(t('apple'));
       }
+
+      // 2. Y arranca la descarga del catálogo, en los dos casos
+      preguntar(true);
+      arrancarConsultas();
+      mostrarEstado(t('guardando').replace('{pct}', 0), false);
+      quitarBoton();
     });
   }
 
-  function ocultarBoton() {
+  function quitarBoton() {
     if (boton && boton.parentNode) boton.parentNode.removeChild(boton);
     boton = null;
   }
@@ -185,32 +219,48 @@
     var previo = document.getElementById('installHint');
     if (previo && previo.parentNode) previo.parentNode.removeChild(previo);
 
+    var destino = document.getElementById('sidebarFootCopy');
+    if (!destino || !destino.parentNode) return;
+
     var p = document.createElement('p');
     p.id = 'installHint';
     p.className = 'install-hint';
     p.textContent = texto;
-    if (boton && boton.parentNode) boton.parentNode.insertBefore(p, boton.nextSibling);
+    destino.parentNode.insertBefore(p, destino);
     setTimeout(function () {
       if (p.parentNode) p.parentNode.removeChild(p);
-    }, 8000);
+    }, 12000);
   }
 
-  /* Android / Chrome de escritorio: el navegador avisa que se puede instalar. */
+  /* Android / Chrome de escritorio avisan cuando se puede instalar. El botón
+     no depende de este aviso —en iPhone nunca llega— pero si llega, se
+     aprovecha para instalar de verdad. */
   window.addEventListener('beforeinstallprompt', function (e) {
     e.preventDefault();
     promesaInstalar = e;
-    crearBoton();
-  });
-
-  /* iPhone / iPad: nunca avisa, así que el botón se pone igual y al tocarlo
-     se explica el camino manual. */
-  document.addEventListener('DOMContentLoaded', function () {
-    if (esApple() && !yaEstaInstalada()) crearBoton();
-
+    if (boton) boton.textContent = etiqueta();
   });
 
   window.addEventListener('appinstalled', function () {
-    ocultarBoton();
     console.log('[offline] el showroom quedó instalado en el dispositivo.');
+  });
+
+  /* --- Arranque ------------------------------------------------------------ */
+
+  document.addEventListener('DOMContentLoaded', function () {
+    if (!puedeGuardar) return;
+
+    // Cuánto pesa el catálogo, para poder decirlo en el botón.
+    fetch('offline-files.json', { cache: 'no-store' })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (j) {
+        if (j && j.pesoMB) pesoMB = j.pesoMB;
+        if (boton) boton.textContent = etiqueta();
+      })
+      .catch(function () {});
+
+    // Si ya lo pidió antes, no se le vuelve a ofrecer: se retoma y se informa.
+    if (yaPidio()) mostrarEstado(t('guardando').replace('{pct}', 0), false);
+    else           crearBoton();
   });
 })();
