@@ -95,6 +95,11 @@ self.addEventListener('activate', function (evento) {
    ------------------------------------------------------------------------ */
 var bajando = false;
 
+/* Cómo viene la descarga, para poder contestar cuando la página pregunte.
+   Sin esto el cartel del menú solo aparecería la primera vez, porque los
+   avisos se mandan durante la instalación y después nunca más. */
+var avance = { guardados: 0, total: 0, terminado: false };
+
 function guardarPesados(lista) {
   if (bajando) return;
   bajando = true;
@@ -104,11 +109,14 @@ function guardarPesados(lista) {
   var listos     = 0;
   var fallados   = 0;
 
+  avance = { guardados: 0, total: total, terminado: false };
+
   caches.open(nombreCajon(lista.version)).then(function (cajon) {
 
     function siguiente() {
       if (!pendientes.length) {
         bajando = false;
+        avance = { guardados: listos, total: total, terminado: true };
         avisar({
           tipo: 'offline-listo',
           guardados: listos,
@@ -132,10 +140,11 @@ function guardarPesados(lista) {
         // Un archivo que falla no arruina la bajada entera.
         fallados++;
       }).then(function () {
-        if ((listos + fallados) % 20 === 0) {
+        avance.guardados = listos + fallados;
+        if (avance.guardados % 20 === 0) {
           avisar({
             tipo: 'offline-progreso',
-            guardados: listos + fallados,
+            guardados: avance.guardados,
             total: total
           });
         }
@@ -147,11 +156,77 @@ function guardarPesados(lista) {
   });
 }
 
+/* ---------------------------------------------------------------------------
+   VIDEOS — el caso especial
+
+   Una imagen se pide entera de una vez. Un video NO: el reproductor pide
+   "dame del byte 0 al 1023", después otro pedazo, y así. Eso se llama pedido
+   por rango, y la respuesta correcta es un 206 con SOLO ese pedazo.
+
+   La copia guardada tiene el archivo entero, así que si se la devolvemos tal
+   cual estamos contestando 200 con todo. Chrome lo perdona; Safari no, y en
+   iPhone y iPad el video no arranca.
+
+   Esta función recorta el pedazo pedido y arma la respuesta como corresponde.
+   ------------------------------------------------------------------------ */
+function responderPorRango(pedido, guardado) {
+  var rango = pedido.headers.get('range');
+  if (!rango) return Promise.resolve(guardado);
+
+  var m = /bytes=(\d*)-(\d*)/.exec(rango);
+  if (!m) return Promise.resolve(guardado);
+
+  return guardado.blob().then(function (entero) {
+    var total  = entero.size;
+    var desde  = m[1] ? parseInt(m[1], 10) : 0;
+    var hasta  = m[2] ? parseInt(m[2], 10) : total - 1;
+
+    // Si pide "los últimos N bytes" viene como 'bytes=-500'
+    if (!m[1] && m[2]) { desde = Math.max(0, total - parseInt(m[2], 10)); hasta = total - 1; }
+    if (hasta >= total) hasta = total - 1;
+
+    if (desde > hasta || desde >= total) {
+      return new Response(null, {
+        status: 416,
+        statusText: 'Range Not Satisfiable',
+        headers: { 'Content-Range': 'bytes */' + total }
+      });
+    }
+
+    return new Response(entero.slice(desde, hasta + 1), {
+      status: 206,
+      statusText: 'Partial Content',
+      headers: {
+        'Content-Type':   guardado.headers.get('Content-Type') || 'application/octet-stream',
+        'Content-Length': String(hasta - desde + 1),
+        'Content-Range':  'bytes ' + desde + '-' + hasta + '/' + total,
+        'Accept-Ranges':  'bytes'
+      }
+    });
+  });
+}
+
 function avisar(mensaje) {
   self.clients.matchAll().then(function (clientes) {
     clientes.forEach(function (c) { c.postMessage(mensaje); });
   });
 }
+
+/* La página pregunta "¿cómo venís?" al abrirse, y el guardián le contesta con
+   lo que tenga. Así el cartel del menú dice la verdad en cualquier visita, no
+   solo la primera. */
+self.addEventListener('message', function (evento) {
+  var m = evento.data || {};
+  if (m.tipo !== 'estado') return;
+
+  var respuesta = avance.terminado
+    ? { tipo: 'offline-listo',    guardados: avance.guardados, total: avance.total, fallados: 0 }
+    : { tipo: 'offline-progreso', guardados: avance.guardados, total: avance.total };
+
+  if (evento.source && evento.source.postMessage) {
+    evento.source.postMessage(respuesta);
+  }
+});
 
 /* ---------------------------------------------------------------------------
    PEDIDOS — de dónde sale cada archivo
@@ -179,19 +254,31 @@ self.addEventListener('fetch', function (evento) {
     if (url.pathname.indexOf('.json') === -1) return;
   }
 
-  // La página y los datos: primero se intenta la versión fresca, y si no hay
-  // internet se cae a la copia guardada. Así los cambios llegan enseguida.
-  var esPagina = pedido.mode === 'navigate';
-  var esDatos  = url.pathname.indexOf('.json') !== -1;
+  /* --------------------------------------------------------------------------
+     LA REGLA DE FONDO — de dónde sale cada cosa
 
-  if (esPagina || esDatos) {
+     · El CÓDIGO de la app (la página, los estilos, los scripts, los datos):
+       PRIMERO INTERNET, y la copia guardada solo si no hay señal.
+       Es obligatorio que sea así: si saliera de la copia, un cambio publicado
+       no le llegaría nunca al cliente — se quedaría con la versión del día que
+       instaló la app, para siempre.
+
+     · Lo PESADO (fotos, videos, tipografías, PDF): primero la copia guardada,
+       que es instantánea y no gasta datos. Estos archivos no cambian: cuando
+       se reemplaza un render, cambia la lista y el guardián baja la versión
+       nueva por su cuenta.
+     ----------------------------------------------------------------------- */
+  var esPagina = pedido.mode === 'navigate';
+  var esCodigo = /\.(css|js|json|webmanifest)$/i.test(url.pathname);
+
+  if (esPagina || esCodigo) {
     evento.respondWith(
       fetch(pedido).then(function (r) {
-        if (r && r.ok) {
+        if (r && r.status === 200) {
           var copia = r.clone();
           caches.open(cajonActual || PREFIJO + 'temp').then(function (cajon) {
             cajon.put(esPagina ? './' : pedido, copia);
-          });
+          }).catch(function () { /* sin espacio: la app sigue andando */ });
         }
         return r;
       }).catch(function () {
@@ -203,15 +290,20 @@ self.addEventListener('fetch', function (evento) {
     return;
   }
 
-  // Todo lo demás (fotos, videos, estilos, código, tipografías): primero la
-  // copia guardada, que es instantánea. Si no está, se pide y se guarda.
+  // Lo pesado: primero la copia guardada. Si no está, se pide y se guarda.
   evento.respondWith(
     caches.match(pedido, IGNORAR_VERSION).then(function (guardado) {
-      if (guardado) return guardado;
+      // Si el reproductor pidió un pedazo, hay que recortarlo (ver arriba).
+      if (guardado) return responderPorRango(pedido, guardado);
+
       return fetch(pedido).then(function (r) {
-        if (r && r.ok && cajonActual) {
+        // Solo se guardan respuestas completas: una respuesta "por pedazos"
+        // (206) no se puede guardar, y guardarla rompería la copia.
+        if (r && r.status === 200 && cajonActual) {
           var copia = r.clone();
-          caches.open(cajonActual).then(function (cajon) { cajon.put(pedido, copia); });
+          caches.open(cajonActual).then(function (cajon) {
+            cajon.put(pedido, copia);
+          }).catch(function () { /* sin espacio o no cacheable: no pasa nada */ });
         }
         return r;
       });

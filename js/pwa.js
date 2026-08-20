@@ -23,23 +23,58 @@
     window.addEventListener('load', function () {
       navigator.serviceWorker.register('sw.js').then(function (reg) {
         console.log('[offline] guardián activo', reg.scope);
+        /* Preguntarle cómo viene la descarga. Si no se le pregunta, el cartel
+           del menú solo aparecería la primera vez que se instala. */
+        navigator.serviceWorker.ready.then(function () {
+          if (navigator.serviceWorker.controller) {
+            navigator.serviceWorker.controller.postMessage({ tipo: 'estado' });
+          }
+        });
       }).catch(function (e) {
         console.warn('[offline] no se pudo activar:', e && e.message);
       });
     });
 
-    /* El guardián avisa cómo viene la descarga. Queda en la consola: es
-       información para Damian, no para el cliente. */
+    /* El guardián avisa cómo viene la descarga. Se muestra en el pie del menú
+       para saber CUÁNDO ya se puede cortar internet sin perder nada — sobre
+       todo los videos, que son lo último en bajarse. */
     navigator.serviceWorker.addEventListener('message', function (ev) {
       var m = ev.data || {};
       if (m.tipo === 'offline-progreso') {
+        var pct = m.total ? Math.round((m.guardados / m.total) * 100) : 0;
+        mostrarEstado(TEXTOS[idioma()].guardando.replace('{pct}', pct), false);
         console.log('[offline] guardando… ' + m.guardados + ' de ' + m.total);
       } else if (m.tipo === 'offline-listo') {
+        mostrarEstado(TEXTOS[idioma()].listo, true);
+        try { localStorage.setItem('luxa.offline.listo', '1'); } catch (e) {}
         console.log('[offline] listo: ' + m.guardados + ' de ' + m.total +
                     ' archivos guardados' + (m.fallados ? ' (' + m.fallados + ' fallaron)' : '') +
                     '. El showroom ya funciona sin internet.');
       }
     });
+  }
+
+  /* --- El cartelito de estado -------------------------------------------- */
+
+  var estadoEl = null;
+  /* Una vez que dijo "listo", no vuelve atrás en esta visita. Cuando el
+     guardián se reinicia repasa los archivos que ya tenía y volvería a
+     contar desde cero, y ver "0%" cuando ya está todo guardado asusta. */
+  var yaDijoListo = false;
+
+  function mostrarEstado(texto, completo) {
+    if (yaDijoListo && !completo) return;
+    if (completo) yaDijoListo = true;
+    if (!estadoEl) {
+      var destino = document.getElementById('sidebarFootCopy');
+      if (!destino || !destino.parentNode) return;
+      estadoEl = document.createElement('p');
+      estadoEl.id = 'offlineEstado';
+      estadoEl.className = 'offline-estado';
+      destino.parentNode.insertBefore(estadoEl, destino);
+    }
+    estadoEl.textContent = texto;
+    estadoEl.classList.toggle('is-listo', !!completo);
   }
 
   /* --- 2. El botón "Instalar" -------------------------------------------- */
@@ -67,12 +102,16 @@
 
   var TEXTOS = {
     es: {
-      instalar: 'Instalar app',
-      apple:    'Para instalar: tocá el botón Compartir y elegí “Agregar a inicio”.'
+      instalar:  'Instalar app',
+      apple:     'Para instalar: tocá el botón Compartir y elegí “Agregar a inicio”.',
+      guardando: 'Guardando para uso sin internet · {pct}%',
+      listo:     '✓ Listo para usar sin internet'
     },
     en: {
-      instalar: 'Install app',
-      apple:    'To install: tap the Share button and choose “Add to Home Screen”.'
+      instalar:  'Install app',
+      apple:     'To install: tap the Share button and choose “Add to Home Screen”.',
+      guardando: 'Saving for offline use · {pct}%',
+      listo:     '✓ Ready for offline use'
     }
   };
 
@@ -132,6 +171,12 @@
      se explica el camino manual. */
   document.addEventListener('DOMContentLoaded', function () {
     if (esApple() && !yaEstaInstalada()) crearBoton();
+
+    /* Si en una visita anterior ya se había guardado todo, decirlo de entrada
+       en vez de esperar a que el guardián termine de repasar los archivos. */
+    var yaGuardado = false;
+    try { yaGuardado = localStorage.getItem('luxa.offline.listo') === '1'; } catch (e) {}
+    if (yaGuardado && puedeGuardar) mostrarEstado(TEXTOS[idioma()].listo, true);
   });
 
   window.addEventListener('appinstalled', function () {

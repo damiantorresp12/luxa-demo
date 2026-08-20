@@ -151,6 +151,18 @@ svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width:
   color: var(--ink-dim);
 }
 
+/* Aviso de la descarga para uso sin internet. Sirve para saber cuándo ya se
+   puede cortar la conexión sin perder los videos, que son lo último en bajar. */
+.offline-estado {
+  margin: 0 0 8px;
+  font-size: 0.55rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  transition: color 0.3s ease;
+}
+.offline-estado.is-listo { color: var(--brass, #c9a24b); }
+
 /* Cuando brand.config.js define logo.image, el cuadradito dorado se corre y
    deja lugar al logo del cliente tal cual es. */
 .brand-mark.has-image {
