@@ -111,8 +111,9 @@
       } else if (m.tipo === 'offline-listo') {
         completo = true;
         pararConsultas();
-        quitarBoton();
         mostrarEstado(t('listo'), true);
+        // El catálogo ya está; el botón se queda solo si falta instalar.
+        refrescarBoton();
         console.log('[offline] listo: ' + m.guardados + ' de ' + m.total + ' archivos guardados.');
 
       } else if (m.tipo === 'offline-incompleto') {
@@ -171,15 +172,33 @@
 
   /* --- El botón ------------------------------------------------------------ */
 
-  function etiqueta() {
-    /* El botón dice solo "Instalar app", sin el peso. Decisión de Damian:
-       el número asusta más de lo que informa. Si ya tiene el ícono puesto,
-       lo único que queda por ofrecer es guardar el catálogo. */
-    return yaEstaInstalada() ? t('soloGuardar') : t('instalarYGuardar');
-  }
+  /* SON DOS COSAS DISTINTAS, Y ESTE FUE EL ERROR QUE HUBO QUE ARREGLAR:
+       · instalar  = poner el ícono en la pantalla de inicio.
+       · guardar   = bajar el catálogo al dispositivo.
+     Se puede tener una sin la otra. Si alguien desinstala el ícono pero
+     conserva el catálogo guardado, el botón TIENE que volver a aparecer —
+     antes no volvía nunca, porque miraba si el catálogo estaba guardado en
+     vez de mirar si la app estaba instalada. */
 
-  function crearBoton() {
-    if (boton || completo || !puedeGuardar) return;
+  function faltaInstalar() {
+    // Chrome deja de ofrecer la instalación mientras está instalada, y vuelve
+    // a ofrecerla al desinstalar. Por eso `promesaInstalar` es la señal buena.
+    return !yaEstaInstalada() && (!!promesaInstalar || esApple());
+  }
+  function faltaGuardar() { return !completo; }
+
+  function refrescarBoton() {
+    if (!puedeGuardar) return;
+
+    if (!faltaInstalar() && !faltaGuardar()) { quitarBoton(); return; }
+
+    // Si todavía no guardó el catálogo y ya lo pidió, está bajando: no se le
+    // vuelve a ofrecer el botón de guardar por el medio.
+    if (!faltaInstalar() && yaPidio()) { quitarBoton(); return; }
+
+    var texto = faltaInstalar() ? t('instalarYGuardar') : t('soloGuardar');
+
+    if (boton) { boton.textContent = texto; return; }
 
     var destino = document.getElementById('sidebarFootCopy');
     if (!destino || !destino.parentNode) return;
@@ -188,26 +207,33 @@
     boton.type = 'button';
     boton.id = 'btnInstalar';
     boton.className = 'install-btn';
-    boton.textContent = etiqueta();
+    boton.textContent = texto;
     destino.parentNode.insertBefore(boton, destino);
+    boton.addEventListener('click', alTocarElBoton);
+  }
 
-    boton.addEventListener('click', function () {
+  function alTocarElBoton() {
+    // 1. El ícono en la pantalla de inicio
+    if (promesaInstalar) {
+      promesaInstalar.prompt();
+      promesaInstalar.userChoice.then(function () {
+        promesaInstalar = null;
+        // Si lo rechazó, el botón se queda para que pueda volver a intentar.
+        refrescarBoton();
+      });
+    } else if (esApple() && !yaEstaInstalada()) {
+      mostrarInstruccion(t('apple'));
+    }
+
+    // 2. Y el catálogo, si todavía no está guardado
+    if (faltaGuardar()) {
       marcarPedido();
-
-      // 1. El ícono en la pantalla de inicio
-      if (promesaInstalar) {
-        promesaInstalar.prompt();
-        promesaInstalar.userChoice.then(function () { promesaInstalar = null; });
-      } else if (esApple() && !yaEstaInstalada()) {
-        mostrarInstruccion(t('apple'));
-      }
-
-      // 2. Y arranca la descarga del catálogo, en los dos casos
       preguntar(true);
       arrancarConsultas();
       mostrarEstado(t('guardando').replace('{pct}', 0), false);
-      quitarBoton();
-    });
+    }
+
+    refrescarBoton();
   }
 
   function quitarBoton() {
@@ -238,10 +264,15 @@
   window.addEventListener('beforeinstallprompt', function (e) {
     e.preventDefault();
     promesaInstalar = e;
-    if (boton) boton.textContent = etiqueta();
+    /* Este aviso llega tarde, después de cargar la página, y también vuelve a
+       llegar cuando alguien desinstala la app. Por eso el botón se rearma acá
+       en vez de decidirse una sola vez al arrancar. */
+    refrescarBoton();
   });
 
   window.addEventListener('appinstalled', function () {
+    promesaInstalar = null;
+    refrescarBoton();
     console.log('[offline] el showroom quedó instalado en el dispositivo.');
   });
 
@@ -250,8 +281,13 @@
   document.addEventListener('DOMContentLoaded', function () {
     if (!puedeGuardar) return;
 
-    // Si ya lo pidió antes, no se le vuelve a ofrecer: se retoma y se informa.
+    // Si ya pidió guardar en otra visita, se retoma en silencio y se informa.
     if (yaPidio()) mostrarEstado(t('guardando').replace('{pct}', 0), false);
-    else           crearBoton();
+
+    /* El botón se decide acá y se vuelve a decidir cada vez que cambia algo
+       (llega el aviso de instalación, se instala, se desinstala, termina de
+       guardarse). En iPhone este es el único momento en que aparece, porque
+       ahí el aviso de instalación no existe. */
+    refrescarBoton();
   });
 })();
