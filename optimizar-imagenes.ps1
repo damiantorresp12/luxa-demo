@@ -73,7 +73,12 @@ function Optimizar {
   $bmp.Dispose(); $img.Dispose(); $ms.Dispose()
 
   $nuevoPeso = (Get-Item $tmp).Length
-  $mejora    = $nuevoPeso -lt $info.Length
+  # Solo vale la pena reescribir si la foto se achica de tamano o si el peso
+  # baja de verdad. Sin este freno, cada pasada volvia a comprimir fotos ya
+  # optimizadas para ahorrar unos pocos bytes, y cada compresion pierde calidad.
+  $seAchica  = ($nw -ne $w) -or ($nh -ne $h)
+  $ahorro    = 1 - ($nuevoPeso / [double]$info.Length)
+  $mejora    = ($nuevoPeso -lt $info.Length) -and ($seAchica -or $ahorro -ge 0.10)
 
   $resultado = [pscustomobject]@{
     Archivo   = $info.FullName.Substring($root.Length + 1)
@@ -81,6 +86,7 @@ function Optimizar {
     DespuesKB = [int]($nuevoPeso / 1KB)
     Antes     = ("{0} x {1}" -f $w, $h)
     Despues   = ("{0} x {1}" -f $nw, $nh)
+    Mejora    = $mejora
     Aplicado  = $false
   }
 
@@ -92,7 +98,10 @@ function Optimizar {
   $rel     = $info.FullName.Substring((Join-Path $root 'assets').Length + 1)
   $destino = Join-Path $backupDir $rel
   New-Item -ItemType Directory -Force (Split-Path $destino -Parent) | Out-Null
-  Move-Item $info.FullName $destino -Force
+  # Nunca pisar un respaldo que ya existe: ese es el original de verdad, y la
+  # copia que estamos reemplazando ya paso por aca alguna vez.
+  if (Test-Path $destino) { Remove-Item $info.FullName -Force }
+  else                    { Move-Item $info.FullName $destino }
   Move-Item $tmp $info.FullName -Force
   $resultado.Aplicado = $true
   return $resultado
@@ -116,9 +125,9 @@ $res = foreach ($o in $objetivos) {
 }
 
 $antes     = ($res | Measure-Object AntesKB -Sum).Sum
-$despues   = ($res | ForEach-Object { if ($_.DespuesKB -lt $_.AntesKB) { $_.DespuesKB } else { $_.AntesKB } } |
+$despues   = ($res | ForEach-Object { if ($_.Mejora) { $_.DespuesKB } else { $_.AntesKB } } |
               Measure-Object -Sum).Sum
-$cambiadas = ($res | Where-Object { $_.DespuesKB -lt $_.AntesKB }).Count
+$cambiadas = ($res | Where-Object { $_.Mejora }).Count
 $pct       = [int]((1 - ($despues / [double]$antes)) * 100)
 
 Write-Host ""
