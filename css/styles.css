@@ -2056,12 +2056,18 @@ svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width:
    del fondo mid-crossfade. Antes ambas capas transicionaban a la par y en el
    punto medio dejaban entrar ~25% de fondo → se percibía como un parpadeo
    sutil pero real. */
+/* OJO con el z-order: la capa OFF es position:absolute, así que por default
+   se apila ENCIMA de una capa ON en flujo normal (los elementos posicionados
+   ganan al static sin z-index). Le doy a la ON position:relative + z-index 1
+   para que quede efectivamente arriba y la OFF actúe como fondo revelable. */
 .space-stage.has-off-variant .space-stage-img-off {
   position: absolute; inset: 0;
   opacity: 1;
-  /* NO transition — queda estática */
+  /* NO transition — queda estática, siempre visible por debajo */
 }
 .space-stage.has-off-variant .space-stage-img-on {
+  position: relative;
+  z-index: 1;
   opacity: 1;
   transition: opacity 0.55s var(--ease);
 }
