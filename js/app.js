@@ -1749,6 +1749,9 @@
       video.style.opacity = '';
     }
     if (still) { still.hidden = true; still.removeAttribute('src'); }
+    // Sacar la capa off dinámica si existía (la crea el toggle handler).
+    var staleOff = overlay.querySelector('.transition-still-off-layer');
+    if (staleOff) staleOff.remove();
     if (card)  { card.hidden = true; card.classList.remove('is-expanded'); }
     var stale = overlay.querySelector('.transition-lights-toggle');
     if (stale) stale.remove();
@@ -1825,10 +1828,10 @@
     // new preload — otherwise the old image can flash in for a beat.
     still.hidden = true;
     still.removeAttribute('src');
-    // Limpiar cualquier opacity/transition inline que haya quedado de un toggle
-    // del hotspot anterior (el crossfade JS setea .style.opacity/.style.transition).
-    still.style.opacity = '';
-    still.style.transition = '';
+    // Sacar la capa OFF de un hotspot anterior si quedó pegada. Se recrea
+    // en cada hotspot cuando checkLightsOff confirma que hay variante off.
+    var priorOff = overlay.querySelector(':scope > img.transition-still-off-layer');
+    if (priorOff) priorOff.remove();
 
     // Preload the close-up out-of-band; only assign to the visible <img> once
     // the bitmap is fully decoded so the reveal at the end is instant (no lag,
@@ -1909,29 +1912,33 @@
           '<span class="lights-label"><span class="on">' + t('lights.on') + '</span><span class="off">' + t('lights.off') + '</span></span>';
         lightsToggleEl.hidden = !revealed; // only show after the close-up is on screen
         overlay.appendChild(lightsToggleEl);
-        // Precargar la variante off en el caché del navegador para que el swap
-        // de src durante el fade sea instantáneo (sin frame vacío intermedio).
-        var offPreload = new Image();
-        offPreload.src = uri(closeUpOffPath);
+        // Crossfade real: creamos una SEGUNDA <img> en JS puro (no en HTML ni
+        // con clase CSS heredada) para evitar el fadeIn de 0.35s de
+        // .transition-still que había hecho flashear la capa OFF sobre el
+        // video en el primer intento. Al crearla con inline styles y sin
+        // clases, ninguna regla del CSS le mete opacity ni animation. La
+        // primera capa queda "on" (still), la segunda es "off" (stillOff),
+        // superpuesta encima. El toggle sólo cambia el opacity de stillOff.
+        var stillOff = document.createElement('img');
+        stillOff.className = 'transition-still-off-layer'; // marker para cleanup
+        stillOff.setAttribute('aria-hidden', 'true');
+        stillOff.alt = '';
+        // setProperty con !important en transition/opacity porque la regla
+        // global de reduced-motion las colapsaría a 0.01ms en máquinas con
+        // animaciones apagadas (mismo criterio que hotspot ping / space stage).
+        stillOff.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;opacity:0;pointer-events:none;animation:none;';
+        stillOff.style.setProperty('transition', 'opacity 0.55s ease', 'important');
+        stillOff.src = uri(closeUpOffPath);
+        // Insert AFTER still: mismo z-index, orden DOM decide → queda encima.
+        if (still.parentNode) still.parentNode.insertBefore(stillOff, still.nextSibling);
+
         lightsToggleEl.addEventListener('click', function () {
           var nextState = lightsToggleEl.dataset.lights === 'on' ? 'off' : 'on';
           lightsToggleEl.dataset.lights = nextState;
           lightsToggleEl.setAttribute('aria-pressed', String(nextState === 'on'));
-          var nextSrc = uri(nextState === 'off' ? closeUpOffPath : closeUpOnPath);
-          // Crossfade con JS puro: fade out, swap src (ya cacheado), fade in.
-          // Evito agregar una segunda <img> superpuesta porque .transition-still
-          // trae un fadeIn de 0.35s en la base que peleaba con la capa oculta.
-          // Uso setProperty con !important para que la regla global de
-          // prefers-reduced-motion (que pisa transitions a 0.01ms) no colapse
-          // el fade en máquinas con animaciones apagadas — misma razón que la
-          // excepción del hotspot ping y el space-stage.
-          still.style.setProperty('transition', 'opacity 0.28s ease', 'important');
-          still.style.opacity = '0';
-          setTimeout(function () {
-            still.src = nextSrc;
-            // setTimeout en vez de rAF: fires en background/foreground igual.
-            setTimeout(function () { still.style.opacity = '1'; }, 20);
-          }, 280);
+          // Crossfade real: subir/bajar opacity de la capa off sola. La capa
+          // on (still) queda estática abajo, siempre visible, sin gap negro.
+          stillOff.style.opacity = nextState === 'off' ? '1' : '0';
         });
       });
     }
@@ -1991,6 +1998,9 @@
       overlay.style.backgroundImage = '';
       card.hidden = true;
       if (lightsToggleEl) { lightsToggleEl.remove(); lightsToggleEl = null; }
+      // Sacar la capa off dinámica que creamos para el crossfade.
+      var offLayer = overlay.querySelector('.transition-still-off-layer');
+      if (offLayer) offLayer.remove();
       if (stageLightsToggle) stageLightsToggle.hidden = false;
       if (overlay.parentNode !== document.body) document.body.appendChild(overlay);
     }
