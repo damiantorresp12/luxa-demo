@@ -2206,9 +2206,12 @@ svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width:
   100% { transform: scale(1.6); opacity: 0 }
 }
 .hotspot:hover { background: var(--brass); }
+/* Label debajo del hotspot: arranca oculto pegado al hotspot (translateY -6px)
+   y se despliega 6px hacia abajo al hover, así el movimiento acompaña la
+   posición final. Antes vivía arriba con bottom: calc(100% + 10px). */
 .hotspot-label {
-  position: absolute; left: 50%; bottom: calc(100% + 10px);
-  transform: translateX(-50%) translateY(6px);
+  position: absolute; left: 50%; top: calc(100% + 10px);
+  transform: translateX(-50%) translateY(-6px);
   white-space: nowrap;
   font-size: 0.68rem; letter-spacing: 0.06em;
   padding: 4px 10px; border-radius: 100px;
