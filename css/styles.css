@@ -2452,6 +2452,9 @@ svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width:
      clickear" — apagarlo hace invisibles a los hotspots. Mismo criterio que
      en ATMO y tdrender.com. Ver memoria [[reduced-motion-windows]]. */
   .hotspot::after { animation-duration: 4.5s !important; }
+  /* Crossfade del toggle luces on/off. Sin este override el fade colapsa a
+     0.01ms y el usuario ve el mismo swap brusco que tenía antes. */
+  .space-stage.has-off-variant .space-stage-img { transition-duration: 0.55s !important; }
 }
 
 /* =============================================================================
