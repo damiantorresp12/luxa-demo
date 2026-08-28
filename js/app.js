@@ -1749,6 +1749,9 @@
       video.style.opacity = '';
     }
     if (still) { still.hidden = true; still.removeAttribute('src'); }
+    var stillOff = $('#transitionStillOff');
+    if (stillOff) { stillOff.hidden = true; stillOff.removeAttribute('src'); }
+    overlay.removeAttribute('data-lights');
     if (card)  { card.hidden = true; card.classList.remove('is-expanded'); }
     var stale = overlay.querySelector('.transition-lights-toggle');
     if (stale) stale.remove();
@@ -1764,6 +1767,7 @@
     var overlay = $('#transitionOverlay');
     var video   = $('#transitionVideo');
     var still   = $('#transitionStill');
+    var stillOff = $('#transitionStillOff');
     var card    = $('#transitionCard');
     var skipBtn = $('#transitionSkip');
     var btnDetail = $('#transitionCardDetail');
@@ -1825,6 +1829,10 @@
     // new preload — otherwise the old image can flash in for a beat.
     still.hidden = true;
     still.removeAttribute('src');
+    // También limpiar la capa OFF y sacar cualquier data-lights de un hotspot
+    // anterior, así el crossfade arranca desde "on" siempre.
+    if (stillOff) { stillOff.hidden = true; stillOff.removeAttribute('src'); }
+    overlay.removeAttribute('data-lights');
 
     // Preload the close-up out-of-band; only assign to the visible <img> once
     // the bitmap is fully decoded so the reveal at the end is instant (no lag,
@@ -1905,11 +1913,18 @@
           '<span class="lights-label"><span class="on">' + t('lights.on') + '</span><span class="off">' + t('lights.off') + '</span></span>';
         lightsToggleEl.hidden = !revealed; // only show after the close-up is on screen
         overlay.appendChild(lightsToggleEl);
+        // Precargar la versión OFF en la capa superpuesta para poder crossfadear
+        // sin flash. El swap ya no toca still.src — sólo cambia data-lights en
+        // el overlay y CSS maneja el fade suave entre las dos capas.
+        if (stillOff) {
+          stillOff.src = uri(closeUpOffPath);
+          stillOff.hidden = false;
+        }
         lightsToggleEl.addEventListener('click', function () {
           var nextState = lightsToggleEl.dataset.lights === 'on' ? 'off' : 'on';
           lightsToggleEl.dataset.lights = nextState;
           lightsToggleEl.setAttribute('aria-pressed', String(nextState === 'on'));
-          still.src = uri(nextState === 'off' ? closeUpOffPath : closeUpOnPath);
+          overlay.dataset.lights = nextState;
         });
       });
     }
