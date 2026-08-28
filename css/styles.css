@@ -2193,16 +2193,17 @@ svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width:
 /* Ping con pausa explícita entre latidos: el aro se expande y se desvanece
    en los primeros ~2s (0-45%), después se queda invisible hasta que arranca
    el próximo ciclo. Antes iba de 0% a 100% sin descanso y se leía como un
-   latido acelerado. */
+   latido acelerado.
+
+   OJO: no respetamos prefers-reduced-motion acá a propósito. El aro no es
+   decorativo — es la señal que le dice al usuario "acá se puede hacer clic".
+   En sistemas con animaciones apagadas (Windows del trabajo de Damián, por
+   ejemplo) sin este pulso los hotspots quedan invisibles como affordance.
+   Mismo criterio aplicado en tdrender.com y ATMO. */
 @keyframes ping {
   0%   { transform: scale(0.7); opacity: 0.9 }
   45%  { transform: scale(1.6); opacity: 0 }
   100% { transform: scale(1.6); opacity: 0 }
-}
-/* Respetá la preferencia del sistema — si el usuario tiene animaciones
-   reducidas (o apagadas en Windows), el aro queda estático. */
-@media (prefers-reduced-motion: reduce) {
-  .hotspot::after { animation: none; }
 }
 .hotspot:hover { background: var(--brass); }
 .hotspot-label {
