@@ -1573,7 +1573,10 @@
     }).join('');
 
     var stage = el('div', 'space-stage');
-    stage.innerHTML = (bg ? '<img src="' + uri(bg) + '" alt="' + tx(sp.name) + '" />' : '') + hotspotsHtml;
+    // La imagen "on" se pinta ya. Si la escena tiene versión "off" (probe abajo),
+    // se inyecta una segunda imagen encima y el toggle crossfadea entre las dos
+    // vía CSS. Sin la segunda capa, el swap de src daría un flash brusco.
+    stage.innerHTML = (bg ? '<img class="space-stage-img space-stage-img-on" src="' + uri(bg) + '" alt="' + tx(sp.name) + '" />' : '') + hotspotsHtml;
 
     // If the scene ships an "off" variant of its main image, surface a small
     // lights toggle in the corner of the stage. When the user flips it off,
@@ -1587,6 +1590,19 @@
         (sp.hotspots || []).forEach(function (h) {
           if (h && h.closeUpImage) checkLightsOff(h.closeUpImage, function () {});
         });
+        // Inyectar la capa "off" superpuesta a la "on". Va delante en el DOM
+        // para que quede debajo en z-order — cuando el CSS baja opacity de la
+        // "on", la "off" aparece por transparencia = crossfade real.
+        var offImg = document.createElement('img');
+        offImg.className = 'space-stage-img space-stage-img-off';
+        offImg.src = uri(offBg);
+        offImg.alt = '';
+        offImg.setAttribute('aria-hidden', 'true');
+        var onImg = stage.querySelector('.space-stage-img-on');
+        if (onImg) stage.insertBefore(offImg, onImg);
+        else stage.insertBefore(offImg, stage.firstChild);
+        stage.classList.add('has-off-variant');
+
         var toggle = document.createElement('button');
         toggle.className = 'space-lights-toggle';
         toggle.type = 'button';
@@ -1613,9 +1629,10 @@
           var nextState = toggle.dataset.lights === 'on' ? 'off' : 'on';
           toggle.dataset.lights = nextState;
           toggle.setAttribute('aria-pressed', String(nextState === 'on'));
+          // El swap visual lo maneja CSS: [data-lights="off"] apaga la capa
+          // "on" y deja ver la "off" debajo. Nada de tocar src acá — swapping
+          // src daría un flash entre el frame vacío y la nueva imagen.
           stage.dataset.lights = nextState;
-          var img = stage.querySelector('img');
-          if (img) img.src = uri(nextState === 'off' ? offBg : bg);
         });
       });
     }

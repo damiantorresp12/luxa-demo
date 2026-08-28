@@ -2045,6 +2045,22 @@ svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width:
   transition: opacity 0.4s var(--ease);
 }
 
+/* Crossfade entre "luces prendidas" y "luces apagadas" cuando la escena
+   tiene versión off. La imagen ON queda en el flujo normal (da altura al
+   stage — sin esto se colapsaría en desktop, que no tiene aspect-ratio).
+   La imagen OFF se pone encima con position: absolute. El toggle sólo
+   cambia data-lights y CSS crossfadea. Sin esto el swap de src daba flash. */
+.space-stage.has-off-variant .space-stage-img-off {
+  position: absolute; inset: 0;
+  opacity: 0;
+  transition: opacity 0.55s var(--ease);
+}
+.space-stage.has-off-variant .space-stage-img-on {
+  transition: opacity 0.55s var(--ease);
+}
+.space-stage.has-off-variant[data-lights="off"] .space-stage-img-off { opacity: 0.92; }
+.space-stage.has-off-variant[data-lights="off"] .space-stage-img-on  { opacity: 0; }
+
 /* Lights on/off toggle — shown on .space-stage when an "off" variant of the
    scene's main image exists. Default state = ON (lit). */
 .space-lights-toggle[hidden] { display: none; }
