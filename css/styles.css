@@ -2427,6 +2427,12 @@ svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width:
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+  /* EXCEPCIONES — animaciones funcionales (no ornamentales) que dejamos vivas
+     aunque el usuario pida menos movimiento. Sin ellas la UI pierde
+     información: el aro del hotspot es la señal visual de "acá se puede
+     clickear" — apagarlo hace invisibles a los hotspots. Mismo criterio que
+     en ATMO y tdrender.com. Ver memoria [[reduced-motion-windows]]. */
+  .hotspot::after { animation-duration: 4.5s !important; }
 }
 
 /* =============================================================================
