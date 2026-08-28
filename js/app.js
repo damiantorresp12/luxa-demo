@@ -1825,6 +1825,10 @@
     // new preload — otherwise the old image can flash in for a beat.
     still.hidden = true;
     still.removeAttribute('src');
+    // Limpiar cualquier opacity/transition inline que haya quedado de un toggle
+    // del hotspot anterior (el crossfade JS setea .style.opacity/.style.transition).
+    still.style.opacity = '';
+    still.style.transition = '';
 
     // Preload the close-up out-of-band; only assign to the visible <img> once
     // the bitmap is fully decoded so the reveal at the end is instant (no lag,
@@ -1905,11 +1909,29 @@
           '<span class="lights-label"><span class="on">' + t('lights.on') + '</span><span class="off">' + t('lights.off') + '</span></span>';
         lightsToggleEl.hidden = !revealed; // only show after the close-up is on screen
         overlay.appendChild(lightsToggleEl);
+        // Precargar la variante off en el caché del navegador para que el swap
+        // de src durante el fade sea instantáneo (sin frame vacío intermedio).
+        var offPreload = new Image();
+        offPreload.src = uri(closeUpOffPath);
         lightsToggleEl.addEventListener('click', function () {
           var nextState = lightsToggleEl.dataset.lights === 'on' ? 'off' : 'on';
           lightsToggleEl.dataset.lights = nextState;
           lightsToggleEl.setAttribute('aria-pressed', String(nextState === 'on'));
-          still.src = uri(nextState === 'off' ? closeUpOffPath : closeUpOnPath);
+          var nextSrc = uri(nextState === 'off' ? closeUpOffPath : closeUpOnPath);
+          // Crossfade con JS puro: fade out, swap src (ya cacheado), fade in.
+          // Evito agregar una segunda <img> superpuesta porque .transition-still
+          // trae un fadeIn de 0.35s en la base que peleaba con la capa oculta.
+          // Uso setProperty con !important para que la regla global de
+          // prefers-reduced-motion (que pisa transitions a 0.01ms) no colapse
+          // el fade en máquinas con animaciones apagadas — misma razón que la
+          // excepción del hotspot ping y el space-stage.
+          still.style.setProperty('transition', 'opacity 0.28s ease', 'important');
+          still.style.opacity = '0';
+          setTimeout(function () {
+            still.src = nextSrc;
+            // setTimeout en vez de rAF: fires en background/foreground igual.
+            setTimeout(function () { still.style.opacity = '1'; }, 20);
+          }, 280);
         });
       });
     }
