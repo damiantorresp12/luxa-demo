@@ -2455,7 +2455,6 @@ svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width:
   /* Crossfade del toggle luces on/off. Sin este override el fade colapsa a
      0.01ms y el usuario ve el mismo swap brusco que tenía antes. */
   .space-stage.has-off-variant .space-stage-img { transition-duration: 0.55s !important; }
-  .transition-still-on, .transition-still-off { transition-duration: 0.55s !important; }
 }
 
 /* =============================================================================
@@ -2483,20 +2482,6 @@ svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width:
   animation: fadeIn 0.35s var(--ease);
 }
 .transition-still[hidden] { display: none; }
-
-/* Crossfade entre "luces on" y "luces off" del close-up del hotspot.
-   Ambas quedan renderizadas superpuestas — la off arranca con opacity 0
-   y sube al 1 cuando el overlay toma data-lights="off". Sin esto el
-   toggle hacía swap de src y se veía como un flash. Igual patrón que
-   el crossfade del .space-stage. */
-/* animation: none evita que la capa off "flashee" al mostrarse — la clase
-   base .transition-still trae un fadeIn de 0.35s que iría de opacity 0 a 1
-   y visualmente rompería el crossfade. La capa off entra en escena silenciosa
-   y sólo aparece cuando el toggle flippea el data-lights del overlay. */
-.transition-still-off { opacity: 0; animation: none; transition: opacity 0.55s var(--ease); z-index: 2; }
-.transition-still-on  { transition: opacity 0.55s var(--ease); }
-.transition-overlay[data-lights="off"] .transition-still-off { opacity: 1; }
-.transition-overlay[data-lights="off"] .transition-still-on  { opacity: 0; }
 .transition-skip {
   position: absolute; top: 14px; right: 14px; z-index: 3;
   width: 36px; height: 36px; border-radius: 50%;
