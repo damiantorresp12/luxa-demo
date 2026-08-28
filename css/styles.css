@@ -2048,18 +2048,24 @@ svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width:
 /* Crossfade entre "luces prendidas" y "luces apagadas" cuando la escena
    tiene versión off. La imagen ON queda en el flujo normal (da altura al
    stage — sin esto se colapsaría en desktop, que no tiene aspect-ratio).
-   La imagen OFF se pone encima con position: absolute. El toggle sólo
-   cambia data-lights y CSS crossfadea. Sin esto el swap de src daba flash. */
+   La imagen OFF se pone encima con position: absolute.
+
+   Estrategia: la capa OFF queda FIJA al 100% (siempre visible por debajo).
+   Solamente la capa ON transiciona su opacity (1 → 0 al apagar, 0 → 1 al
+   prender). Así OFF cubre todo el tiempo y ningún gap deja filtrar el negro
+   del fondo mid-crossfade. Antes ambas capas transicionaban a la par y en el
+   punto medio dejaban entrar ~25% de fondo → se percibía como un parpadeo
+   sutil pero real. */
 .space-stage.has-off-variant .space-stage-img-off {
   position: absolute; inset: 0;
-  opacity: 0;
-  transition: opacity 0.55s var(--ease);
+  opacity: 1;
+  /* NO transition — queda estática */
 }
 .space-stage.has-off-variant .space-stage-img-on {
+  opacity: 1;
   transition: opacity 0.55s var(--ease);
 }
-.space-stage.has-off-variant[data-lights="off"] .space-stage-img-off { opacity: 0.92; }
-.space-stage.has-off-variant[data-lights="off"] .space-stage-img-on  { opacity: 0; }
+.space-stage.has-off-variant[data-lights="off"] .space-stage-img-on { opacity: 0; }
 
 /* Lights on/off toggle — shown on .space-stage when an "off" variant of the
    scene's main image exists. Default state = ON (lit). */
