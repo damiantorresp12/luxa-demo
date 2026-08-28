@@ -2186,11 +2186,24 @@ svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width:
 .hotspot::after {
   content: ''; position: absolute; inset: -6px;
   border-radius: 50%; border: 1px solid rgba(255,255,255,0.35);
-  animation: ping 2.8s ease-out infinite;
+  animation: ping 4.5s ease-out infinite;
   pointer-events: none;
 }
 .hotspot:hover { background: rgba(201,162,75,0.55); border-color: rgba(255,255,255,0.9); }
-@keyframes ping { 0%{ transform: scale(0.7); opacity: 0.9 } 100%{ transform: scale(1.7); opacity: 0 } }
+/* Ping con pausa explícita entre latidos: el aro se expande y se desvanece
+   en los primeros ~2s (0-45%), después se queda invisible hasta que arranca
+   el próximo ciclo. Antes iba de 0% a 100% sin descanso y se leía como un
+   latido acelerado. */
+@keyframes ping {
+  0%   { transform: scale(0.7); opacity: 0.9 }
+  45%  { transform: scale(1.6); opacity: 0 }
+  100% { transform: scale(1.6); opacity: 0 }
+}
+/* Respetá la preferencia del sistema — si el usuario tiene animaciones
+   reducidas (o apagadas en Windows), el aro queda estático. */
+@media (prefers-reduced-motion: reduce) {
+  .hotspot::after { animation: none; }
+}
 .hotspot:hover { background: var(--brass); }
 .hotspot-label {
   position: absolute; left: 50%; bottom: calc(100% + 10px);
