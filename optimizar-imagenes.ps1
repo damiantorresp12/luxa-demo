@@ -37,6 +37,18 @@ $backupDir = Join-Path $root 'assets\_originales'
 $jpegCodec = [System.Drawing.Imaging.ImageCodecInfo]::GetImageEncoders() |
              Where-Object { $_.MimeType -eq 'image/jpeg' }
 
+function Medir-Pixeles {
+  param([string]$Ruta)
+  try {
+    $b  = [IO.File]::ReadAllBytes($Ruta)
+    $ms = New-Object IO.MemoryStream(,$b)
+    $im = [System.Drawing.Image]::FromStream($ms)
+    $n  = $im.Width * $im.Height
+    $im.Dispose(); $ms.Dispose()
+    return $n
+  } catch { return 0 }
+}
+
 function Optimizar {
   param([string]$Ruta, [int]$MaxLado, [int]$Calidad, [bool]$SoloSimular)
 
@@ -98,10 +110,14 @@ function Optimizar {
   $rel     = $info.FullName.Substring((Join-Path $root 'assets').Length + 1)
   $destino = Join-Path $backupDir $rel
   New-Item -ItemType Directory -Force (Split-Path $destino -Parent) | Out-Null
-  # Nunca pisar un respaldo que ya existe: ese es el original de verdad, y la
-  # copia que estamos reemplazando ya paso por aca alguna vez.
-  if (Test-Path $destino) { Remove-Item $info.FullName -Force }
-  else                    { Move-Item $info.FullName $destino }
+  # Como original se guarda el de MAS pixeles. Sin este cuidado pasaba una de
+  # dos: o se pisaba el original grande con una copia ya achicada, o al volver
+  # a exportar la misma foto en mejor resolucion se tiraba la version buena.
+  # Gana la que mas detalle tiene.
+  $guardar = $true
+  if (Test-Path $destino) { $guardar = ($w * $h) -gt (Medir-Pixeles $destino) }
+  if ($guardar) { Move-Item $info.FullName $destino -Force }
+  else          { Remove-Item $info.FullName -Force }
   Move-Item $tmp $info.FullName -Force
   $resultado.Aplicado = $true
   return $resultado
