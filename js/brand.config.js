@@ -74,8 +74,8 @@ window.BRAND = {
     whatsapp: '5491160029154',
 
     /* Dirección completa de las redes. Dejá '' para que el ícono no aparezca. */
-    facebook:  '',
-    instagram: ''
+    linkedin:  'https://www.linkedin.com/company/tdrender/',
+    instagram: 'https://www.instagram.com/td.render/'
   }
 
 };

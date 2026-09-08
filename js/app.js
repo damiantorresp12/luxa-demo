@@ -566,12 +566,12 @@
 
   function initSidebarSocial() {
     var c = (DATA.brand && DATA.brand.contact) || {};
-    var fb = $('#socialFacebook');
+    var li = $('#socialLinkedin');
     var ig = $('#socialInstagram');
     var wa = $('#socialWhatsapp');
-    if (fb) {
-      if (c.facebook) { fb.href = c.facebook; fb.hidden = false; }
-      else { fb.hidden = true; }
+    if (li) {
+      if (c.linkedin) { li.href = c.linkedin; li.hidden = false; }
+      else { li.hidden = true; }
     }
     if (ig) {
       if (c.instagram) { ig.href = c.instagram; ig.hidden = false; }
