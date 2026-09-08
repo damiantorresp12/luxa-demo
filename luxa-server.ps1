@@ -1,5 +1,38 @@
 param([int]$Port = 8080)
 
+# =============================================================================
+# Apagar el "modo seleccion rapida" de la ventana
+#
+# Windows trae las consolas con QuickEdit prendido: alcanza UN CLIC adentro de
+# esta ventana para que Windows PAUSE el proceso hasta que se apriete Esc o
+# Enter. El servidor queda vivo — la ventana sigue diciendo que esta activo —
+# pero no atiende a nadie: el navegador se queda cargando para siempre y parece
+# que se cayo. Como no hay ningun error a la vista, la unica salida obvia es
+# cerrar la ventana y volver a abrirla.
+#
+# Es la causa mas comun de "se me colgo el servidor y lo tuve que reiniciar".
+# Se apaga aca. Si algo falla, se sigue igual: el servidor arranca lo mismo.
+# =============================================================================
+try {
+  Add-Type -Namespace Consola -Name Nativo -ErrorAction Stop -MemberDefinition @'
+    [DllImport("kernel32.dll", SetLastError = true)]
+    public static extern IntPtr GetStdHandle(int nStdHandle);
+    [DllImport("kernel32.dll", SetLastError = true)]
+    public static extern bool GetConsoleMode(IntPtr hConsoleHandle, out uint lpMode);
+    [DllImport("kernel32.dll", SetLastError = true)]
+    public static extern bool SetConsoleMode(IntPtr hConsoleHandle, uint dwMode);
+'@
+  $STD_INPUT      = -10
+  $QUICK_EDIT     = 0x0040
+  $EXTENDED_FLAGS = 0x0080
+  $h = [Consola.Nativo]::GetStdHandle($STD_INPUT)
+  $modo = 0
+  if ([Consola.Nativo]::GetConsoleMode($h, [ref]$modo)) {
+    $nuevo = ($modo -band (-bnot $QUICK_EDIT)) -bor $EXTENDED_FLAGS
+    [void][Consola.Nativo]::SetConsoleMode($h, $nuevo)
+  }
+} catch { }
+
 $root   = $PSScriptRoot
 $prefix = "http://localhost:$Port/"
 
