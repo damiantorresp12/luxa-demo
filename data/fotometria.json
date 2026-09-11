@@ -1,0 +1,12 @@
+{
+  "_readme": "Qué archivo fotométrico (IES) corresponde a cada producto. Lo lee la ficha de producto de la app para la sección Fotometría: curva, datos y descarga. Cuando un producto tiene IES, la potencia y el flujo de la ficha salen de este archivo, que es el dato del fabricante. No lo toca el Product Data Generator.",
+  "productos": {
+    "bitpop-downlight": {
+      "ies": "assets/ies/bitpop_c_2.2_ies/bitpop_c_2.2_ies/BITPOP C 2.2 F 30° [3000K 18W 230Vac].IES",
+      "fabricante": "Luce&Light",
+      "mostrarFabricante": false,
+      "_nota": "En la demo LUXA el producto figura con marca propia: la ficha dice 'del fabricante' sin nombrarlo. En el showroom de un cliente real el fabricante es el cliente y se puede mostrar.",
+      "version": { "es": "óptica 30° · 3000K", "en": "30° optic · 3000K" }
+    }
+  }
+}

@@ -1176,6 +1176,7 @@
       '<p class="detail-code">' + p.code + '</p>' +
       '<p class="detail-desc">' + tx(p.description) + '</p>' +
       '<div class="spec-table">' + rows + '</div>' +
+      '<section class="detail-photometry" data-pid="' + p.id + '" hidden></section>' +
       '<div class="detail-actions">' +
         (quoteUrlForProduct(p)
           ? '<a class="btn btn-primary detail-quote" href="' + quoteUrlForProduct(p) + '" target="_blank" rel="noopener noreferrer">' +
@@ -1193,6 +1194,8 @@
         '<button class="btn btn-ghost detail-fav" data-action="fav">' +
           (isFav(p.id) ? t('detail.saved') : t('detail.favorite')) + '</button>' +
       '</div>';
+
+    renderPhotometry($('#detailBody'), p);
 
     var viewSpaceBtn = $('[data-action="view-space"]', $('#detailBody'));
     if (viewSpaceBtn) viewSpaceBtn.addEventListener('click', function () {
@@ -1555,6 +1558,270 @@
     panels.style.scrollBehavior = prev;
   }
 
+  /* =============================================================================
+     Mapa de luz — capa opcional por escena. Las imágenes y los números los genera
+     la herramienta interna /mapa-de-luz/ a partir de la fotometría real (IES) de
+     cada luminaria, y los anota en data/mapas-de-luz.json (clave = foto principal
+     de la escena). La app no calcula nada: muestra la imagen de la óptica elegida
+     con un fundido, la tarjeta con los números y la línea de especificación.
+     Ese índice no lo toca el Space Planner, así que publicar escenas no lo borra.
+     ========================================================================== */
+  var LIGHT_MAP_COLORS = ['#0d1846', '#1c3aa8', '#1f7bd6', '#23b3c4', '#2fbf86', '#58c24a',
+                          '#9fcf3c', '#d7d839', '#f2c233', '#f28a2e', '#e5472d', '#b3164f'];
+  var lightMapsIndex = null;
+  function getLightMaps(cb) {
+    if (!lightMapsIndex) {
+      lightMapsIndex = fetch('data/mapas-de-luz.json', { cache: 'no-store' })
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .catch(function () { return null; });
+    }
+    lightMapsIndex.then(function (idx) { cb((idx && idx.escenas) || {}); });
+  }
+
+  function fmtNum(n, dec) {
+    return Number(n).toLocaleString(lang === 'en' ? 'en-US' : 'es-AR',
+      { minimumFractionDigits: dec || 0, maximumFractionDigits: dec || 0 });
+  }
+
+  function addLightMap(section, stage, lm) {
+    var opticas = lm.opticas || [];
+    if (!opticas.length) return;
+    var actual = opticas.filter(function (o) { return o.id === lm.inicial; })[0] || opticas[0];
+
+    // Una capa por óptica, apiladas: cambiar de óptica es un fundido entre capas,
+    // sin cambiar el src de una imagen visible (eso daría un parpadeo).
+    var capas = {};
+    opticas.forEach(function (o) {
+      var img = document.createElement('img');
+      img.className = 'space-stage-img space-stage-img-map';
+      img.src = uri(o.imagen);
+      img.alt = '';
+      img.setAttribute('aria-hidden', 'true');
+      stage.appendChild(img);
+      capas[o.id] = img;
+    });
+    stage.classList.add('has-light-map');
+    stage.dataset.mapa = 'off';
+
+    var card = el('div', 'light-map-card');
+    card.setAttribute('aria-hidden', 'true');
+    stage.appendChild(card);
+
+    var btn = document.createElement('button');
+    btn.className = 'space-map-toggle';
+    btn.type = 'button';
+    btn.setAttribute('aria-pressed', 'false');
+    btn.innerHTML =
+      '<span class="map-swatch" aria-hidden="true"><i></i><i></i><i></i></span>' +
+      '<span class="map-label">' + t('lightMap.toggle') + '</span>';
+    stage.appendChild(btn);
+
+    var selector = null;
+    if (opticas.length > 1) {
+      selector = el('div', 'light-map-optics');
+      selector.setAttribute('role', 'group');
+      selector.setAttribute('aria-label', t('lightMap.optic'));
+      selector.innerHTML = opticas.map(function (o) {
+        return '<button type="button" data-optica="' + o.id + '">' + tx(o.nombre) + '</button>';
+      }).join('');
+      stage.appendChild(selector);
+    }
+
+    // Línea de especificación en el panel de la escena (se ve siempre)
+    var spec = el('div', 'space-spec');
+    var info = section.querySelector('.space-info');
+    var antes = info && info.querySelector('.space-products-label');
+    if (info) info.insertBefore(spec, antes || null);
+
+    // Cambio de óptica sin parpadeo: la capa anterior queda fija debajo (is-prev)
+    // mientras la nueva aparece encima; recién cuando la nueva ya cubre todo, la
+    // anterior se apaga. Si las dos fundieran a la vez, a mitad de camino se vería
+    // el render de abajo (con los muebles). Mismo arreglo que el switch de luces.
+    var soltarAnterior = null;
+    function activarCapa(id, desdeId) {
+      clearTimeout(soltarAnterior);
+      Object.keys(capas).forEach(function (k) {
+        capas[k].classList.toggle('is-active', k === id);
+        capas[k].classList.toggle('is-prev', k === desdeId && k !== id);
+      });
+      if (desdeId && desdeId !== id) {
+        soltarAnterior = setTimeout(function () { capas[desdeId].classList.remove('is-prev'); }, 700);
+      }
+    }
+    activarCapa(actual.id);
+
+    function pintar() {
+      if (selector) $$('button', selector).forEach(function (b) {
+        var on = b.dataset.optica === actual.id;
+        b.classList.toggle('is-active', on);
+        b.setAttribute('aria-pressed', String(on));
+      });
+
+      // La referencia (ej. 500 lx) se mide a la altura de trabajo. Si el mapa es del
+      // piso, la comparación usa los números de esa altura (actual.trabajo), no los del piso.
+      var ref = lm.referencia, tr = actual.trabajo;
+      var comparado = tr ? tr.promedio : actual.promedio;
+      var pct = ref ? Math.round(comparado / ref.lux * 100) : null;
+      // "a 0,75 m" solo se ve en celular: en computadora ya lo dice la línea de arriba.
+      var refTexto = ref && (t('lightMap.ofRef', { pct: pct, lux: fmtNum(ref.lux) }) +
+        (tr ? '<span class="ref-at"> ' + t('lightMap.at', { h: fmtNum(tr.altura, 2) }) + '</span>' : ''));
+      card.innerHTML =
+        (lm.superficie ? '<p class="light-map-surface">' + tx(lm.superficie) + '</p>' : '') +
+        '<p class="light-map-value"><b>' + fmtNum(actual.promedio) + '</b> ' + t('lightMap.average') + '</p>' +
+        '<div class="light-map-stats">' +
+          '<span>' + t('lightMap.min') + '<b>' + fmtNum(actual.minimo) + '</b></span>' +
+          '<span>' + t('lightMap.max') + '<b>' + fmtNum(actual.maximo) + '</b></span>' +
+          '<span>' + t('lightMap.even') + '<b>' + fmtNum(actual.uniformidad, 2) + '</b></span>' +
+        '</div>' +
+        (tr ? '<p class="light-map-work">' + t('lightMap.workLine', { h: fmtNum(tr.altura, 2), v: fmtNum(tr.promedio) }) + '</p>' : '') +
+        (ref
+          ? '<div class="light-map-bar"><i style="width:' + Math.min(100, pct) + '%"></i></div>' +
+            '<p class="light-map-ref"><span class="ref-pct">' + refTexto + '</span>' +
+              '<span class="ref-name"> · ' + tx(ref.nombre) + '</span></p>'
+          : '') +
+        '<div class="light-map-scale">' + LIGHT_MAP_COLORS.map(function (c) { return '<i style="background:' + c + '"></i>'; }).join('') + '</div>' +
+        '<div class="light-map-scale-labels"><span>' + t('lightMap.low') + '</span><span>' + t('lightMap.high') + '</span></div>' +
+        '<p class="light-map-note">' + t('lightMap.note') + '</p>';
+
+      var p = lm.producto || {};
+      var n = p.cantidad || 1;
+      var partes = [n + ' × ' + (p.nombre || ''), tx(actual.nombre), actual.cct];
+      if (actual.watts) partes.push(t('lightMap.totalW', { w: fmtNum(actual.watts * n) }));
+      if (actual.lumenes) partes.push(fmtNum(actual.lumenes * n) + ' lm');
+      spec.innerHTML =
+        '<span class="space-spec-label">' + t('lightMap.spec') + '</span>' +
+        '<span class="space-spec-val">' + partes.filter(Boolean).join(' · ') + '</span>';
+    }
+    pintar();
+
+    btn.addEventListener('click', function () {
+      var on = stage.dataset.mapa !== 'on';
+      stage.dataset.mapa = on ? 'on' : 'off';
+      btn.setAttribute('aria-pressed', String(on));
+      card.setAttribute('aria-hidden', String(!on));
+    });
+    if (selector) selector.addEventListener('click', function (ev) {
+      var b = ev.target.closest('button[data-optica]');
+      if (!b || b.dataset.optica === actual.id) return;
+      var desde = actual.id;
+      actual = opticas.filter(function (o) { return o.id === b.dataset.optica; })[0] || actual;
+      activarCapa(actual.id, desde);
+      pintar();
+    });
+  }
+
+  /* =============================================================================
+     Fotometría en la ficha de producto. data/fotometria.json dice qué archivo IES
+     corresponde a cada producto; js/ies.js lo lee. Con eso se dibuja la curva,
+     se muestran los datos del fabricante y se ofrece la descarga del archivo.
+     La potencia y el flujo de la tabla de la ficha se reemplazan por los del IES:
+     el archivo del fabricante manda sobre lo cargado a mano.
+     ========================================================================== */
+  var photometryIndex = null;
+  var photometryCache = {};
+  function getPhotometry(productId, cb) {
+    if (!photometryIndex) {
+      photometryIndex = fetch('data/fotometria.json', { cache: 'no-store' })
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .catch(function () { return null; });
+    }
+    photometryIndex.then(function (idx) {
+      var entry = idx && idx.productos && idx.productos[productId];
+      if (!entry || !entry.ies || !window.IES) return cb(null);
+      if (!photometryCache[entry.ies]) {
+        photometryCache[entry.ies] = fetch(uri(entry.ies))
+          .then(function (r) { return r.ok ? r.text() : null; })
+          .then(function (txt) {
+            if (!txt) return null;
+            var ies = window.IES.parse(txt);
+            return { ies: ies, datos: window.IES.datos(ies) };
+          })
+          .catch(function () { return null; });
+      }
+      photometryCache[entry.ies].then(function (res) {
+        cb(res ? { entry: entry, ies: res.ies, datos: res.datos } : null);
+      });
+    });
+  }
+
+  // Curva de distribución (C0–C180 y C90–C270) en cd/klm, como en las fichas técnicas.
+  function photometrySvg(ies, d) {
+    var aKlm = 1000 / d.lumenesCalculados, max = 0;
+    for (var g = 0; g <= 180; g += 2) {
+      [0, 90, 180, 270].forEach(function (c) { max = Math.max(max, window.IES.intensidad(ies, c, g) * aKlm); });
+    }
+    var pasos = [50, 100, 200, 250, 500, 1000, 2000, 2500, 5000, 10000, 20000];
+    var anillo = pasos.filter(function (p) { return p * 4 >= max; })[0] || Math.ceil(max / 4);
+    var tope = anillo * 4, cx = 110, cy = 110, R = 92;
+    function curva(C) {
+      var pts = [];
+      for (var a = -180; a <= 180; a += 2) {
+        var plano = a < 0 ? C + 180 : C;
+        var r = window.IES.intensidad(ies, plano, Math.abs(a)) * aKlm / tope * R;
+        var ang = a * Math.PI / 180;
+        pts.push((cx + r * Math.sin(ang)).toFixed(1) + ',' + (cy + r * Math.cos(ang)).toFixed(1));
+      }
+      return 'M' + pts.join('L') + 'Z';
+    }
+    var aros = '', etiquetas = '';
+    for (var k = 1; k <= 4; k++) {
+      aros += '<circle cx="' + cx + '" cy="' + cy + '" r="' + (R * k / 4) + '"/>';
+      etiquetas += '<text x="' + (cx + 4) + '" y="' + (cy - R * k / 4 + 9) + '">' + fmtNum(anillo * k) + '</text>';
+    }
+    return '<svg class="photometry-svg" viewBox="0 0 220 220" role="img" aria-label="' + t('photometry.title') + '">' +
+      '<g class="grid">' + aros + '<line x1="' + (cx - R) + '" y1="' + cy + '" x2="' + (cx + R) + '" y2="' + cy + '"/>' +
+        '<line x1="' + cx + '" y1="' + (cy - R) + '" x2="' + cx + '" y2="' + (cy + R) + '"/></g>' +
+      '<g class="labels">' + etiquetas + '<text x="' + (cx + R - 2) + '" y="' + (cy - R + 8) + '" text-anchor="end">cd/klm</text></g>' +
+      '<path class="c90" d="' + curva(90) + '"/>' +
+      '<path class="c0" d="' + curva(0) + '"/>' +
+    '</svg>';
+  }
+
+  function renderPhotometry(body, p) {
+    var box = $('.detail-photometry', body);
+    if (!box) return;
+    getPhotometry(p.id, function (ph) {
+      // La ficha pudo cambiar de producto mientras llegaba el archivo
+      if (!ph || !box.isConnected || box.dataset.pid !== p.id) return;
+      var d = ph.datos;
+      var apertura = d.simetrica ? fmtNum(d.aperturaC0) + '°' : fmtNum(d.aperturaC0) + '° × ' + fmtNum(d.aperturaC90) + '°';
+      var filas = [
+        [t('photometry.lumens'),   fmtNum(d.lumenes) + ' lm'],
+        [t('photometry.power'),    d.watts ? fmtNum(d.watts) + ' W' : ''],
+        [t('photometry.efficacy'), d.eficiencia ? fmtNum(d.eficiencia) + ' lm/W' : ''],
+        [t('photometry.beam'),     apertura],
+        [t('photometry.peak'),     fmtNum(d.pico) + ' cd'],
+        [t('photometry.down'),     fmtNum(d.fraccionAbajo * 100) + ' %']
+      ].filter(function (r) { return r[1]; }).map(function (r) {
+        return '<div class="spec-row"><span class="spec-key">' + r[0] + '</span><span class="spec-val">' + r[1] + '</span></div>';
+      }).join('');
+      box.innerHTML =
+        '<h3 class="photometry-title">' + t('photometry.title') + '</h3>' +
+        // El nombre del fabricante se muestra salvo que la ficha diga lo contrario
+        // (en la demo LUXA el producto figura con marca propia: ahí va genérico).
+        '<p class="photometry-source">' +
+          (ph.entry.fabricante && ph.entry.mostrarFabricante !== false
+            ? t('photometry.source', { maker: ph.entry.fabricante })
+            : t('photometry.sourceGeneric')) +
+          (ph.entry.version ? ' · ' + tx(ph.entry.version) : '') + '</p>' +
+        '<div class="photometry-grid">' +
+          '<div class="photometry-curve">' + photometrySvg(ph.ies, d) +
+            '<div class="photometry-legend"><span class="c0">C0–C180</span><span class="c90">C90–C270</span></div></div>' +
+          '<div class="spec-table photometry-specs">' + filas + '</div>' +
+        '</div>' +
+        '<a class="btn btn-ghost photometry-download" href="' + uri(ph.entry.ies) + '" download>' + t('photometry.download') + '</a>';
+      box.hidden = false;
+
+      // Potencia y flujo de la tabla principal: los del archivo del fabricante
+      $$('.spec-table:not(.photometry-specs) .spec-row', body).forEach(function (row) {
+        var key = $('.spec-key', row), val = $('.spec-val', row);
+        if (!key || !val) return;
+        if (key.textContent === t('detail.power') && d.watts) val.textContent = fmtNum(d.watts) + ' W';
+        if (key.textContent === t('detail.output')) val.textContent = fmtNum(d.lumenes) + ' lm';
+      });
+    });
+  }
+
   /* Una "tarjeta" completa de un ambiente: stage con hotspots + sidebar con
      descripción y "Destacados en este ambiente". Es el bloque que se repite
      verticalmente cuando hay varias escenas del tipo elegido. */
@@ -1577,6 +1844,13 @@
     // se inyecta una segunda imagen encima y el toggle crossfadea entre las dos
     // vía CSS. Sin la segunda capa, el swap de src daría un flash brusco.
     stage.innerHTML = (bg ? '<img class="space-stage-img space-stage-img-on" src="' + uri(bg) + '" alt="' + tx(sp.name) + '" />' : '') + hotspotsHtml;
+
+    // Mapa de luz: si la escena figura en data/mapas-de-luz.json, se suman sus
+    // capas encima del render, con botón, selector de óptica y especificación.
+    // Llega asíncrono, así que para entonces el panel de la escena ya existe.
+    if (bg) getLightMaps(function (mapas) {
+      if (mapas[bg]) addLightMap(section, stage, mapas[bg]);
+    });
 
     // If the scene ships an "off" variant of its main image, surface a small
     // lights toggle in the corner of the stage. When the user flips it off,

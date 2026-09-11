@@ -1,0 +1,119 @@
+{
+  "_readme": "Mapas de luz de las escenas de Ambientes. Lo escribe la herramienta interna /mapa-de-luz/ con \"Guardar para la app\"; no editar a mano. La clave es la foto principal de la escena.",
+  "escenas": {
+    "assets/Spaces/Office 03/Office 03.jpeg": {
+      "generado": "2026-09-11T20:28:07.066Z",
+      "superficie": {
+        "es": "Sobre el piso",
+        "en": "On the floor"
+      },
+      "referencia": {
+        "lux": 500,
+        "nombre": {
+          "es": "Recomendado en salas de reunión",
+          "en": "Recommended for meeting rooms"
+        }
+      },
+      "producto": {
+        "id": "bitpop-downlight",
+        "nombre": "Bitpop C 2.2",
+        "cantidad": 3
+      },
+      "inicial": "30",
+      "opticas": [
+        {
+          "id": "17",
+          "nombre": {
+            "es": "17°",
+            "en": "17°"
+          },
+          "imagen": "assets/Spaces/Office 03/Office 03 mapa piso 17.jpeg",
+          "cct": "2700K",
+          "lumenes": 996,
+          "watts": 18,
+          "apertura": "17°",
+          "promedio": 102,
+          "minimo": 7,
+          "maximo": 805,
+          "uniformidad": 0.07,
+          "trabajo": {
+            "altura": 0.75,
+            "promedio": 102,
+            "minimo": 6,
+            "maximo": 1425,
+            "uniformidad": 0.06
+          }
+        },
+        {
+          "id": "30",
+          "nombre": {
+            "es": "30°",
+            "en": "30°"
+          },
+          "imagen": "assets/Spaces/Office 03/Office 03 mapa piso 30.jpeg",
+          "cct": "2700K",
+          "lumenes": 930,
+          "watts": 18,
+          "apertura": "31°",
+          "promedio": 94,
+          "minimo": 6,
+          "maximo": 336,
+          "uniformidad": 0.07,
+          "trabajo": {
+            "altura": 0.75,
+            "promedio": 96,
+            "minimo": 6,
+            "maximo": 591,
+            "uniformidad": 0.06
+          }
+        },
+        {
+          "id": "42",
+          "nombre": {
+            "es": "42°",
+            "en": "42°"
+          },
+          "imagen": "assets/Spaces/Office 03/Office 03 mapa piso 42.jpeg",
+          "cct": "2700K",
+          "lumenes": 938,
+          "watts": 18,
+          "apertura": "42°",
+          "promedio": 81,
+          "minimo": 13,
+          "maximo": 176,
+          "uniformidad": 0.17,
+          "trabajo": {
+            "altura": 0.75,
+            "promedio": 89,
+            "minimo": 9,
+            "maximo": 279,
+            "uniformidad": 0.1
+          }
+        },
+        {
+          "id": "oval",
+          "nombre": {
+            "es": "Oval",
+            "en": "Oval"
+          },
+          "imagen": "assets/Spaces/Office 03/Office 03 mapa piso oval.jpeg",
+          "cct": "2700K",
+          "lumenes": 980,
+          "watts": 18,
+          "apertura": "45° × 17°",
+          "promedio": 94,
+          "minimo": 7,
+          "maximo": 382,
+          "uniformidad": 0.07,
+          "trabajo": {
+            "altura": 0.75,
+            "promedio": 99,
+            "minimo": 6,
+            "maximo": 673,
+            "uniformidad": 0.07
+          }
+        }
+      ]
+    }
+  }
+}

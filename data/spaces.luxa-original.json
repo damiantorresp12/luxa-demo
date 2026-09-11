@@ -510,6 +510,33 @@
       ]
     },
     {
+      "id": "office-bitpop-mapa-de-luz",
+      "name": {
+        "es": "Colección Oficina Bitpop",
+        "en": "Office Bitpop Collection"
+      },
+      "tagline": {
+        "es": "Sala de reuniones con la luz calculada",
+        "en": "Meeting room with calculated lighting"
+      },
+      "description": {
+        "es": "Una sala de reuniones iluminada con tres downlights Bitpop. Activá el mapa de luz para ver cómo se reparte la luz en el espacio, calculada con la fotometría real de la luminaria, y probá las distintas ópticas.",
+        "en": "A meeting room lit by three Bitpop downlights. Turn on the light map to see how the light spreads across the space, calculated from the luminaire's real photometry, and try the different optics."
+      },
+      "image": "assets/Spaces/Office 03/Office 03.jpeg",
+      "gallery": [
+        "assets/Spaces/Office 03/Office 03.jpeg"
+      ],
+      "heroProduct": "bitpop-downlight",
+      "hotspots": [
+        {
+          "productId": "bitpop-downlight",
+          "x": 50,
+          "y": 27
+        }
+      ]
+    },
+    {
       "id": "bedroom-bedroom-bitpop-flat-collection-manual-28",
       "name": {
         "es": "Colección Dormitorio bitpop & Flat",

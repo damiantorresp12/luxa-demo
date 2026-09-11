@@ -1767,6 +1767,35 @@ svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width:
 .detail-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 28px; }
 .detail-actions .btn { flex: 1 1 auto; padding: 0.85em 1.3em; }
 
+/* Fotometría — sección de la ficha, solo en productos con archivo IES
+   (data/fotometria.json). Curva a la izquierda, datos a la derecha. */
+.detail-photometry { margin-top: 26px; }
+.detail-photometry[hidden] { display: none; }
+.photometry-title {
+  margin: 0;
+  font-size: 0.66rem; font-weight: 500;
+  letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--brass);
+}
+.photometry-source { margin: 4px 0 12px; font-size: 0.78rem; color: var(--ink-faint); }
+.photometry-grid { display: grid; grid-template-columns: 190px minmax(0, 1fr); gap: 18px; align-items: center; }
+.photometry-curve { min-width: 0; }
+.photometry-svg { display: block; width: 100%; height: auto; }
+.photometry-svg .grid { fill: none; stroke: rgba(255,255,255,0.12); stroke-width: 1; }
+.photometry-svg .labels { fill: var(--ink-faint); font-size: 8px; font-family: inherit; }
+.photometry-svg .c0 { fill: rgba(201,162,75,0.16); stroke: var(--brass); stroke-width: 1.6; stroke-linejoin: round; }
+.photometry-svg .c90 { fill: none; stroke: #7fb4e6; stroke-width: 1.3; stroke-dasharray: 4 3; }
+.photometry-legend { display: flex; justify-content: center; gap: 14px; margin-top: 4px; font-size: 0.66rem; color: var(--ink-faint); }
+.photometry-legend span::before { content: ''; display: inline-block; width: 14px; margin-right: 5px; vertical-align: middle; }
+.photometry-legend .c0::before { border-top: 2px solid var(--brass); }
+.photometry-legend .c90::before { border-top: 2px dashed #7fb4e6; }
+.photometry-specs .spec-row { padding: 8px 0; }
+.photometry-download { display: inline-flex; margin-top: 14px; padding: 0.7em 1.2em; }
+@media (max-width: 560px) {
+  .photometry-grid { grid-template-columns: 1fr; }
+  .photometry-curve { max-width: 220px; margin: 0 auto; }
+}
+
 /* =============================================================================
    PANEL: SPACES — interactive module with tabs
    ========================================================================== */
@@ -2144,6 +2173,178 @@ svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width:
   .space-lights-toggle .lights-icon { width: 14px; height: 14px; }
 }
 
+/* Mapa de luz — capa opcional con los lux calculados (sp.lightMap). Va encima
+   del render y aparece con un fundido; el botón vive arriba a la izquierda para
+   no chocar con el de Luz ON/OFF, que está a la derecha. */
+.space-stage.has-light-map .space-stage-img-map {
+  position: absolute; inset: 0;
+  z-index: 2;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.55s var(--ease);
+}
+/* Hay una capa por óptica; se ve solo la elegida (.is-active) y cambiar de óptica
+   es un fundido entre capas. */
+.space-stage[data-mapa="on"] .space-stage-img-map.is-active { opacity: 1; z-index: 3; }
+/* La óptica anterior queda fija debajo mientras la nueva aparece (ver activarCapa en app.js) */
+.space-stage[data-mapa="on"] .space-stage-img-map.is-prev { opacity: 1; transition: none; }
+.space-stage[data-mapa="on"] .hotspot { opacity: 0; pointer-events: none; }
+
+/* Selector de óptica: debajo del botón, solo con el mapa prendido */
+.light-map-optics {
+  position: absolute;
+  top: 60px; left: 16px;
+  z-index: 5;
+  display: flex; gap: 2px;
+  padding: 3px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(8,8,10,0.62);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-4px);
+  transition: opacity 0.35s var(--ease), transform 0.35s var(--ease);
+}
+.space-stage[data-mapa="on"] .light-map-optics { opacity: 1; pointer-events: auto; transform: none; }
+.light-map-optics button {
+  border: 0; border-radius: 999px;
+  background: transparent;
+  color: var(--ink-dim);
+  font-family: inherit; font-size: 0.7rem; font-weight: 500;
+  padding: 5px 11px;
+  cursor: pointer;
+  transition: background 0.2s var(--ease), color 0.2s var(--ease);
+}
+.light-map-optics button:hover { color: var(--ink); }
+.light-map-optics button.is-active { background: var(--brass); color: #16120a; }
+
+/* Línea de especificación en el panel de la escena */
+.space-spec {
+  margin: 4px 0 18px;
+  padding: 10px 12px;
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius);
+  display: flex; flex-direction: column; gap: 2px;
+}
+.space-spec-label { font-size: 0.62rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-faint); }
+.space-spec-val { font-size: 0.85rem; color: var(--ink); line-height: 1.45; }
+
+.space-map-toggle {
+  position: absolute;
+  top: 16px; left: 16px;
+  z-index: 5;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 36px;
+  padding: 0 14px 0 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.18);
+  background: rgba(8,8,10,0.55);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: var(--ink);
+  font-family: inherit;
+  font-size: 0.66rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.25s var(--ease), border-color 0.25s var(--ease);
+}
+.space-map-toggle:hover,
+.space-map-toggle:focus-visible {
+  border-color: rgba(201,162,75,0.7);
+  background: rgba(8,8,10,0.75);
+  outline: none;
+}
+.space-map-toggle[aria-pressed="true"] {
+  border-color: rgba(201,162,75,0.9);
+  background: rgba(201,162,75,0.22);
+}
+.space-map-toggle .map-swatch { display: inline-flex; width: 18px; height: 10px; border-radius: 2px; overflow: hidden; opacity: 0.85; }
+.space-map-toggle .map-swatch i { flex: 1; }
+.space-map-toggle .map-swatch i:nth-child(1) { background: #1f7bd6; }
+.space-map-toggle .map-swatch i:nth-child(2) { background: #9fcf3c; }
+.space-map-toggle .map-swatch i:nth-child(3) { background: #f28a2e; }
+
+/* Arriba a la derecha: en los renders esa zona es techo vacío, y abajo está la
+   superficie pintada (piso o mesa), que es justo lo que no hay que tapar. Si la
+   escena tiene el botón Luz ON/OFF, la tarjeta se corre debajo de él. */
+.light-map-card {
+  position: absolute;
+  right: 16px; top: 16px;
+  z-index: 4;
+  width: 210px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(8,8,10,0.72);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: var(--ink);
+  opacity: 0;
+  transform: translateY(6px);
+  pointer-events: none;
+  transition: opacity 0.45s var(--ease), transform 0.45s var(--ease);
+}
+.space-stage.has-off-variant .light-map-card { top: 62px; }
+.space-stage[data-mapa="on"] .light-map-card { opacity: 1; transform: none; }
+.light-map-card p { margin: 0; }
+.light-map-surface { font-size: 0.62rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-dim); }
+.light-map-value { margin-top: 2px !important; font-size: 0.8rem; color: var(--ink-dim); }
+.light-map-value b { font-size: 1.7rem; font-weight: 500; color: var(--brass); margin-right: 2px; }
+.light-map-ref { margin-top: 2px !important; font-size: 0.68rem; color: var(--ink-dim); line-height: 1.35; }
+.light-map-ref .ref-at { display: none; }
+.light-map-work { margin-top: 9px !important; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.1); font-size: 0.68rem; color: var(--ink); line-height: 1.35; }
+.light-map-bar { height: 5px; margin-top: 7px; border-radius: 3px; background: rgba(255,255,255,0.12); overflow: hidden; }
+.light-map-bar i { display: block; height: 100%; border-radius: 3px; background: var(--brass); transition: width 0.45s var(--ease); }
+.light-map-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; margin-top: 8px; font-size: 0.62rem; color: var(--ink-faint); }
+.light-map-stats b { display: block; font-size: 0.85rem; font-weight: 500; color: var(--ink); }
+.light-map-scale { display: flex; height: 7px; border-radius: 2px; overflow: hidden; margin-top: 10px; }
+.light-map-scale i { flex: 1; }
+.light-map-scale-labels { display: flex; justify-content: space-between; font-size: 0.62rem; color: var(--ink-faint); margin-top: 3px; }
+.light-map-note { margin-top: 8px !important; font-size: 0.62rem; line-height: 1.4; color: var(--ink-faint); }
+
+@media (max-width: 560px) {
+  .space-map-toggle {
+    height: 28px;
+    padding: 0 10px 0 6px;
+    gap: 6px;
+    font-size: 0.55rem;
+    letter-spacing: 0.12em;
+    top: 10px; left: 10px;
+  }
+  /* En celular la escena se recorta angosta y alta: la superficie pintada queda
+     en la mitad de abajo y arriba sobra techo. La tarjeta pasa a ser una franja
+     fina arriba, debajo del botón. */
+  .light-map-optics { top: 42px; left: 10px; }
+  .light-map-optics button { font-size: 0.6rem; padding: 3px 9px; }
+  /* Dos líneas: "225 lx promedio · 45 % de 500 lx" y "mín · máx · pareja".
+     El resto (barra, nombre de la referencia, escala, nota) se ve en computadora. */
+  .light-map-card,
+  .space-stage.has-off-variant .light-map-card {
+    top: 70px; bottom: auto; left: 8px; right: 8px; width: auto;
+    padding: 4px 10px;
+    display: grid; grid-template-columns: auto 1fr; column-gap: 10px; align-items: baseline;
+  }
+  .light-map-surface,
+  .light-map-work { display: none; }
+  .light-map-value { grid-column: 1; grid-row: 1; font-size: 0.68rem; margin-top: 0 !important; }
+  .light-map-value b { font-size: 1.1rem; }
+  .light-map-ref { grid-column: 2; grid-row: 1; font-size: 0.6rem; text-align: right; margin-top: 0 !important; }
+  .light-map-ref .ref-name { display: none; }
+  .light-map-ref .ref-at { display: inline; }
+  .light-map-stats { grid-column: 1 / -1; grid-row: 2; margin-top: 2px; display: flex; gap: 12px; font-size: 0.58rem; }
+  .light-map-stats b { display: inline; font-size: 0.68rem; margin-left: 3px; }
+  .light-map-bar,
+  .light-map-scale,
+  .light-map-scale-labels,
+  .light-map-note { display: none; }
+}
+
 /* Inside the close-up transition overlay: position on the top-left so it
    doesn't collide with the X button on the top-right. */
 .transition-lights-toggle {
@@ -2467,6 +2668,13 @@ svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width:
   /* Crossfade del toggle luces on/off. Sin este override el fade colapsa a
      0.01ms y el usuario ve el mismo swap brusco que tenía antes. */
   .space-stage.has-off-variant .space-stage-img { transition-duration: 0.55s !important; }
+  /* Mismo criterio para el Mapa de luz: el fundido render → mapa (y entre
+     ópticas) es el que cuenta qué cambió. Sin esto, con las animaciones de
+     Windows apagadas, el mapa aparece de golpe. */
+  .space-stage.has-light-map .space-stage-img-map { transition-duration: 0.55s !important; }
+  .light-map-card { transition-duration: 0.45s !important; }
+  .light-map-optics { transition-duration: 0.35s !important; }
+  .light-map-bar i { transition-duration: 0.45s !important; }
 }
 
 /* =============================================================================

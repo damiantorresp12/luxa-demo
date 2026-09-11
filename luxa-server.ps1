@@ -70,7 +70,7 @@ $mime = @{
 # Mini-API for the Product Data Generator
 #   GET  /__list?path=<rel>    → JSON list of files in folder (whitelisted)
 #   POST /__save?path=<rel>    → writes request body to file (whitelisted, auto-backup)
-#   POST /__upload?path=<rel>  → writes raw request body as binary file (whitelisted to assets/)
+#   POST /__upload?path=<rel>  → writes raw request body as binary file (whitelisted to assets/; &reemplazar=1 overwrites)
 #   POST /__delete?path=<rel>  → soft-deletes by moving file into a _trash/ subfolder
 # =============================================================================
 $listAllowedPrefixes   = @('assets/', 'space-planner/catalogs/', 'space-planner/')
@@ -197,8 +197,11 @@ try {
           $parentDir = Split-Path -Parent $safe
           if (-not (Test-Path $parentDir)) { New-Item -ItemType Directory -Path $parentDir -Force | Out-Null }
           # Avoid clobber: if a file with this name already exists, append _2, _3, ...
+          # Excepcion: ?reemplazar=1 pisa el archivo (lo usa el Mapa de luz, que
+          # regenera siempre la misma imagen de la escena).
           $finalPath = $safe
-          if (Test-Path $finalPath -PathType Leaf) {
+          $reemplazar = $req.QueryString['reemplazar'] -eq '1'
+          if (-not $reemplazar -and (Test-Path -LiteralPath $finalPath -PathType Leaf)) {
             $dir = Split-Path -Parent $finalPath
             $base = [System.IO.Path]::GetFileNameWithoutExtension($finalPath)
             $ext = [System.IO.Path]::GetExtension($finalPath)
@@ -274,7 +277,9 @@ try {
       if ([string]::IsNullOrEmpty($relPath)) { $relPath = 'index.html' }
       $fullPath = Join-Path $root $relPath
 
-      if (Test-Path $fullPath -PathType Container) {
+      # -LiteralPath: sin esto, un nombre con corchetes (ej. los IES "[2700K 18W]")
+      # se lee como comodin y el archivo "no existe".
+      if (Test-Path -LiteralPath $fullPath -PathType Container) {
         $fullPath = Join-Path $fullPath 'index.html'
       }
 
@@ -285,7 +290,7 @@ try {
         $res.StatusCode = 403
         $msg = [Text.Encoding]::UTF8.GetBytes("403 Forbidden")
         $res.OutputStream.Write($msg, 0, $msg.Length)
-      } elseif (Test-Path $resolved -PathType Leaf) {
+      } elseif (Test-Path -LiteralPath $resolved -PathType Leaf) {
         $ext = [System.IO.Path]::GetExtension($resolved).ToLower()
         $ct = $mime[$ext]
         if (-not $ct) { $ct = 'application/octet-stream' }

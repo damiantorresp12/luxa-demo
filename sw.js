@@ -358,6 +358,9 @@ self.addEventListener('fetch', function (evento) {
     // Las fichas de catálogo sí las necesita la app.
     if (url.pathname.indexOf('.json') === -1) return;
   }
+  // El Mapa de luz también es herramienta interna, y trabaja con renders que
+  // Damian reemplaza seguido: si se guardara copia, calcularía sobre la foto vieja.
+  if (url.pathname.indexOf('/mapa-de-luz/') !== -1) return;
 
   /* --------------------------------------------------------------------------
      LA REGLA DE FONDO — de dónde sale cada cosa

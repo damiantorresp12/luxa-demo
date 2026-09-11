@@ -27,7 +27,7 @@ while ($listener.IsListening) {
     if ($reqPath -eq '/' -or $reqPath -eq '') { $reqPath = '/index.html' }
     $full = Join-Path $root ($reqPath.TrimStart('/').Replace('/', '\'))
 
-    if (Test-Path $full -PathType Leaf) {
+    if (Test-Path -LiteralPath $full -PathType Leaf) {  # -LiteralPath: corchetes en el nombre no son comodines
       $ext = [System.IO.Path]::GetExtension($full).ToLower()
       $ct = $mime[$ext]; if (-not $ct) { $ct = 'application/octet-stream' }
       $bytes = [System.IO.File]::ReadAllBytes($full)

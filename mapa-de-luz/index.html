@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mapa de luz · TD Experience</title>
+  <link rel="stylesheet" href="css/mapa-de-luz.css" />
+</head>
+<body>
+
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark">TD EXPERIENCE</span>
+      <span class="brand-sub">Mapa de luz · prueba</span>
+    </div>
+    <div id="escena-titulo" class="escena-titulo">Cargando escena…</div>
+  </header>
+
+  <main class="layout">
+
+    <!-- Controles + resultados -->
+    <section class="panel panel-controles">
+      <div class="bloque">
+        <h2>Óptica</h2>
+        <select id="sel-ies"></select>
+        <p class="ayuda">Cambiá la óptica y el mapa se recalcula al instante.</p>
+      </div>
+
+      <div class="bloque">
+        <h2>Dónde se mide</h2>
+        <div class="segmentado" id="seg-plano">
+          <button data-plano="0.75" class="activo">Escritorio · 0,75 m</button>
+          <button data-plano="0">Piso</button>
+        </div>
+      </div>
+
+      <div class="bloque">
+        <h2>Resultado</h2>
+        <div class="kpis">
+          <div class="kpi kpi-grande"><span class="kpi-num" id="k-prom">—</span><span class="kpi-lbl">lux promedio</span></div>
+          <div class="kpi"><span class="kpi-num" id="k-min">—</span><span class="kpi-lbl">mínimo</span></div>
+          <div class="kpi"><span class="kpi-num" id="k-max">—</span><span class="kpi-lbl">máximo</span></div>
+          <div class="kpi"><span class="kpi-num" id="k-uni">—</span><span class="kpi-lbl">uniformidad</span></div>
+        </div>
+        <div class="referencia" id="referencia"></div>
+      </div>
+
+      <div class="bloque">
+        <h2>Luz que rebota <span class="tag">estimado</span></h2>
+        <label class="check"><input type="checkbox" id="chk-rebote" checked /> Sumar el rebote en techo, paredes y piso</label>
+        <div class="deslizador"><span>Techo</span><input type="range" id="r-techo" min="0.05" max="0.9" step="0.05" /><b id="v-techo"></b></div>
+        <div class="deslizador"><span>Paredes</span><input type="range" id="r-paredes" min="0.05" max="0.9" step="0.05" /><b id="v-paredes"></b></div>
+        <div class="deslizador"><span>Piso</span><input type="range" id="r-piso" min="0.05" max="0.9" step="0.05" /><b id="v-piso"></b></div>
+        <p class="ayuda" id="rebote-info"></p>
+      </div>
+
+      <div class="bloque">
+        <h2>Vista</h2>
+        <label class="check"><input type="checkbox" id="chk-numeros" checked /> Mostrar los lux en la grilla</label>
+        <label class="check"><input type="checkbox" id="chk-borde" checked /> No contar 0,5 m junto a las paredes</label>
+      </div>
+    </section>
+
+    <!-- Planta -->
+    <section class="panel panel-mapa">
+      <div class="segmentado seg-vista" id="seg-vista">
+        <button data-vista="planta" class="activo">Planta</button>
+        <button data-vista="render">Sobre el render</button>
+      </div>
+
+      <div class="mapa-wrap" id="mapa-wrap">
+        <canvas id="mapa"></canvas>
+        <div class="tooltip" id="tooltip" hidden></div>
+      </div>
+
+      <div class="render-wrap" id="render-wrap" hidden>
+        <div class="escenario">
+          <img id="compuesto-base" alt="Render de la escena" />
+          <canvas id="compuesto"></canvas>
+          <div class="switch-app" id="switch-app">
+            <button data-capa="render">Render</button>
+            <button data-capa="mapa" class="activo">Mapa de luz</button>
+          </div>
+        </div>
+        <div class="render-pie">
+          <label class="fondo">Fondo <select id="sel-fondo"></select></label>
+          <span id="compuesto-nota"></span>
+          <button class="btn-mini btn-oro" id="btn-guardar-app" hidden>Guardar para la app</button>
+          <button class="btn-mini" id="btn-descargar">Descargar imagen</button>
+        </div>
+      </div>
+
+      <div class="leyenda" id="leyenda"></div>
+    </section>
+
+    <!-- Ficha de la luminaria + render -->
+    <section class="panel panel-ficha">
+      <div class="bloque">
+        <h2>Luminaria</h2>
+        <div class="ficha-nombre" id="f-nombre">—</div>
+        <div class="ficha-fab" id="f-fab"></div>
+        <canvas id="polar" width="300" height="300"></canvas>
+        <div class="polar-leyenda"><span class="c0">C0–C180</span><span class="c90">C90–C270</span><span class="unidad">cd/klm</span></div>
+        <dl class="ficha-datos" id="f-datos"></dl>
+      </div>
+
+      <div class="bloque">
+        <h2>Render de noche</h2>
+        <img id="render" alt="Render de la escena solo con las luminarias" hidden />
+        <p class="ayuda" id="render-falta" hidden>Guardá el render de noche como <code>mapa-de-luz/escenas/oficina-prueba-noche.jpg</code> y aparece acá para comparar.</p>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="pie">
+    Valores indicativos, calculados con la fotometría publicada por el fabricante. No reemplazan un estudio lumínico.
+  </footer>
+
+  <script src="../js/ies.js"></script>
+  <script src="js/mapa-de-luz.js"></script>
+</body>
+</html>

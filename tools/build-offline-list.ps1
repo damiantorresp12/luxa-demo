@@ -33,6 +33,7 @@ $armazon = @(
   'css/fonts.css',
   'js/brand.config.js',
   'js/catalog.data.js',
+  'js/ies.js',
   'js/app.js',
   'js/compare.js',
   'js/pwa.js',
@@ -78,6 +79,8 @@ function Sumar-Carpeta {
 # descarga se corta por el medio, ya quedo guardado lo que mas se usa.
 $pesados += Sumar-Carpeta 'assets/Imagenes'     '^\.(jpe?g|png|webp)$'
 $pesados += Sumar-Carpeta 'assets/Spaces'       '^\.(jpe?g|png|webp)$'
+# Fotometrias (IES): la ficha "Fotometria" las lee para la curva y los datos.
+$pesados += Sumar-Carpeta 'assets/ies'          '^\.(ies|ldt)$'
 $pesados += Sumar-Carpeta 'assets/pdfs'         '^\.pdf$'
 $pesados += 'assets/og-preview.jpg'
 $pesados += Sumar-Carpeta 'assets/Transiciones' '^\.(mp4|webm)$'
