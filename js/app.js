@@ -1010,7 +1010,9 @@
     // initial view stays on Catálogo — the thumbs are an invitation, not a
     // redirect. If the product doesn't appear in any scene, opts stays empty
     // and the detail panel renders catalog-only as before.
-    var startsOnCatalog = false;
+    // Un hotspot puede pedir que la ficha arranque en la foto de catálogo (fondo blanco)
+    // y deje la imagen del espacio en la galería (ej. renders con la sala entera).
+    var startsOnCatalog = !!opts.startsOnCatalog;
     var contextSpaceId = opts.spaceId || null;
     if (!opts.closeUpImage && !opts.spaceImage) {
       var fromScene = findSpaceFor(id);
@@ -2099,7 +2101,7 @@
         var pid = node.dataset.id;
         var h = (sp.hotspots || []).filter(function (x) { return x.productId === pid; })[0];
         var opts = (h && h.closeUpImage)
-          ? { closeUpImage: h.closeUpImage, contextLabel: tx(sp.name), spaceImage: sp.image, spaceId: sp.id }
+          ? { closeUpImage: h.closeUpImage, contextLabel: tx(sp.name), spaceImage: sp.image, spaceId: sp.id, startsOnCatalog: !!h.detailStartsOnCatalog }
           : (sp.image ? { spaceImage: sp.image, contextLabel: tx(sp.name), spaceId: sp.id } : { spaceId: sp.id });
         var isHotspot = node.classList.contains('hotspot');
         if (isHotspot && h && h.transitionVideo && $('#transitionOverlay')) {
@@ -2436,7 +2438,7 @@
     }
     function onDetail() {
       var opts = h.closeUpImage
-        ? { closeUpImage: h.closeUpImage, contextLabel: tx(sp.name), spaceImage: sp.image, spaceId: sp.id }
+        ? { closeUpImage: h.closeUpImage, contextLabel: tx(sp.name), spaceImage: sp.image, spaceId: sp.id, startsOnCatalog: !!h.detailStartsOnCatalog }
         : (sp.image ? { spaceImage: sp.image, contextLabel: tx(sp.name), spaceId: sp.id } : { spaceId: sp.id });
       closeOverlay();
       openDetail(pid, opts);

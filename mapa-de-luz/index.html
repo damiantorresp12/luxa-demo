@@ -40,8 +40,8 @@
       <div class="bloque">
         <h2>Dónde se mide</h2>
         <div class="segmentado" id="seg-plano">
-          <button data-plano="0.75" class="activo">Escritorio · 0,75 m</button>
-          <button data-plano="0">Piso</button>
+          <button data-plano="0" class="activo">Piso</button>
+          <button data-plano="0.75">Escritorio · 0,75 m</button>
         </div>
       </div>
 
@@ -91,14 +91,14 @@
       </div>
 
       <div class="render-wrap" id="render-wrap" hidden>
-        <div class="escenario">
+        <div class="escenario ver-muebles">
           <img id="compuesto-base" alt="Render sin muebles" />
           <img id="compuesto-muebles" class="capa-muebles" alt="Render con muebles" />
           <canvas id="compuesto"></canvas>
           <div class="switch-app" id="switch-app">
-            <button data-capa="muebles">Con muebles</button>
+            <button data-capa="muebles" class="activo">Con muebles</button>
             <button data-capa="vacio">Sin muebles</button>
-            <button data-capa="mapa" class="activo">Mapa de luz</button>
+            <button data-capa="mapa">Mapa de luz</button>
           </div>
         </div>
         <div class="render-pie">

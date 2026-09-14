@@ -37,7 +37,7 @@
   const estado = {
     escena: null, geo: null,
     ies: null, iesNombre: '', datosIes: null, cacheIes: {},
-    plano: 0.75, rebote: true, rho: {}, numeros: true, borde: true,
+    plano: 0, rebote: true, rho: {}, numeros: true, borde: true,
     directa: null, nx: 0, ny: 0, eInd: 0, reboteInfo: null,
     vista: null, vistaMapa: 'planta', fondo: 0,
     modoPorLuz: false        // true = cada luz con su propio IES (el que trae de 3ds Max)
@@ -1382,7 +1382,8 @@
       const deMax = await importarDe3dsMax(esc);
       estado.escena = esc;
       estado.geo = geometria(esc);
-      estado.plano = esc.planoTrabajo;
+      // Arranca midiendo en el piso (lo que se ve pintado); "Escritorio" queda a un clic
+      estado.plano = 0;
       estado.rho = { ...esc.reflectancias };
       const g = estado.geo;
       await cargarIes(esc.iesElegido);
