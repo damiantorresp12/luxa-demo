@@ -7,7 +7,7 @@ echo ============================================================
 echo.
 echo   App principal  : http://localhost:8080/
 echo   Space Planner  : http://localhost:8080/space-planner/
-echo   Mapa de luz    : http://localhost:8080/mapa-de-luz/
+echo   TD Light Study : http://localhost:8080/mapa-de-luz/
 echo.
 echo   Cerra esta ventana (o Ctrl+C) para detener el servidor.
 echo ============================================================

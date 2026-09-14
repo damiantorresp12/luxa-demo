@@ -3,15 +3,26 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Mapa de luz · TD Experience</title>
+  <title>TD Light Study · Mapa de luz</title>
   <link rel="stylesheet" href="css/mapa-de-luz.css" />
 </head>
 <body>
 
+  <!-- Código de acceso (solo en la versión publicada; en la compu no se pide) -->
+  <div class="acceso" id="acceso" hidden>
+    <form class="acceso-caja" id="acceso-form" autocomplete="off">
+      <span class="brand-mark">TD LIGHT STUDY</span>
+      <p>Ingresá el código de acceso</p>
+      <input type="password" id="acceso-codigo" aria-label="Código de acceso" autofocus />
+      <button type="submit" class="btn-mini btn-oro">Entrar</button>
+      <p class="acceso-error" id="acceso-error" hidden>Código incorrecto</p>
+    </form>
+  </div>
+
   <header class="topbar">
     <div class="brand">
-      <span class="brand-mark">TD EXPERIENCE</span>
-      <span class="brand-sub">Mapa de luz · prueba</span>
+      <span class="brand-mark">TD LIGHT STUDY</span>
+      <span class="brand-sub">Mapa de luz</span>
     </div>
     <div id="escena-titulo" class="escena-titulo">Cargando escena…</div>
   </header>
@@ -75,15 +86,17 @@
 
       <div class="render-wrap" id="render-wrap" hidden>
         <div class="escenario">
-          <img id="compuesto-base" alt="Render de la escena" />
+          <img id="compuesto-base" alt="Render sin muebles" />
+          <img id="compuesto-muebles" class="capa-muebles" alt="Render con muebles" />
           <canvas id="compuesto"></canvas>
           <div class="switch-app" id="switch-app">
-            <button data-capa="render">Render</button>
+            <button data-capa="muebles">Con muebles</button>
+            <button data-capa="vacio">Sin muebles</button>
             <button data-capa="mapa" class="activo">Mapa de luz</button>
           </div>
         </div>
         <div class="render-pie">
-          <label class="fondo">Fondo <select id="sel-fondo"></select></label>
+          <label class="fondo" hidden>Fondo <select id="sel-fondo"></select></label>
           <span id="compuesto-nota"></span>
           <button class="btn-mini btn-oro" id="btn-guardar-app" hidden>Guardar para la app</button>
           <button class="btn-mini" id="btn-descargar">Descargar imagen</button>

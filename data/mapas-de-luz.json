@@ -2,7 +2,7 @@
   "_readme": "Mapas de luz de las escenas de Ambientes. Lo escribe la herramienta interna /mapa-de-luz/ con \"Guardar para la app\"; no editar a mano. La clave es la foto principal de la escena.",
   "escenas": {
     "assets/Spaces/Office 03/Office 03.jpeg": {
-      "generado": "2026-09-11T20:28:07.066Z",
+      "generado": "2026-09-14T17:59:25.892Z",
       "superficie": {
         "es": "Sobre el piso",
         "en": "On the floor"
@@ -14,103 +14,228 @@
           "en": "Recommended for meeting rooms"
         }
       },
-      "producto": {
-        "id": "bitpop-downlight",
-        "nombre": "Bitpop C 2.2",
-        "cantidad": 3
-      },
-      "inicial": "30",
-      "opticas": [
+      "terminaciones": [
         {
-          "id": "17",
+          "id": "white",
           "nombre": {
-            "es": "17°",
-            "en": "17°"
+            "es": "Blanco",
+            "en": "White"
           },
-          "imagen": "assets/Spaces/Office 03/Office 03 mapa piso 17.jpeg",
-          "cct": "2700K",
-          "lumenes": 996,
-          "watts": 18,
-          "apertura": "17°",
-          "promedio": 102,
-          "minimo": 7,
-          "maximo": 805,
-          "uniformidad": 0.07,
+          "foto": "assets/Spaces/Office 03/Office 03.jpeg"
+        },
+        {
+          "id": "black",
+          "nombre": {
+            "es": "Negro",
+            "en": "Black"
+          },
+          "foto": "assets/Spaces/Office 03/Office 03 black.jpeg"
+        }
+      ],
+      "inicial": "oval",
+      "propuestas": [
+        {
+          "id": "oval",
+          "nombre": {
+            "es": "Lente oval",
+            "en": "Oval lens"
+          },
+          "imagenes": {
+            "white": "assets/Spaces/Office 03/Office 03 mapa oval white.jpeg",
+            "black": "assets/Spaces/Office 03/Office 03 mapa oval black.jpeg"
+          },
+          "productos": [
+            {
+              "id": "bo55-surface",
+              "nombre": "BO 55 Surface",
+              "detalle": {
+                "es": "lente oval · 2700K",
+                "en": "oval lens · 2700K"
+              },
+              "cantidad": 6,
+              "watts": 24,
+              "lumenes": 1692
+            },
+            {
+              "id": "bitpop-downlight",
+              "nombre": "Bitpop C 2.2",
+              "detalle": {
+                "es": "42° · 2700K",
+                "en": "42° · 2700K"
+              },
+              "cantidad": 2,
+              "watts": 18,
+              "lumenes": 938
+            }
+          ],
+          "promedio": 546,
+          "minimo": 392,
+          "maximo": 633,
+          "uniformidad": 0.72,
           "trabajo": {
             "altura": 0.75,
-            "promedio": 102,
-            "minimo": 6,
-            "maximo": 1425,
-            "uniformidad": 0.06
+            "promedio": 612,
+            "minimo": 381,
+            "maximo": 834,
+            "uniformidad": 0.62
+          },
+          "paredes": {
+            "promedio": 135,
+            "minimo": 68,
+            "maximo": 236
+          }
+        },
+        {
+          "id": "soft",
+          "nombre": {
+            "es": "Lente soft",
+            "en": "Soft lens"
+          },
+          "imagenes": {
+            "white": "assets/Spaces/Office 03/Office 03 mapa soft white.jpeg",
+            "black": "assets/Spaces/Office 03/Office 03 mapa soft black.jpeg"
+          },
+          "productos": [
+            {
+              "id": "bo55-surface",
+              "nombre": "BO 55 Surface",
+              "detalle": {
+                "es": "lente soft · 2700K",
+                "en": "soft lens · 2700K"
+              },
+              "cantidad": 6,
+              "watts": 24,
+              "lumenes": 1662
+            },
+            {
+              "id": "bitpop-downlight",
+              "nombre": "Bitpop C 2.2",
+              "detalle": {
+                "es": "42° · 2700K",
+                "en": "42° · 2700K"
+              },
+              "cantidad": 2,
+              "watts": 18,
+              "lumenes": 938
+            }
+          ],
+          "promedio": 528,
+          "minimo": 367,
+          "maximo": 633,
+          "uniformidad": 0.69,
+          "trabajo": {
+            "altura": 0.75,
+            "promedio": 603,
+            "minimo": 334,
+            "maximo": 887,
+            "uniformidad": 0.55
+          },
+          "paredes": {
+            "promedio": 131,
+            "minimo": 69,
+            "maximo": 288
+          }
+        },
+        {
+          "id": "37",
+          "nombre": {
+            "es": "Haz 37°",
+            "en": "37° beam"
+          },
+          "imagenes": {
+            "white": "assets/Spaces/Office 03/Office 03 mapa 37 white.jpeg",
+            "black": "assets/Spaces/Office 03/Office 03 mapa 37 black.jpeg"
+          },
+          "productos": [
+            {
+              "id": "bo55-surface",
+              "nombre": "BO 55 Surface",
+              "detalle": {
+                "es": "haz 37° · 2700K",
+                "en": "37° beam · 2700K"
+              },
+              "cantidad": 6,
+              "watts": 24,
+              "lumenes": 2014
+            },
+            {
+              "id": "bitpop-downlight",
+              "nombre": "Bitpop C 2.2",
+              "detalle": {
+                "es": "42° · 2700K",
+                "en": "42° · 2700K"
+              },
+              "cantidad": 2,
+              "watts": 18,
+              "lumenes": 938
+            }
+          ],
+          "promedio": 719,
+          "minimo": 296,
+          "maximo": 1018,
+          "uniformidad": 0.41,
+          "trabajo": {
+            "altura": 0.75,
+            "promedio": 797,
+            "minimo": 224,
+            "maximo": 1519,
+            "uniformidad": 0.28
+          },
+          "paredes": {
+            "promedio": 106,
+            "minimo": 70,
+            "maximo": 357
           }
         },
         {
           "id": "30",
           "nombre": {
-            "es": "30°",
-            "en": "30°"
+            "es": "Haz 30°",
+            "en": "30° beam"
           },
-          "imagen": "assets/Spaces/Office 03/Office 03 mapa piso 30.jpeg",
-          "cct": "2700K",
-          "lumenes": 930,
-          "watts": 18,
-          "apertura": "31°",
-          "promedio": 94,
-          "minimo": 6,
-          "maximo": 336,
-          "uniformidad": 0.07,
+          "imagenes": {
+            "white": "assets/Spaces/Office 03/Office 03 mapa 30 white.jpeg",
+            "black": "assets/Spaces/Office 03/Office 03 mapa 30 black.jpeg"
+          },
+          "productos": [
+            {
+              "id": "bo55-surface",
+              "nombre": "BO 55 Surface",
+              "detalle": {
+                "es": "haz 30° · 2700K",
+                "en": "30° beam · 2700K"
+              },
+              "cantidad": 6,
+              "watts": 24,
+              "lumenes": 2005
+            },
+            {
+              "id": "bitpop-downlight",
+              "nombre": "Bitpop C 2.2",
+              "detalle": {
+                "es": "42° · 2700K",
+                "en": "42° · 2700K"
+              },
+              "cantidad": 2,
+              "watts": 18,
+              "lumenes": 938
+            }
+          ],
+          "promedio": 734,
+          "minimo": 242,
+          "maximo": 1134,
+          "uniformidad": 0.33,
           "trabajo": {
             "altura": 0.75,
-            "promedio": 96,
-            "minimo": 6,
-            "maximo": 591,
-            "uniformidad": 0.06
-          }
-        },
-        {
-          "id": "42",
-          "nombre": {
-            "es": "42°",
-            "en": "42°"
+            "promedio": 808,
+            "minimo": 179,
+            "maximo": 1944,
+            "uniformidad": 0.22
           },
-          "imagen": "assets/Spaces/Office 03/Office 03 mapa piso 42.jpeg",
-          "cct": "2700K",
-          "lumenes": 938,
-          "watts": 18,
-          "apertura": "42°",
-          "promedio": 81,
-          "minimo": 13,
-          "maximo": 176,
-          "uniformidad": 0.17,
-          "trabajo": {
-            "altura": 0.75,
-            "promedio": 89,
-            "minimo": 9,
-            "maximo": 279,
-            "uniformidad": 0.1
-          }
-        },
-        {
-          "id": "oval",
-          "nombre": {
-            "es": "Oval",
-            "en": "Oval"
-          },
-          "imagen": "assets/Spaces/Office 03/Office 03 mapa piso oval.jpeg",
-          "cct": "2700K",
-          "lumenes": 980,
-          "watts": 18,
-          "apertura": "45° × 17°",
-          "promedio": 94,
-          "minimo": 7,
-          "maximo": 382,
-          "uniformidad": 0.07,
-          "trabajo": {
-            "altura": 0.75,
+          "paredes": {
             "promedio": 99,
-            "minimo": 6,
-            "maximo": 673,
-            "uniformidad": 0.07
+            "minimo": 68,
+            "maximo": 333
           }
         }
       ]

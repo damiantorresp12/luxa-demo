@@ -2230,6 +2230,60 @@ svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width:
 }
 .space-spec-label { font-size: 0.62rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-faint); }
 .space-spec-val { font-size: 0.85rem; color: var(--ink); line-height: 1.45; }
+.space-spec-list { list-style: none; margin: 4px 0 0; padding: 0; display: flex; flex-direction: column; gap: 3px; }
+.space-spec-list li { font-size: 0.85rem; color: var(--ink); line-height: 1.45; }
+.space-spec-prod { font: inherit; color: var(--ink); background: none; border: 0; padding: 0; text-align: left; }
+button.space-spec-prod { cursor: pointer; text-decoration: underline; text-decoration-color: rgba(201,162,75,0.55); text-underline-offset: 3px; }
+button.space-spec-prod:hover, button.space-spec-prod:focus-visible { color: var(--brass); outline: none; }
+.space-spec-det { color: var(--ink-dim); }
+.space-spec-total { margin-top: 5px; font-size: 0.75rem; color: var(--ink-dim); }
+
+/* Terminación de los artefactos (blanco / negro…): una foto por terminación encima de
+   la principal, con fundido. La principal queda siempre debajo, así no hay parpadeo. */
+.space-stage.has-finish .space-stage-img-finish {
+  position: absolute; inset: 0;
+  z-index: 1;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.55s var(--ease);
+}
+.space-stage.has-finish .space-stage-img-finish.is-active { opacity: 1; }
+.space-stage.has-finish .hotspot { z-index: 3; }
+.space-finish {
+  position: absolute;
+  right: 16px; bottom: 16px;
+  z-index: 5;
+  display: inline-flex; align-items: center; gap: 6px;
+  height: 36px;
+  padding: 0 7px 0 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.18);
+  background: rgba(8,8,10,0.55);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: var(--ink);
+  font-size: 0.66rem; font-weight: 500;
+  letter-spacing: 0.18em; text-transform: uppercase;
+}
+.space-finish-label { margin-right: 4px; }
+.space-finish button {
+  width: 24px; height: 24px; padding: 2px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.25);
+  background: transparent;
+  cursor: pointer;
+  transition: border-color 0.2s var(--ease), box-shadow 0.2s var(--ease);
+}
+.space-finish button.is-active { border-color: var(--brass); box-shadow: 0 0 0 1px var(--brass); }
+.space-finish .sw { display: block; width: 100%; height: 100%; border-radius: 50%; }
+.space-finish .sw-white { background: #f3f1ec; }
+.space-finish .sw-black { background: #151515; }
+.space-finish .sw-gold  { background: #c9a24b; }
+@media (max-width: 560px) {
+  .space-finish { right: 10px; bottom: 10px; height: 30px; padding: 0 5px; }
+  .space-finish-label { display: none; }
+  .space-finish button { width: 22px; height: 22px; }
+}
 
 .space-map-toggle {
   position: absolute;
@@ -2298,6 +2352,7 @@ svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width:
 .light-map-value b { font-size: 1.7rem; font-weight: 500; color: var(--brass); margin-right: 2px; }
 .light-map-ref { margin-top: 2px !important; font-size: 0.68rem; color: var(--ink-dim); line-height: 1.35; }
 .light-map-ref .ref-at { display: none; }
+.light-map-walls { margin-top: 3px !important; font-size: 0.68rem; color: var(--ink); line-height: 1.35; }
 .light-map-work { margin-top: 9px !important; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.1); font-size: 0.68rem; color: var(--ink); line-height: 1.35; }
 .light-map-bar { height: 5px; margin-top: 7px; border-radius: 3px; background: rgba(255,255,255,0.12); overflow: hidden; }
 .light-map-bar i { display: block; height: 100%; border-radius: 3px; background: var(--brass); transition: width 0.45s var(--ease); }
@@ -2331,7 +2386,8 @@ svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width:
     display: grid; grid-template-columns: auto 1fr; column-gap: 10px; align-items: baseline;
   }
   .light-map-surface,
-  .light-map-work { display: none; }
+  .light-map-work,
+  .light-map-walls { display: none; }
   .light-map-value { grid-column: 1; grid-row: 1; font-size: 0.68rem; margin-top: 0 !important; }
   .light-map-value b { font-size: 1.1rem; }
   .light-map-ref { grid-column: 2; grid-row: 1; font-size: 0.6rem; text-align: right; margin-top: 0 !important; }
@@ -2675,6 +2731,7 @@ svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width:
   .light-map-card { transition-duration: 0.45s !important; }
   .light-map-optics { transition-duration: 0.35s !important; }
   .light-map-bar i { transition-duration: 0.45s !important; }
+  .space-stage.has-finish .space-stage-img-finish { transition-duration: 0.55s !important; }
 }
 
 /* =============================================================================

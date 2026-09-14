@@ -21,6 +21,16 @@
 * { box-sizing: border-box; }
 [hidden] { display: none !important; }
 
+/* ---------- Código de acceso ---------- */
+.acceso { position: fixed; inset: 0; z-index: 100; display: flex; align-items: center; justify-content: center; padding: 16px; background: var(--bg-0); }
+.acceso-caja { display: flex; flex-direction: column; align-items: center; gap: 12px; width: 100%; max-width: 320px; padding: 28px 24px; background: var(--bg-2); border: 1px solid var(--line); border-radius: var(--radius); }
+.acceso-caja p { margin: 0; color: var(--text-dim); font-size: 13px; }
+.acceso-caja input { width: 100%; padding: 10px 12px; font-size: 16px; text-align: center; color: var(--text); background: var(--bg-1); border: 1px solid var(--line); border-radius: 6px; }
+.acceso-caja input:focus { outline: none; border-color: var(--gold-dim); }
+.acceso-caja button { width: 100%; padding: 10px; font-size: 14px; }
+.acceso-caja .acceso-error { color: var(--red); }
+body.bloqueado > :not(.acceso) { display: none; }
+
 html, body {
   margin: 0;
   background: var(--bg-0);
@@ -151,7 +161,10 @@ select {
 .escenario { position: relative; border-radius: 6px; overflow: hidden; background: #000; }
 .escenario img, .escenario canvas { display: block; width: 100%; height: auto; }
 .escenario canvas { position: absolute; inset: 0; transition: opacity .6s ease; }
-.escenario.ver-render canvas { opacity: 0; }
+.escenario.ver-render canvas, .escenario.ver-muebles canvas { opacity: 0; }
+/* Los muebles (IA) van encima del render vacío; si la foto salió con otra proporción, se recorta apenas */
+.escenario img.capa-muebles { position: absolute; inset: 0; height: 100%; object-fit: cover; opacity: 0; transition: opacity .6s ease; }
+.escenario.ver-muebles img.capa-muebles { opacity: 1; }
 .switch-app {
   position: absolute; left: 50%; bottom: 14px; transform: translateX(-50%);
   display: flex; gap: 2px; padding: 3px; border-radius: 8px; background: rgba(10,10,12,.82);

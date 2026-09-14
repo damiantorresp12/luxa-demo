@@ -558,6 +558,38 @@
     }
   },
   {
+    "id": "BO-55-surface",
+    "name": "BO 55 Surface",
+    "image": "../assets/Imagenes/BO 55 surface.jpeg",
+    "catalogId": "bo55-surface",
+    "category": "Ceiling Lights",
+    "type": "ceiling_light",
+    "collection": "BO",
+    "style": "decorative",
+    "spaces": [
+      "office",
+      "living",
+      "kitchen"
+    ],
+    "code": "BO55-SF",
+    "designer": "LUXA Studio",
+    "power": "24 W",
+    "lumens": "2014 lm",
+    "temperature": "2700 K",
+    "cri": "≥ 90",
+    "ip": "",
+    "dimensions": "Ø 55 mm",
+    "finish": "Negro mate · Blanco",
+    "application": {
+      "es": "Oficinas, retail y hotelería",
+      "en": "Offices, retail and hospitality"
+    },
+    "description": {
+      "es": "Un spot cilíndrico de superficie con cabezal orientable y reflector de alta eficiencia. Con lente oval o soft pasa de luz de acento a iluminación general.",
+      "en": "A cylindrical surface spotlight with an adjustable head and a high-efficiency reflector. With an oval or soft lens it goes from accent light to general lighting."
+    }
+  },
+  {
     "id": "DVA-Bolle-Orizzontale-Hanging-Lamp",
     "name": "Bolle Orizzontale",
     "image": "../assets/Imagenes/DVA-Bolle Orizzontale Hanging Lamp_corona.jpg",

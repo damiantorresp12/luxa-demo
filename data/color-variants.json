@@ -1,7 +1,11 @@
 {
   "_readme": "Manifest de variantes de color para luminarias del catalogo. Generado a partir de las subcarpetas de assets/Imagenes/Imagenes_colors/. La key de cada entry es el basename del filename original del render (assets.image del producto, sin extension). La app lo lee al boot y attacha las variantes al producto correspondiente. Para regenerar despues de agregar/quitar variantes, ver tools/build-color-variants.ps1 (a crear) o regenerar a mano siguiendo la misma estructura.",
-  "generatedAt": "2026-06-24",
+  "generatedAt": "2026-09-14",
   "variants": {
+    "BO 55 surface": [
+      { "id": "white", "image": "assets/Imagenes/Imagenes_colors/BO 55 surface/white.jpeg" },
+      { "id": "black", "image": "assets/Imagenes/Imagenes_colors/BO 55 surface/black.jpeg", "original": true }
+    ],
     "DVA-Aballs A II Ceiling Light_corona": [
       { "id": "white", "image": "assets/Imagenes/Imagenes_colors/DVA-Aballs A II Ceiling Light_corona/white.jpeg" },
       { "id": "gold", "image": "assets/Imagenes/Imagenes_colors/DVA-Aballs A II Ceiling Light_corona/gold.jpeg" }
@@ -32,6 +36,10 @@
     "DVA-Arum Wall Lamp_corona": [
       { "id": "white", "image": "assets/Imagenes/Imagenes_colors/DVA-Arum Wall Lamp_corona/white.jpeg" },
       { "id": "gold", "image": "assets/Imagenes/Imagenes_colors/DVA-Arum Wall Lamp_corona/gold.jpeg" }
+    ],
+    "DVA-Bitpop C 2.2 Recessed Downlight_corona": [
+      { "id": "white", "image": "assets/Imagenes/Imagenes_colors/DVA-Bitpop C 2.2 Recessed Downlight_corona/white.jpeg", "original": true },
+      { "id": "black", "image": "assets/Imagenes/Imagenes_colors/DVA-Bitpop C 2.2 Recessed Downlight_corona/black.jpeg" }
     ],
     "DVA-BO 32 Surface Ceiling Light_corona": [
       { "id": "white", "image": "assets/Imagenes/Imagenes_colors/DVA-BO 32 Surface Ceiling Light_corona/white.jpeg" },

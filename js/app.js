@@ -1583,22 +1583,77 @@
       { minimumFractionDigits: dec || 0, maximumFractionDigits: dec || 0 });
   }
 
-  function addLightMap(section, stage, lm) {
-    var opticas = lm.opticas || [];
-    if (!opticas.length) return;
-    var actual = opticas.filter(function (o) { return o.id === lm.inicial; })[0] || opticas[0];
+  // Convierte el formato anterior (ópticas de un solo producto) al de propuestas, así
+  // las escenas ya publicadas se siguen viendo igual.
+  function normalizarMapa(lm) {
+    if (lm.propuestas && lm.propuestas.length) return lm;
+    var p = lm.producto || {};
+    return {
+      superficie: lm.superficie,
+      referencia: lm.referencia,
+      inicial: lm.inicial,
+      propuestas: (lm.opticas || []).map(function (o) {
+        return {
+          id: o.id, nombre: o.nombre, imagenes: { base: o.imagen },
+          promedio: o.promedio, minimo: o.minimo, maximo: o.maximo, uniformidad: o.uniformidad, trabajo: o.trabajo,
+          productos: [{
+            id: p.id, nombre: p.nombre, cantidad: p.cantidad || 1,
+            detalle: [tx(o.nombre), o.cct].filter(Boolean).join(' · '),
+            watts: o.watts, lumenes: o.lumenes
+          }]
+        };
+      })
+    };
+  }
 
-    // Una capa por óptica, apiladas: cambiar de óptica es un fundido entre capas,
-    // sin cambiar el src de una imagen visible (eso daría un parpadeo).
-    var capas = {};
-    opticas.forEach(function (o) {
+  /* Propuestas de iluminación: cada una es una distribución completa (mapa, números y
+     productos con cantidades). Si hay más de una, aparece el selector. Si la escena
+     tiene terminaciones (artefactos blancos / negros), aparece el selector de color
+     y cambian la foto y el mapa. */
+  function addLightMap(section, stage, lmOriginal) {
+    var lm = normalizarMapa(lmOriginal);
+    var props = lm.propuestas || [];
+    if (!props.length) return;
+    var terms = lm.terminaciones || [];
+    var actual = props.filter(function (p) { return p.id === lm.inicial; })[0] || props[0];
+    var term = terms.length ? terms[0].id : null;
+
+    function imagenDe(p, tId) {
+      var im = p.imagenes || {};
+      return im[tId] || im.base || im[Object.keys(im)[0]];
+    }
+    function claveCapa(p, tId) { return p.id + '|' + (tId || 'base'); }
+
+    // Foto de cada terminación extra (la primera ya es la foto principal de la escena)
+    var fotosTerm = {};
+    terms.forEach(function (tm, i) {
+      if (i === 0) return;
       var img = document.createElement('img');
-      img.className = 'space-stage-img space-stage-img-map';
-      img.src = uri(o.imagen);
+      img.className = 'space-stage-img space-stage-img-finish';
+      img.src = uri(tm.foto);
       img.alt = '';
       img.setAttribute('aria-hidden', 'true');
       stage.appendChild(img);
-      capas[o.id] = img;
+      fotosTerm[tm.id] = img;
+    });
+    if (terms.length > 1) stage.classList.add('has-finish');
+
+    // Una capa de mapa por propuesta y terminación, apiladas: cambiar es un fundido
+    // entre capas, sin cambiar el src de una imagen visible (eso daría un parpadeo).
+    var capas = {};
+    var idsTerm = terms.length ? terms.map(function (tm) { return tm.id; }) : [null];
+    props.forEach(function (p) {
+      idsTerm.forEach(function (tId) {
+        var key = claveCapa(p, tId), src = imagenDe(p, tId);
+        if (!src || capas[key]) return;
+        var img = document.createElement('img');
+        img.className = 'space-stage-img space-stage-img-map';
+        img.src = uri(src);
+        img.alt = '';
+        img.setAttribute('aria-hidden', 'true');
+        stage.appendChild(img);
+        capas[key] = img;
+      });
     });
     stage.classList.add('has-light-map');
     stage.dataset.mapa = 'off';
@@ -1617,38 +1672,59 @@
     stage.appendChild(btn);
 
     var selector = null;
-    if (opticas.length > 1) {
+    if (props.length > 1) {
       selector = el('div', 'light-map-optics');
       selector.setAttribute('role', 'group');
-      selector.setAttribute('aria-label', t('lightMap.optic'));
-      selector.innerHTML = opticas.map(function (o) {
-        return '<button type="button" data-optica="' + o.id + '">' + tx(o.nombre) + '</button>';
+      selector.setAttribute('aria-label', t('lightMap.option'));
+      selector.innerHTML = props.map(function (p) {
+        return '<button type="button" data-optica="' + p.id + '">' + tx(p.nombre) + '</button>';
       }).join('');
       stage.appendChild(selector);
     }
 
-    // Línea de especificación en el panel de la escena (se ve siempre)
+    var finish = null;
+    if (terms.length > 1) {
+      finish = el('div', 'space-finish');
+      finish.setAttribute('role', 'group');
+      finish.setAttribute('aria-label', t('lightMap.finish'));
+      finish.innerHTML = '<span class="space-finish-label">' + t('lightMap.finish') + '</span>' +
+        terms.map(function (tm) {
+          return '<button type="button" data-term="' + tm.id + '" title="' + tx(tm.nombre) + '" aria-label="' + tx(tm.nombre) + '">' +
+            '<i class="sw sw-' + tm.id + '"></i></button>';
+        }).join('');
+      stage.appendChild(finish);
+    }
+
+    // Especificación en el panel de la escena (se ve siempre)
     var spec = el('div', 'space-spec');
     var info = section.querySelector('.space-info');
     var antes = info && info.querySelector('.space-products-label');
     if (info) info.insertBefore(spec, antes || null);
 
-    // Cambio de óptica sin parpadeo: la capa anterior queda fija debajo (is-prev)
-    // mientras la nueva aparece encima; recién cuando la nueva ya cubre todo, la
-    // anterior se apaga. Si las dos fundieran a la vez, a mitad de camino se vería
-    // el render de abajo (con los muebles). Mismo arreglo que el switch de luces.
+    // Cambio sin parpadeo: la capa anterior queda fija debajo (is-prev) mientras la nueva
+    // aparece encima; recién cuando la nueva ya cubre todo, la anterior se apaga.
     var soltarAnterior = null;
-    function activarCapa(id, desdeId) {
+    function activarCapa(key, desde) {
       clearTimeout(soltarAnterior);
       Object.keys(capas).forEach(function (k) {
-        capas[k].classList.toggle('is-active', k === id);
-        capas[k].classList.toggle('is-prev', k === desdeId && k !== id);
+        capas[k].classList.toggle('is-active', k === key);
+        capas[k].classList.toggle('is-prev', k === desde && k !== key);
       });
-      if (desdeId && desdeId !== id) {
-        soltarAnterior = setTimeout(function () { capas[desdeId].classList.remove('is-prev'); }, 700);
+      if (desde && desde !== key && capas[desde]) {
+        soltarAnterior = setTimeout(function () { capas[desde].classList.remove('is-prev'); }, 700);
       }
     }
-    activarCapa(actual.id);
+    activarCapa(claveCapa(actual, term));
+
+    function pintarTerminacion() {
+      Object.keys(fotosTerm).forEach(function (id) { fotosTerm[id].classList.toggle('is-active', id === term); });
+      if (finish) $$('button', finish).forEach(function (b) {
+        var on = b.dataset.term === term;
+        b.classList.toggle('is-active', on);
+        b.setAttribute('aria-pressed', String(on));
+      });
+    }
+    pintarTerminacion();
 
     function pintar() {
       if (selector) $$('button', selector).forEach(function (b) {
@@ -1658,7 +1734,7 @@
       });
 
       // La referencia (ej. 500 lx) se mide a la altura de trabajo. Si el mapa es del
-      // piso, la comparación usa los números de esa altura (actual.trabajo), no los del piso.
+      // piso, la comparación usa los números de esa altura (actual.trabajo).
       var ref = lm.referencia, tr = actual.trabajo;
       var comparado = tr ? tr.promedio : actual.promedio;
       var pct = ref ? Math.round(comparado / ref.lux * 100) : null;
@@ -1674,6 +1750,7 @@
           '<span>' + t('lightMap.even') + '<b>' + fmtNum(actual.uniformidad, 2) + '</b></span>' +
         '</div>' +
         (tr ? '<p class="light-map-work">' + t('lightMap.workLine', { h: fmtNum(tr.altura, 2), v: fmtNum(tr.promedio) }) + '</p>' : '') +
+        (actual.paredes ? '<p class="light-map-walls">' + t('lightMap.walls', { v: fmtNum(actual.paredes.promedio) }) + '</p>' : '') +
         (ref
           ? '<div class="light-map-bar"><i style="width:' + Math.min(100, pct) + '%"></i></div>' +
             '<p class="light-map-ref"><span class="ref-pct">' + refTexto + '</span>' +
@@ -1683,14 +1760,28 @@
         '<div class="light-map-scale-labels"><span>' + t('lightMap.low') + '</span><span>' + t('lightMap.high') + '</span></div>' +
         '<p class="light-map-note">' + t('lightMap.note') + '</p>';
 
-      var p = lm.producto || {};
-      var n = p.cantidad || 1;
-      var partes = [n + ' × ' + (p.nombre || ''), tx(actual.nombre), actual.cct];
-      if (actual.watts) partes.push(t('lightMap.totalW', { w: fmtNum(actual.watts * n) }));
-      if (actual.lumenes) partes.push(fmtNum(actual.lumenes * n) + ' lm');
+      // Especificación: una línea por producto (se toca para abrir su ficha) y totales
+      var totalW = 0, totalLm = 0;
+      var filas = (actual.productos || []).map(function (pr) {
+        var n = pr.cantidad || 1;
+        if (pr.watts) totalW += pr.watts * n;
+        if (pr.lumenes) totalLm += pr.lumenes * n;
+        var nombre = n + ' × ' + (pr.nombre || '');
+        var enCatalogo = pr.id && productById(pr.id);
+        return '<li>' +
+          (enCatalogo
+            ? '<button type="button" class="space-spec-prod" data-id="' + pr.id + '">' + nombre + '</button>'
+            : '<span class="space-spec-prod">' + nombre + '</span>') +
+          (pr.detalle ? '<span class="space-spec-det"> · ' + tx(pr.detalle) + '</span>' : '') +
+        '</li>';
+      }).join('');
+      var totales = [];
+      if (totalW) totales.push(t('lightMap.totalW', { w: fmtNum(totalW) }));
+      if (totalLm) totales.push(fmtNum(totalLm) + ' lm');
       spec.innerHTML =
-        '<span class="space-spec-label">' + t('lightMap.spec') + '</span>' +
-        '<span class="space-spec-val">' + partes.filter(Boolean).join(' · ') + '</span>';
+        '<span class="space-spec-label">' + t('lightMap.spec') + (props.length > 1 ? ' · ' + tx(actual.nombre) : '') + '</span>' +
+        '<ul class="space-spec-list">' + filas + '</ul>' +
+        (totales.length ? '<span class="space-spec-total">' + totales.join(' · ') + '</span>' : '');
     }
     pintar();
 
@@ -1703,10 +1794,22 @@
     if (selector) selector.addEventListener('click', function (ev) {
       var b = ev.target.closest('button[data-optica]');
       if (!b || b.dataset.optica === actual.id) return;
-      var desde = actual.id;
-      actual = opticas.filter(function (o) { return o.id === b.dataset.optica; })[0] || actual;
-      activarCapa(actual.id, desde);
+      var desde = claveCapa(actual, term);
+      actual = props.filter(function (p) { return p.id === b.dataset.optica; })[0] || actual;
+      activarCapa(claveCapa(actual, term), desde);
       pintar();
+    });
+    if (finish) finish.addEventListener('click', function (ev) {
+      var b = ev.target.closest('button[data-term]');
+      if (!b || b.dataset.term === term) return;
+      var desde = claveCapa(actual, term);
+      term = b.dataset.term;
+      activarCapa(claveCapa(actual, term), desde);
+      pintarTerminacion();
+    });
+    spec.addEventListener('click', function (ev) {
+      var b = ev.target.closest('.space-spec-prod[data-id]');
+      if (b) openDetail(b.dataset.id, { spaceId: section.dataset.spaceId });
     });
   }
 
@@ -2807,10 +2910,12 @@
       var list = manifest[fn];
       if (!list || !list.length) return;
       // Don't double up if the curated render IS already one of the variants.
-      var alreadyHasOriginal = list.some(function (v) { return v.image === p.assets.image; });
-      if (alreadyHasOriginal) {
+      // Also when the manifest flags a variant as "original": same picture as the curated
+      // render, detected by tools/build-color-variants.ps1 comparing the images.
+      var original = list.filter(function (v) { return v.image === p.assets.image || v.original; })[0];
+      if (original) {
         p.colorVariants = list.slice();
-        p.defaultColorId = p.colorVariants[0].id;
+        p.defaultColorId = original.id;
         return;
       }
       // Infer the original's color: if exactly one of the KNOWN_COLORS isn't

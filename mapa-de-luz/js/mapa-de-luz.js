@@ -1,5 +1,5 @@
 /* =============================================================================
-   Mapa de luz — prueba. Calcula cuánta luz llega a cada punto de la planta a
+   TD Light Study · Mapa de luz. Calcula cuánta luz llega a cada punto de la planta a
    partir de la fotometría real (IES) de cada luminaria, y la pinta en colores.
 
    Luz directa: exacta a partir del IES (ley del cuadrado de la distancia y
@@ -39,7 +39,8 @@
     ies: null, iesNombre: '', datosIes: null, cacheIes: {},
     plano: 0.75, rebote: true, rho: {}, numeros: true, borde: true,
     directa: null, nx: 0, ny: 0, eInd: 0, reboteInfo: null,
-    vista: null, vistaMapa: 'planta', fondo: 0
+    vista: null, vistaMapa: 'planta', fondo: 0,
+    modoPorLuz: false        // true = cada luz con su propio IES (el que trae de 3ds Max)
   };
 
   // ---------------------------------------------------------------- geometría
@@ -50,7 +51,7 @@
       W: m.cajaAncho * k,
       L: m.cajaLargo * k,
       H: esc.altoTecho,
-      luces: m.luces.map((l) => ({ id: l.id, ...aPlano(l.X, l.Y), z: l.Z * k, rot: l.rot || 0 })),
+      luces: m.luces.map((l) => ({ id: l.id, ...aPlano(l.X, l.Y), z: l.Z * k, rot: l.rot || 0, iesRuta: l.iesRuta || null })),
       cam: camara(m, aPlano)
     };
   }
@@ -96,6 +97,16 @@
         if (t <= 0) return null;
         return { x: cam.x + t * d.x, y: cam.y + t * d.y, prof: t * pto(d, f) };
       },
+      // pixel -> punto de una pared (plano vertical x = cte o y = cte, ver planoPared)
+      alPared(px, py, pl) {
+        const a = (px - cx) / fpx, b = (py - cy) / fpx;
+        const d = { x: f.x + a * r.x - b * u.x, y: f.y + a * r.y - b * u.y, z: f.z + a * r.z - b * u.z };
+        const comp = d[pl.eje];
+        if (Math.abs(comp) < 1e-6) return null;
+        const t = (pl.valor - cam[pl.eje]) / comp;
+        if (t <= 0) return null;
+        return { x: cam.x + t * d.x, y: cam.y + t * d.y, z: cam.z + t * d.z, prof: t * pto(d, f) };
+      },
       // punto 3D -> pixel
       aPixel(p) {
         const d = sub(p, cam), z = pto(d, f);
@@ -106,6 +117,10 @@
   }
 
   // ------------------------------------------------------------------ cálculo
+  // Fotometría de una luz: la suya (modo "según 3ds Max") o la elegida en la lista.
+  function iesDe(l) { return (estado.modoPorLuz && l.ies) || estado.ies; }
+  function datosDe(l) { return (estado.modoPorLuz && l.datos) || estado.datosIes; }
+
   function directa(x, y, z) {
     let E = 0;
     for (const l of estado.geo.luces) {
@@ -115,7 +130,38 @@
       const r = Math.sqrt(r2);
       const gamma = Math.acos(dz / r) * 180 / Math.PI;
       const C = Math.atan2(dy, dx) * 180 / Math.PI - l.rot;
-      E += IES.intensidad(estado.ies, C, gamma) * (dz / r) / r2;
+      E += IES.intensidad(iesDe(l), C, gamma) * (dz / r) / r2;
+    }
+    return E;
+  }
+
+  // Pared del ambiente: plano, normal hacia adentro y cómo ubicar un punto sobre ella
+  // (u = metros a lo largo de la pared, z = altura).
+  function planoPared(nombre) {
+    const { W, L } = estado.geo;
+    switch (nombre) {
+      case 'izquierda': return { eje: 'x', valor: 0, n: { x: 1, y: 0, z: 0 }, largo: L, punto: (u, z) => ({ x: 0, y: u, z }) };
+      case 'derecha':   return { eje: 'x', valor: W, n: { x: -1, y: 0, z: 0 }, largo: L, punto: (u, z) => ({ x: W, y: u, z }) };
+      case 'fondo':     return { eje: 'y', valor: L, n: { x: 0, y: -1, z: 0 }, largo: W, punto: (u, z) => ({ x: u, y: L, z }) };
+      case 'frente':    return { eje: 'y', valor: 0, n: { x: 0, y: 1, z: 0 }, largo: W, punto: (u, z) => ({ x: u, y: 0, z }) };
+      default: return null;
+    }
+  }
+
+  // Luz directa sobre una superficie con cualquier orientación (normal n): se usa en
+  // las paredes. Igual que directa(), pero con el ángulo de incidencia contra la pared.
+  function directaN(p, n) {
+    let E = 0;
+    for (const l of estado.geo.luces) {
+      const dx = l.x - p.x, dy = l.y - p.y, dz = l.z - p.z;
+      if (dz <= 0) continue;
+      const r2 = dx * dx + dy * dy + dz * dz;
+      const r = Math.sqrt(r2);
+      const cosInc = (dx * n.x + dy * n.y + dz * n.z) / r;
+      if (cosInc <= 0) continue;
+      const gamma = Math.acos(dz / r) * 180 / Math.PI;
+      const C = Math.atan2(-dy, -dx) * 180 / Math.PI - l.rot;
+      E += IES.intensidad(iesDe(l), C, gamma) * cosInc / r2;
     }
     return E;
   }
@@ -133,7 +179,7 @@
 
   function calcularRebote() {
     const { W, L, H, luces } = estado.geo;
-    const esc = estado.escena, rho = estado.rho, d = estado.datosIes;
+    const esc = estado.escena, rho = estado.rho;
 
     // Luz directa que cae sobre el piso (integrada en una grilla de 10 cm).
     const n = 10, nx = Math.round(W * n), ny = Math.round(L * n);
@@ -141,9 +187,14 @@
     for (let j = 0; j < ny; j++) for (let i = 0; i < nx; i++) {
       phiPiso += directa((i + 0.5) / n, (j + 0.5) / n, 0) / (n * n);
     }
-    const phiTotal = d.lumenesCalculados * luces.length;
-    const phiArriba = phiTotal * (1 - d.fraccionAbajo);
-    const phiParedes = Math.max(0, phiTotal * d.fraccionAbajo - phiPiso);
+    // Cada luz aporta su propio flujo (pueden ser productos distintos)
+    let phiTotal = 0, phiArriba = 0;
+    for (const l of luces) {
+      const d = datosDe(l);
+      phiTotal += d.lumenesCalculados;
+      phiArriba += d.lumenesCalculados * (1 - d.fraccionAbajo);
+    }
+    const phiParedes = Math.max(0, phiTotal - phiArriba - phiPiso);
 
     const aPiso = W * L, aTecho = W * L, aMuros = 2 * (W + L) * H;
     const aVidrio = (esc.vidrios || []).reduce((s, v) => s + (v.hasta - v.desde) * v.alto, 0);
@@ -428,9 +479,9 @@
       .map((r) => (typeof r === 'string' ? { archivo: r, nombre: r } : r));
   }
 
-  // Cada render trae sus superficies: qué pixeles son piso, mesa, etc. (máscaras) y a
-  // qué altura está cada una. Así, en un render con muebles se pinta la tapa de la mesa
-  // con la luz que le llega a esa altura, y las patas y sillas quedan intactas.
+  // Cada render trae sus superficies: el piso ({ altura: 0 }) y las paredes
+  // ({ pared: 'izquierda' | 'derecha' | 'fondo' | 'frente' }), cada una con su máscara.
+  // Los muebles van con IA sobre el render vacío, así que no se calcula sobre ellos.
   function superficiesDe(render) {
     if (render && render.superficies) return render.superficies;
     const piso = (estado.escena.imagenes || {}).piso;
@@ -446,12 +497,47 @@
     return x.getImageData(0, 0, Wi, Hi).data;
   }
 
-  async function dibujarSobreRender() {
+  // Mask ID de Corona: un color plano por objeto. El color de la superficie se toma solo,
+  // del pixel donde cae el centro del ambiente (a la altura de la superficie), y se marcan
+  // todos los pixeles de ese color (con tolerancia para los bordes suavizados).
+  async function leerMaskId(s, Wi, Hi, P) {
+    const im = await cargarImagen('escenas/' + s.maskId);
+    if (!im) return null;
+    const c = document.createElement('canvas'); c.width = Wi; c.height = Hi;
+    const x = c.getContext('2d', { willReadFrequently: true });
+    x.imageSmoothingEnabled = false;
+    x.drawImage(im, 0, 0, Wi, Hi);
+    const d = x.getImageData(0, 0, Wi, Hi).data;
+    const { W, L } = estado.geo;
+    // Piso: el centro del ambiente. Pared: su centro a 0,4 m de altura (debajo de
+    // cualquier ventana); se puede cambiar con muestraU (0-1 a lo largo) y muestraZ.
+    const pl = s.pared ? planoPared(s.pared) : null;
+    const muestra = pl
+      ? pl.punto(pl.largo * (s.muestraU != null ? s.muestraU : 0.5), s.muestraZ != null ? s.muestraZ : 0.4)
+      : { x: W / 2, y: L / 2, z: s.altura || 0 };
+    const p = P.aPixel(muestra);
+    if (!p || p.x < 0 || p.y < 0 || p.x >= Wi || p.y >= Hi) return null;
+    const i0 = ((p.y | 0) * Wi + (p.x | 0)) * 4;
+    const r0 = d[i0], g0 = d[i0 + 1], b0 = d[i0 + 2], tol = 24;
+    const mk = new Uint8ClampedArray(Wi * Hi * 4);
+    for (let i = 0; i < d.length; i += 4) {
+      if (Math.abs(d[i] - r0) + Math.abs(d[i + 1] - g0) + Math.abs(d[i + 2] - b0) <= tol) mk[i] = 255;
+    }
+    return mk;
+  }
+
+  // opciones.archivo: dibujar sobre ese render en vez del elegido en la lista (lo usa
+  // "Guardar para la app" para generar un mapa por terminación).
+  async function dibujarSobreRender(opciones) {
     const cam = estado.geo.cam, nota = $('#compuesto-nota');
     if (!cam || !cam.objetivo || !cam.fov) { nota.textContent = 'Faltan los datos de la cámara (objetivo y lente).'; return; }
 
     const lista = listaRenders();
-    const orden = lista[estado.fondo] ? [lista[estado.fondo], ...lista] : lista;
+    let forzado = opciones && opciones.archivo && lista.find((r) => r.archivo === opciones.archivo);
+    // Un fondo que no está en la lista (ej. el render con artefactos negros, que solo usa la
+    // app): se dibuja con las superficies del primero, porque es la misma cámara y el mismo Mask ID.
+    if (opciones && opciones.archivo && !forzado && lista[0]) forzado = { ...lista[0], archivo: opciones.archivo };
+    const orden = forzado ? [forzado] : (lista[estado.fondo] ? [lista[estado.fondo], ...lista] : lista);
     let render = null, base = null;
     for (const r of orden) { base = await cargarImagen('escenas/' + r.archivo); if (base) { render = r; break; } }
     const Wi = base ? base.naturalWidth : 2000;
@@ -465,17 +551,17 @@
     const img = ctx.getImageData(0, 0, Wi, Hi), px = img.data;
 
     // Superficies con su máscara leída. Sin ninguna máscara, se pinta la caja del piso.
+    const P = proyector(cam, Wi, Hi);
     const pedidas = superficiesDe(render);
     const sup = [];
     const faltan = [];
     for (const s of pedidas) {
-      const mk = await leerMascara(s.mascara, Wi, Hi);
-      if (mk) sup.push({ ...s, mk }); else faltan.push(s);
+      const mk = s.maskId ? await leerMaskId(s, Wi, Hi, P) : await leerMascara(s.mascara, Wi, Hi);
+      if (mk) sup.push({ ...s, mk, pl: s.pared ? planoPared(s.pared) : null }); else faltan.push(s);
     }
     const sinMascaras = pedidas.length === 0;
     if (sinMascaras) sup.push({ nombre: 'Piso', altura: 0, mk: null });
 
-    const P = proyector(cam, Wi, Hi);
     const { W, L } = estado.geo;
     const e = estado.rebote ? estado.eInd : 0;
     const colores = BANDAS.map((b) => [1, 3, 5].map((k) => parseInt(b[1].slice(k, k + 2), 16)));
@@ -489,9 +575,17 @@
         let col = null, cual = null;
         for (const s of sup) {
           if (s.mk && s.mk[i0] <= 127) continue;
-          const q = P.alPlano(bx + B / 2, by + B / 2, s.altura);
-          if (!q || (!s.mk && !dentro(q))) continue;
-          col = colores[indice(directa(q.x, q.y, s.altura) + e)];
+          let lux;
+          if (s.pl) {
+            const q = P.alPared(bx + B / 2, by + B / 2, s.pl);
+            if (!q || q.z < 0 || q.z > estado.geo.H) continue;
+            lux = directaN(q, s.pl.n) + e;
+          } else {
+            const q = P.alPlano(bx + B / 2, by + B / 2, s.altura);
+            if (!q || (!s.mk && !dentro(q))) continue;
+            lux = directa(q.x, q.y, s.altura) + e;
+          }
+          col = colores[indice(lux)];
           cual = s;
           break;
         }
@@ -515,16 +609,31 @@
     ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.lineJoin = 'round';
     const ocupados = [];                                    // para no encimar números
     const libre = (x, y, w, h) => !ocupados.some((o) => Math.abs(o.x - x) < (o.w + w) / 2 + 6 && Math.abs(o.y - y) < (o.h + h) / 2 + 4);
+    // Dónde se escriben los lux: en el piso cada 1 m; en las paredes cada 1 m a lo largo,
+    // a 1,0 y 2,0 m de altura.
+    const puntosDe = (s) => {
+      const pts = [];
+      if (s.pl) {
+        for (let u = 0.5; u < s.pl.largo; u += 1) {
+          for (const z of [1.0, 2.0]) { const p3 = s.pl.punto(u, z); pts.push({ p3, lux: () => directaN(p3, s.pl.n) + e }); }
+        }
+      } else {
+        const paso = s.paso || 1;
+        for (let y = paso / 2; y < L; y += paso) {
+          for (let x = paso / 2; x < W; x += paso) pts.push({ p3: { x, y, z: s.altura }, lux: () => directa(x, y, s.altura) + e });
+        }
+      }
+      return pts;
+    };
     for (const s of sup) {
-      const paso = s.paso || (s.altura > 0 ? 0.5 : 1);
-      for (let y = paso / 2; y < L; y += paso) {
-        for (let x = paso / 2; x < W; x += paso) {
-          const p = P.aPixel({ x, y, z: s.altura });
+      for (const pt of puntosDe(s)) {
+        {
+          const p = P.aPixel(pt.p3);
           if (!p || p.x < 0 || p.y < 0 || p.x >= Wi || p.y >= Hi) continue;
           if (s.mk && s.mk[((p.y | 0) * Wi + (p.x | 0)) * 4] < 128) continue;
           const t = Math.min(56, p.fpx * 0.09 / p.prof);
-          if (t < 18) continue;
-          const txt = fmt(directa(x, y, s.altura) + e);
+          if (t < 15) continue;                            // más chico no se lee (la pared del fondo da ~17)
+          const txt = fmt(pt.lux());
           ctx.font = `600 ${Math.round(t)}px Segoe UI, system-ui, sans-serif`;
           const ancho = ctx.measureText(txt).width;
           if (!libre(p.x, p.y, ancho, t)) continue;
@@ -539,32 +648,50 @@
 
     // Números de cada superficie visible: se muestrea la planta cada 5 cm a la altura de la
     // superficie y se cuentan solo los puntos que caen sobre su máscara en la imagen.
+    // (en las paredes, la parte que se ve en el render: la máscara deja afuera ventanas y marcos)
     estado.statsSuperficies = sup.filter((s) => s.mk).map((s) => {
       let suma = 0, n = 0, min = Infinity, max = 0;
-      for (let y = 0.025; y < L; y += 0.05) {
-        for (let x = 0.025; x < W; x += 0.05) {
-          const p = P.aPixel({ x, y, z: s.altura });
-          if (!p || p.x < 0 || p.y < 0 || p.x >= Wi || p.y >= Hi) continue;
-          if (s.mk[((p.y | 0) * Wi + (p.x | 0)) * 4] < 128) continue;
-          const lux = directa(x, y, s.altura) + e;
-          suma += lux; n++;
-          if (lux < min) min = lux;
-          if (lux > max) max = lux;
+      const sumar = (p3, calc) => {
+        const p = P.aPixel(p3);
+        if (!p || p.x < 0 || p.y < 0 || p.x >= Wi || p.y >= Hi) return;
+        if (s.mk[((p.y | 0) * Wi + (p.x | 0)) * 4] < 128) return;
+        const lux = calc();
+        suma += lux; n++;
+        if (lux < min) min = lux;
+        if (lux > max) max = lux;
+      };
+      if (s.pl) {
+        for (let u = 0.025; u < s.pl.largo; u += 0.05) {
+          for (let z = 0.025; z < estado.geo.H; z += 0.05) { const p3 = s.pl.punto(u, z); sumar(p3, () => directaN(p3, s.pl.n) + e); }
+        }
+      } else {
+        for (let y = 0.025; y < L; y += 0.05) {
+          for (let x = 0.025; x < W; x += 0.05) sumar({ x, y, z: s.altura }, () => directa(x, y, s.altura) + e);
         }
       }
       const prom = n ? suma / n : 0;
-      return { nombre: s.nombre, altura: s.altura, prom, min: n ? min : 0, max, uni: prom ? min / prom : 0, area: n * 0.0025 };
+      return { nombre: s.nombre, altura: s.altura, pared: s.pared || null, prom, min: n ? min : 0, max, uni: prom ? min / prom : 0, area: n * 0.0025 };
     });
     estado.renderActual = render;
-    $('#btn-guardar-app').hidden = !(render && render.paraApp);
+    // "Guardar para la app" solo sirve con luxa-server en la compu; en la versión publicada no se muestra
+    const enLaCompu = ['localhost', '127.0.0.1'].includes(location.hostname);
+    $('#btn-guardar-app').hidden = !(render && render.paraApp && enLaCompu);
 
     $('#compuesto-base').src = base ? base.src : cv.toDataURL('image/jpeg', 0.6);
+    if (!opciones) {
+      const muebles = render && render.conMuebles;
+      const bMuebles = $('#switch-app [data-capa="muebles"]');
+      bMuebles.hidden = !muebles;
+      if (muebles) $('#compuesto-muebles').src = 'escenas/' + muebles;
+      else if (bMuebles.classList.contains('activo')) $('#switch-app [data-capa="mapa"]').click();
+    }
     const partes = [base ? `Render: ${render.archivo}` : 'Sin render: guardalo en <code>mapa-de-luz/escenas/</code>'];
     if (sinMascaras) partes.push('sin máscara: se pinta la caja del piso');
     for (const st of estado.statsSuperficies) {
-      partes.push(`<b>${st.nombre}</b> a ${fmt(st.altura, 2)} m: ${fmt(st.prom)} lx promedio (mín ${fmt(st.min)} · máx ${fmt(st.max)} · uniformidad ${fmt(st.uni, 2)})`);
+      const donde = st.pared ? '' : ` a ${fmt(st.altura, 2)} m`;
+      partes.push(`<b>${st.nombre}</b>${donde}: ${fmt(st.prom)} lx promedio (mín ${fmt(st.min)} · máx ${fmt(st.max)})`);
     }
-    for (const s of faltan) partes.push(`<span class="falta">falta la máscara «${s.mascara}» (${s.nombre.toLowerCase()})</span>`);
+    for (const s of faltan) partes.push(`<span class="falta">falta la máscara «${s.maskId || s.mascara}» (${s.nombre.toLowerCase()})</span>`);
     nota.innerHTML = partes.join(' · ');
   }
 
@@ -594,6 +721,41 @@
     estado.ies = c.ies; estado.datosIes = c.datos; estado.iesNombre = nombre;
   }
 
+  // Carga el IES de cada luz que lo trae de 3ds Max. Si hay alguno, se activa el modo
+  // "según 3ds Max" y la ficha muestra el producto que más se repite.
+  async function cargarIesPorLuz() {
+    const luces = estado.geo.luces.filter((l) => l.iesRuta);
+    if (!luces.length) return null;
+    const cache = {};
+    for (const l of luces) {
+      if (!cache[l.iesRuta]) {
+        const url = l.iesRuta.split('/').map(encodeURIComponent).join('/');
+        const r = await fetch(url);
+        if (!r.ok) throw new Error(`No se pudo abrir el IES de ${l.id} (${r.status}): ${l.iesRuta}`);
+        const ies = IES.parse(await r.text());
+        cache[l.iesRuta] = { ies, datos: IES.datos(ies), n: 0 };
+      }
+      const c = cache[l.iesRuta];
+      l.ies = c.ies; l.datos = c.datos; c.n++;
+    }
+    const grupos = Object.values(cache).sort((a, b) => b.n - a.n);
+    estado.modoPorLuz = true;
+    estado.iesPorLuz = grupos;
+    return grupos;
+  }
+
+  function usarProductoPrincipal() {
+    const g = estado.iesPorLuz && estado.iesPorLuz[0];
+    if (!g) return;
+    estado.ies = g.ies; estado.datosIes = g.datos; estado.iesNombre = g.ies.nombre;
+  }
+
+  function composicion() {
+    if (!estado.modoPorLuz || !estado.iesPorLuz) return null;
+    const sinIes = estado.geo.luces.filter((l) => !l.ies).length;
+    return estado.iesPorLuz.map((g) => `${g.n} × ${g.ies.nombre}`).join(' + ') + (sinIes ? ` + ${sinIes} sin IES` : '');
+  }
+
   function recalcularTodo() {
     calcularGrilla();
     calcularRebote();
@@ -609,10 +771,16 @@
   function armarControles() {
     const esc = estado.escena;
     const sel = $('#sel-ies');
-    sel.innerHTML = esc.iesOpciones.map((n) => `<option value="${n}"${n === esc.iesElegido ? ' selected' : ''}>${etiquetaIes(n)}</option>`).join('');
+    const conMax = !!estado.iesPorLuz;
+    sel.innerHTML =
+      (conMax ? `<option value="__max__" selected>Según 3ds Max (cada luz con su IES)</option>` : '') +
+      esc.iesOpciones.map((n) => `<option value="${n}"${!conMax && n === esc.iesElegido ? ' selected' : ''}>Todas: ${etiquetaIes(n)}</option>`).join('');
     sel.addEventListener('change', async () => {
-      try { await cargarIes(sel.value); mostrarFicha(); dibujarPolar(); recalcularTodo(); }
-      catch (e) { alert(e.message); }
+      try {
+        if (sel.value === '__max__') { estado.modoPorLuz = true; usarProductoPrincipal(); }
+        else { estado.modoPorLuz = false; await cargarIes(sel.value); }
+        mostrarFicha(); dibujarPolar(); recalcularTodo();
+      } catch (e) { alert(e.message); }
     });
 
     $('#seg-plano').addEventListener('click', (ev) => {
@@ -645,15 +813,19 @@
       else dibujarMapa();
     });
 
-    // Vista previa del botón de la app: render ↔ mapa, con fundido
+    // Con muebles / Sin muebles / Mapa de luz, con fundido. El mapa siempre se calcula
+    // sobre el render vacío: los muebles (IA) son solo para ver cómo queda.
     $('#switch-app').addEventListener('click', (ev) => {
       const b = ev.target.closest('button'); if (!b) return;
       $('#switch-app').querySelectorAll('button').forEach((x) => x.classList.toggle('activo', x === b));
-      $('.escenario').classList.toggle('ver-render', b.dataset.capa === 'render');
+      $('.escenario').classList.toggle('ver-render', b.dataset.capa === 'vacio');
+      $('.escenario').classList.toggle('ver-muebles', b.dataset.capa === 'muebles');
     });
 
     const selFondo = $('#sel-fondo');
     selFondo.innerHTML = listaRenders().map((r, i) => `<option value="${i}">${r.nombre}</option>`).join('');
+    // Con un solo render no hay nada que elegir
+    selFondo.closest('label').hidden = listaRenders().length < 2;
     selFondo.addEventListener('change', () => {
       estado.fondo = parseInt(selFondo.value, 10);
       dibujarSobreRender().catch((e) => console.error(e));
@@ -666,6 +838,11 @@
     $('#btn-guardar-app').addEventListener('click', async () => {
       const r = estado.renderActual, cfg = r && r.paraApp, btn = $('#btn-guardar-app');
       if (!cfg) return;
+      if (cfg.propuesta) { await guardarPropuesta(cfg, btn); return; }
+      if (estado.iesPorLuz && estado.iesPorLuz.length > 1) {
+        alert('Esta escena mezcla productos (cada luz con su IES). Para guardarla, la escena tiene que definir una "propuesta" en paraApp. No se guardó nada.');
+        return;
+      }
       clearTimeout(pendienteRender);
       btn.disabled = true;
       const previa = estado.iesNombre;
@@ -761,14 +938,180 @@
       }
     });
 
+    // Aplica la fotometría de una variante a las luces que coinciden (o vuelve a la de
+    // 3ds Max con prop = null) y recalcula. Ej.: el BO 55 con lente oval, soft o sin lente.
+    async function aplicarVariante(prop, originales) {
+      for (const o of originales) { o.l.ies = o.ies; o.l.datos = o.datos; }
+      if (prop && prop.ies) {
+        estado.cacheIesRuta = estado.cacheIesRuta || {};
+        for (const [clave, ruta] of Object.entries(prop.ies)) {
+          if (!estado.cacheIesRuta[ruta]) {
+            const r = await fetch(ruta.split('/').map(encodeURIComponent).join('/'));
+            if (!r.ok) throw new Error(`No se pudo abrir el IES de la variante «${tx2(prop.nombre)}» (${r.status}): ${ruta}`);
+            const ies = IES.parse(await r.text());
+            estado.cacheIesRuta[ruta] = { ies, datos: IES.datos(ies) };
+          }
+          const c = estado.cacheIesRuta[ruta];
+          for (const o of originales) {
+            if ((o.l.iesRuta || '').toLowerCase().includes(clave.toLowerCase())) { o.l.ies = c.ies; o.l.datos = c.datos; }
+          }
+        }
+      }
+      // Grupos por fotometría: los usan la lista de productos, el título y la ficha
+      if (estado.modoPorLuz) {
+        const grupos = new Map();
+        for (const l of estado.geo.luces) {
+          if (!l.ies) continue;
+          if (!grupos.has(l.ies)) grupos.set(l.ies, { ies: l.ies, datos: l.datos, n: 0 });
+          grupos.get(l.ies).n++;
+        }
+        estado.iesPorLuz = [...grupos.values()].sort((a, b) => b.n - a.n);
+      }
+      calcularGrilla();
+      calcularRebote();
+    }
+
+    // Productos de la escena con sus cantidades, según la fotometría que tiene cada luz ahora
+    function productosDeLaEscena(cfg, prop) {
+      const grupos = (estado.modoPorLuz && estado.iesPorLuz)
+        ? estado.iesPorLuz.map((g) => {
+            const l = estado.geo.luces.find((x) => x.ies === g.ies);
+            return { clave: `${l ? l.iesRuta : ''} ${g.ies.nombre}`, datos: g.datos, n: g.n };
+          })
+        : [{ clave: `${estado.iesNombre} ${estado.ies.nombre}`, datos: estado.datosIes, n: estado.geo.luces.length }];
+      return grupos.map((g) => {
+        const m = (cfg.productos || []).find((p) => g.clave.toLowerCase().includes(p.ies.toLowerCase())) || {};
+        const detalle = (prop && prop.detalle && m.id && prop.detalle[m.id]) || m.detalle || null;
+        return {
+          id: m.id || null, nombre: m.nombre || g.clave.trim(), detalle, cantidad: g.n,
+          watts: g.datos.watts || null, lumenes: Math.round(g.datos.lumenesCalculados)
+        };
+      });
+    }
+
+    // Guarda PROPUESTAS de iluminación para la app. Con "variantes" en la escena, genera
+    // una propuesta por variante (la misma distribución con otra óptica); si no, una sola.
+    // Por cada propuesta: un mapa por terminación de los artefactos (blancos, negros…),
+    // los números (piso, altura de trabajo y paredes) y la lista de productos. Las fotos
+    // de la escena (una por terminación) se guardan una sola vez.
+    async function guardarPropuesta(cfg, btn) {
+      clearTimeout(pendienteRender);
+      btn.disabled = true;
+      const reemplazadas = [];
+      const subir = async (nombre, blob) => {
+        const res = await fetch('/__upload?reemplazar=1&path=' + encodeURIComponent(cfg.carpeta + nombre), { method: 'POST', body: blob });
+        if (res.status === 404) throw new Error('Este servidor no guarda archivos. Abrí la herramienta desde luxa-server (http://localhost:8080/mapa-de-luz/).');
+        const j = await res.json();
+        if (!j.ok) throw new Error(j.error || 'no se pudo guardar');
+        reemplazadas.push(cfg.carpeta + nombre);
+        return j;
+      };
+      const redondear = (s) => ({ promedio: Math.round(s.prom), minimo: Math.round(s.min), maximo: Math.round(s.max), uniformidad: Math.round(s.uni * 100) / 100 });
+      const originales = estado.geo.luces.map((l) => ({ l, ies: l.ies, datos: l.datos }));
+      try {
+        const conVariantes = !!(cfg.variantes && cfg.variantes.length);
+        const variantes = conVariantes ? cfg.variantes : [{ id: cfg.propuesta.id, nombre: cfg.propuesta.nombre }];
+        const terms = cfg.terminaciones && cfg.terminaciones.length ? cfg.terminaciones : [{ id: 'base', fondoMapa: null, foto: cfg.fotoEscena }];
+        const nuevas = [];
+        const fotos = [];
+
+        for (let vi = 0; vi < variantes.length; vi++) {
+          const prop = variantes[vi];
+          await aplicarVariante(conVariantes ? prop : null, originales);
+          const imagenes = {};
+          let st = null, trabajo = null, paredes = null;
+          for (let i = 0; i < terms.length; i++) {
+            const tm = terms[i];
+            btn.textContent = `Guardando «${tx2(prop.nombre)}» · ${i + 1} de ${terms.length}…`;
+            await dibujarSobreRender(tm.fondoMapa ? { archivo: tm.fondoMapa } : null);
+            const sup = estado.statsSuperficies.find((s) => !s.pared);
+            if (!sup) throw new Error('Falta la máscara del piso: no hay mapa para guardar.');
+            if (!st) {
+              st = cfg.estadisticas === 'planta' ? statsPlanta(sup.altura) : sup;
+              trabajo = cfg.trabajo != null ? statsPlanta(cfg.trabajo) : null;
+              // Paredes: promedio de todas las que se ven, pesado por la superficie de cada una
+              const ps = estado.statsSuperficies.filter((s) => s.pared && s.area > 0);
+              const area = ps.reduce((a, s) => a + s.area, 0);
+              if (area > 0) paredes = {
+                promedio: Math.round(ps.reduce((a, s) => a + s.prom * s.area, 0) / area),
+                minimo: Math.round(Math.min(...ps.map((s) => s.min))),
+                maximo: Math.round(Math.max(...ps.map((s) => s.max)))
+              };
+            }
+            const mapa = $('#compuesto');
+            const escala = Math.min(1, 1800 / Math.max(mapa.width, mapa.height));
+            const w = Math.round(mapa.width * escala), h = Math.round(mapa.height * escala);
+            const nombreMapa = `${cfg.base} mapa ${prop.id}${terms.length > 1 ? ' ' + tm.id : ''}.jpeg`;
+            await subir(nombreMapa, await imagenParaApp(mapa, w, h));
+            imagenes[tm.id] = cfg.carpeta + nombreMapa;
+            if (vi === 0 && tm.foto) {
+              const foto = await cargarImagen('escenas/' + tm.foto);
+              if (!foto) throw new Error('No encuentro el render ' + tm.foto);
+              // La foto va exactamente al tamaño del mapa: así las capas calzan en la app
+              // aunque el render con muebles (IA) haya salido con otra proporción.
+              const nombreFoto = `${cfg.base}${i === 0 ? '' : ' ' + tm.id}.jpeg`;
+              await subir(nombreFoto, await imagenParaApp(foto, w, h));
+              fotos.push({ id: tm.id, nombre: tm.nombre || { es: tm.id, en: tm.id }, foto: cfg.carpeta + nombreFoto });
+            }
+          }
+          nuevas.push({
+            id: prop.id, nombre: prop.nombre, imagenes,
+            productos: productosDeLaEscena(cfg, conVariantes ? prop : null),
+            ...redondear(st),
+            trabajo: trabajo ? { altura: cfg.trabajo, ...redondear(trabajo) } : null,
+            paredes
+          });
+        }
+
+        // Índice de la app. Con variantes, las propuestas de la escena son exactamente esas;
+        // sin variantes, se reemplaza la del mismo id y se conservan las otras.
+        const INDICE = 'data/mapas-de-luz.json';
+        const previo = await fetch('/' + INDICE, { cache: 'no-store' }).then((x) => (x.ok ? x.json() : null)).catch(() => null);
+        const indice = previo && previo.escenas ? previo : {
+          _readme: 'Mapas de luz de las escenas de Ambientes. Lo escribe la herramienta interna /mapa-de-luz/ con "Guardar para la app"; no editar a mano. La clave es la foto principal de la escena.',
+          escenas: {}
+        };
+        const clave = cfg.carpeta + cfg.base + '.jpeg';
+        const anterior = indice.escenas[clave] || {};
+        const propuestas = conVariantes
+          ? nuevas
+          : (anterior.propuestas || []).filter((p) => !nuevas.some((n) => n.id === p.id)).concat(nuevas);
+        const existe = (id) => id && propuestas.some((p) => p.id === id);
+        indice.escenas[clave] = {
+          generado: new Date().toISOString(),
+          superficie: cfg.superficie,
+          referencia: cfg.referencia,
+          terminaciones: fotos.length > 1 ? fotos : (anterior.terminaciones || undefined),
+          inicial: existe(cfg.inicial) ? cfg.inicial : (existe(anterior.inicial) ? anterior.inicial : propuestas[0].id),
+          propuestas
+        };
+        const res = await fetch('/__save?path=' + encodeURIComponent(INDICE), { method: 'POST', body: JSON.stringify(indice, null, 2) });
+        const j = await res.json().catch(() => ({}));
+        if (!j.ok) throw new Error('No se pudo anotar el mapa en ' + INDICE + ': ' + (j.error || res.status));
+        await borrarCopiasGuardadas(reemplazadas);
+        btn.textContent = nuevas.length > 1
+          ? `✓ ${nuevas.length} propuestas guardadas en la app`
+          : `✓ Propuesta «${tx2(nuevas[0].nombre)}» guardada en la app`;
+      } catch (e) {
+        btn.textContent = 'Guardar para la app';
+        alert(e.message);
+      } finally {
+        await aplicarVariante(null, originales);
+        await dibujarSobreRender();
+        btn.disabled = false;
+      }
+    }
+    const tx2 = (o) => (o && typeof o === 'object' ? (o.es || o.en || '') : (o || ''));
+
     // Mismo tamaño y calidad que deja optimizar-imagenes.ps1 en los ambientes
     // (lado mayor 1800 px, calidad 82), así no hay que volver a optimizarla.
-    function imagenParaApp(src) {
+    // Con w y h, la imagen va exactamente a ese tamaño.
+    function imagenParaApp(src, wFijo, hFijo) {
       src = src || $('#compuesto');
       const ancho = src.naturalWidth || src.width, alto = src.naturalHeight || src.height;
       const escala = Math.min(1, 1800 / Math.max(ancho, alto));
       const chica = document.createElement('canvas');
-      chica.width = Math.round(ancho * escala); chica.height = Math.round(alto * escala);
+      chica.width = wFijo || Math.round(ancho * escala); chica.height = hFijo || Math.round(alto * escala);
       const c = chica.getContext('2d');
       c.imageSmoothingQuality = 'high';
       c.drawImage(src, 0, 0, chica.width, chica.height);
@@ -819,7 +1162,7 @@
     const img = $('#render');
     img.onload = () => { img.hidden = false; };
     img.onerror = () => { $('#render-falta').hidden = false; };
-    img.src = 'escenas/' + esc.renderNoche;
+    if (esc.renderNoche) img.src = 'escenas/' + esc.renderNoche;
   }
 
   // Si el navegador guardó copias de los renders de la herramienta (versiones
@@ -837,20 +1180,74 @@
     } catch (e) { /* sin acceso a las copias: se sigue igual */ }
   }
 
+  // Si la escena apunta a un archivo exportado desde 3ds Max (tools/3dsmax/
+  // exportar-mapa-de-luz.ms), sus luces, cámara y caja reemplazan a los números
+  // cargados a mano. Si el archivo no está, se sigue con los de la escena.
+  async function importarDe3dsMax(esc) {
+    if (!esc.importar3dsMax) return null;
+    const r = await fetch('escenas/' + esc.importar3dsMax, { cache: 'no-store' }).catch(() => null);
+    if (!r || !r.ok) return null;
+    const m = await r.json();
+    const v = (a) => ({ X: a[0], Y: a[1], Z: a[2] });
+    const avisos = [];
+    // Solo cuentan las luces que están dentro de la caja del ambiente: el archivo de
+    // Max puede tener otras luces con IES en otras partes de la escena.
+    const dentro = (l) => !m.caja || (l.pos[0] >= m.caja.min[0] && l.pos[0] <= m.caja.max[0] &&
+                                       l.pos[1] >= m.caja.min[1] && l.pos[1] <= m.caja.max[1]);
+    const fuera = m.luces.filter((l) => !dentro(l));
+    m.luces = m.luces.filter(dentro);
+    if (fuera.length) avisos.push(`${fuera.length} luces fuera del ambiente, no se cuentan (${fuera.map((l) => l.nombre).join(', ')})`);
+    if (!m.luces.length) return { luces: 0, exportado: m.exportado, avisos: ['ninguna luz dentro del ambiente: se usan las cargadas a mano'] };
+    esc.max.pulgada = m.metrosPorUnidad;
+    // Ruta del IES de cada luz, relativa a la herramienta. Solo se usan IES que estén
+    // dentro de assets/ies del proyecto (el servidor no puede abrir otras carpetas).
+    const rutaIes = (p) => {
+      if (!p) return null;
+      const s = p.replace(/\\/g, '/'), i = s.toLowerCase().indexOf('assets/ies/');
+      return i === -1 ? null : '../' + s.slice(i);
+    };
+    esc.max.luces = m.luces.map((l, i) => ({ id: 'L' + (i + 1), ...v(l.pos), rot: l.giroZ || 0, nombre: l.nombre, iesRuta: rutaIes(l.ies) }));
+    const fueraDeAssets = m.luces.filter((l) => l.ies && !rutaIes(l.ies)).length;
+    if (fueraDeAssets) avisos.push(`${fueraDeAssets} luces con IES fuera de assets/ies: copialos al proyecto`);
+    if (m.caja) {
+      esc.max.esquina = { X: m.caja.min[0], Y: m.caja.min[1] };
+      esc.max.cajaAncho = m.caja.max[0] - m.caja.min[0];
+      esc.max.cajaLargo = m.caja.max[1] - m.caja.min[1];
+    }
+    if (m.camara) {
+      esc.max.camara = { ...v(m.camara.pos), objetivo: v(m.camara.objetivo), fovHorizontal: m.camara.fovHorizontal };
+    }
+    // Óptica: si todas las luces usan el mismo IES y está entre las disponibles, se elige esa
+    const nombres = [...new Set(m.luces.map((l) => (l.ies || '').split(/[\\/]/).pop()).filter(Boolean))];
+    if (nombres.length === 1 && esc.iesOpciones.includes(nombres[0])) esc.iesElegido = nombres[0];
+    const sinIes = m.luces.filter((l) => !l.ies).length;
+    if (sinIes) avisos.push(`${sinIes} luces sin IES`);
+    if (!m.caja) avisos.push('sin caja del ambiente: se usan las medidas cargadas a mano');
+    if (!m.camara) avisos.push('sin cámara: se usa la cargada a mano');
+    return { luces: m.luces.length, exportado: m.exportado, avisos };
+  }
+
   async function iniciar() {
     await borrarCopiasDeLaHerramienta();
     try {
       const r = await fetch('escenas/oficina-prueba.json', { cache: 'no-store' });
       if (!r.ok) throw new Error('No se encontró la escena (escenas/oficina-prueba.json).');
       const esc = await r.json();
+      const deMax = await importarDe3dsMax(esc);
       estado.escena = esc;
       estado.geo = geometria(esc);
       estado.plano = esc.planoTrabajo;
       estado.rho = { ...esc.reflectancias };
       const g = estado.geo;
-      $('#escena-titulo').innerHTML = `<b>${esc.nombre}</b> · ${fmt(g.W, 2)} × ${fmt(g.L, 2)} m · ${g.luces.length} × ${esc.producto}`;
-
       await cargarIes(esc.iesElegido);
+      await cargarIesPorLuz();
+      if (estado.modoPorLuz) usarProductoPrincipal();
+      $('#escena-titulo').innerHTML = `<b>${esc.nombre}</b> · ${fmt(g.W, 2)} × ${fmt(g.L, 2)} m · ${composicion() || `${g.luces.length} × ${esc.producto}`}`;
+
+      if (deMax) {
+        const aviso = deMax.avisos.length ? ` · <span class="falta">${deMax.avisos.join(' · ')}</span>` : '';
+        $('#escena-titulo').innerHTML += `<br>Datos de 3ds Max (${deMax.luces} luces, ${deMax.exportado})${aviso}`;
+      }
       armarControles();
       dibujarLeyenda();
       mostrarFicha();
@@ -862,5 +1259,35 @@
     }
   }
 
-  iniciar();
+  // Código de acceso: una barrera simple para compartir el link, no una seguridad real.
+  // En la compu (localhost) no se pide; con ?codigo en la dirección se fuerza para probarlo.
+  // Se guarda la huella (SHA-256) del código, no el código. Cada dispositivo lo pide una vez.
+  const HUELLA_CODIGO = '3cefd4946bc669c584d394b8411d7abd792768c5491606eeaa290d91b96a538a';
+  const CLAVE_ACCESO = 'td-light-study-acceso';
+  async function huella(txt) {
+    const b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(txt));
+    return [...new Uint8Array(b)].map((x) => x.toString(16).padStart(2, '0')).join('');
+  }
+  function conAcceso() {
+    const enLaCompu = ['localhost', '127.0.0.1'].includes(location.hostname);
+    const forzar = new URLSearchParams(location.search).has('codigo');
+    if (enLaCompu && !forzar) return Promise.resolve();
+    try { if (!forzar && localStorage.getItem(CLAVE_ACCESO) === HUELLA_CODIGO) return Promise.resolve(); } catch (e) { /* sin almacenamiento: se pide siempre */ }
+    document.body.classList.add('bloqueado');
+    $('#acceso').hidden = false;
+    $('#acceso-codigo').focus();
+    return new Promise((ok) => {
+      $('#acceso-form').addEventListener('submit', async (ev) => {
+        ev.preventDefault();
+        const h = await huella($('#acceso-codigo').value.trim().toLowerCase());
+        if (h !== HUELLA_CODIGO) { $('#acceso-error').hidden = false; $('#acceso-codigo').select(); return; }
+        try { localStorage.setItem(CLAVE_ACCESO, h); } catch (e) { /* no se recuerda, no pasa nada */ }
+        $('#acceso').hidden = true;
+        document.body.classList.remove('bloqueado');
+        ok();
+      });
+    });
+  }
+
+  conAcceso().then(iniciar);
 })();

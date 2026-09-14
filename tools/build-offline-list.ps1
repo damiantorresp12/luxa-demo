@@ -79,8 +79,17 @@ function Sumar-Carpeta {
 # descarga se corta por el medio, ya quedo guardado lo que mas se usa.
 $pesados += Sumar-Carpeta 'assets/Imagenes'     '^\.(jpe?g|png|webp)$'
 $pesados += Sumar-Carpeta 'assets/Spaces'       '^\.(jpe?g|png|webp)$'
-# Fotometrias (IES): la ficha "Fotometria" las lee para la curva y los datos.
-$pesados += Sumar-Carpeta 'assets/ies'          '^\.(ies|ldt)$'
+# Fotometrias (IES): solo las que usa la ficha "Fotometria" (data/fotometria.json).
+# La carpeta assets/ies tiene bibliotecas enteras de fabricantes (miles de archivos) que
+# solo usa la herramienta interna: no tiene sentido bajarlas al dispositivo.
+$fotometria = Join-Path $root 'data\fotometria.json'
+if (Test-Path -LiteralPath $fotometria) {
+  $fj = Get-Content -Raw -Encoding UTF8 -LiteralPath $fotometria | ConvertFrom-Json
+  foreach ($prop in $fj.productos.PSObject.Properties) {
+    $ruta = [string]$prop.Value.ies
+    if ($ruta -and (Test-Path -LiteralPath (Join-Path $root ($ruta -replace '/', '\')))) { $pesados += $ruta }
+  }
+}
 $pesados += Sumar-Carpeta 'assets/pdfs'         '^\.pdf$'
 $pesados += 'assets/og-preview.jpg'
 $pesados += Sumar-Carpeta 'assets/Transiciones' '^\.(mp4|webm)$'
@@ -96,16 +105,18 @@ $pesados = $pesados | Where-Object { $_ } | Select-Object -Unique
 # la fecha y hora, cada publicacion -aunque solo cambiara una linea de codigo-
 # le costaria al cliente una descarga completa.
 #
-# Se arma con el nombre y el peso de los archivos PESADOS unicamente. El codigo
-# queda afuera a proposito: la app lo busca siempre por internet y la copia es
-# solo su respaldo, asi que un cambio de codigo no tiene por que costarle al
-# cliente volver a bajar todos los renders.
+# Se arma con el nombre y el CONTENIDO (huella MD5) de los archivos PESADOS
+# unicamente. Antes era nombre + peso: si se reemplazaba un render con el mismo
+# nombre y justo pesaba igual, la version no cambiaba y el cliente seguia viendo
+# la foto vieja. El codigo queda afuera a proposito: la app lo busca siempre por
+# internet y la copia es solo su respaldo, asi que un cambio de codigo no tiene
+# por que costarle al cliente volver a bajar todos los renders.
 $huella = New-Object Text.StringBuilder
 foreach ($rel in ($pesados | Sort-Object)) {
   if ($rel -eq './') { continue }
   $f = Join-Path $root ($rel -replace '/', '\')
-  if (Test-Path $f -PathType Leaf) {
-    [void]$huella.Append($rel).Append(':').Append((Get-Item $f).Length).Append('|')
+  if (Test-Path -LiteralPath $f -PathType Leaf) {
+    [void]$huella.Append($rel).Append(':').Append((Get-FileHash -Algorithm MD5 -LiteralPath $f).Hash).Append('|')
   }
 }
 
@@ -142,6 +153,23 @@ $sb = New-Object Text.StringBuilder
 
 $destino = Join-Path $root 'offline-files.json'
 [IO.File]::WriteAllText($destino, $sb.ToString(), (New-Object Text.UTF8Encoding($false)))
+
+# ---- 4. Anotar la version dentro del guardian (sw.js) -----------------------
+# El navegador solo reinstala el guardian cuando cambia sw.js, y recien ahi tira
+# la copia vieja. Si la version del contenido no queda escrita en sw.js, un render
+# reemplazado con el mismo nombre no le llega nunca al cliente.
+$sw = Join-Path $root 'sw.js'
+if (Test-Path -LiteralPath $sw) {
+  $utf8 = New-Object Text.UTF8Encoding($false)
+  $txt = [IO.File]::ReadAllText($sw, $utf8)
+  $nuevo = [regex]::Replace($txt, "var VERSION_CONTENIDO = '[^']*';", "var VERSION_CONTENIDO = '$version';")
+  if ($nuevo -ne $txt) {
+    [IO.File]::WriteAllText($sw, $nuevo, $utf8)
+    Write-Host "Guardian (sw.js) actualizado con la version $version" -ForegroundColor Green
+  } elseif ($txt -notmatch 'var VERSION_CONTENIDO') {
+    Write-Host "OJO: sw.js no tiene la linea VERSION_CONTENIDO; los clientes no van a enterarse de fotos reemplazadas." -ForegroundColor Yellow
+  }
+}
 
 # ---- 4. Informe -------------------------------------------------------------
 $pesoArmazon = Peso-De $armazon

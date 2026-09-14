@@ -1,0 +1,20 @@
+{
+  "_readme": "Exportado desde 3ds Max para la herramienta Mapa de luz. Se regenera corriendo tools/3dsmax/exportar-mapa-de-luz.ms.",
+  "archivoMax": "C:\\Users\\Damian\\Desktop\\Borrar\\Enviroment Generico light-2.max",
+  "exportado": "14/9/2026 12:45:16",
+  "unidades": "inches",
+  "metrosPorUnidad": 0.025400,
+  "render": { "ancho": 2000, "alto": 1334 },
+  "luces": [
+    { "nombre": "Corona Light014", "clase": "CoronaLight", "pos": [120.3878, -109.5845, 111.0385], "giroZ": -90.0000, "apunta": [0.0000, 0.0000, -1.0000], "ies": "C:\\Users\\Damian\\Desktop\\Borrar\\TD light experience\\assets\\ies\\bitpop_c_2.2_ies\\bitpop_c_2.2_ies\\BITPOP C 2.2 L 42° [2700K 18W 230Vac].IES", "iesActivo": true, "intensidad": "930.0", "unidadIntensidad": "1" },
+    { "nombre": "Corona Light026", "clase": "CoronaLight", "pos": [148.8914, -49.8799, 108.0926], "giroZ": -90.0000, "apunta": [0.0000, 0.0000, -1.0000], "ies": "C:\\Users\\Damian\\Desktop\\Borrar\\TD light experience\\assets\\ies\\XAL__14_09_BO_semi-recessed___surface_ies\\XAL__25_07_BO_55_surface_049-6240417F011_002-90726_oval_lens_BO_55_007-1965890.ies", "iesActivo": true, "intensidad": "1692.0", "unidadIntensidad": "1" },
+    { "nombre": "Corona Light028", "clase": "CoronaLight", "pos": [148.8914, -160.9877, 108.0926], "giroZ": -90.0000, "apunta": [0.0000, 0.0000, -1.0000], "ies": "C:\\Users\\Damian\\Desktop\\Borrar\\TD light experience\\assets\\ies\\XAL__14_09_BO_semi-recessed___surface_ies\\XAL__25_07_BO_55_surface_049-6240417F011_002-90726_oval_lens_BO_55_007-1965890.ies", "iesActivo": true, "intensidad": "1692.0", "unidadIntensidad": "1" },
+    { "nombre": "Corona Light029", "clase": "CoronaLight", "pos": [31.2217, -49.8799, 108.0926], "giroZ": -90.0000, "apunta": [0.0000, 0.0000, -1.0000], "ies": "C:\\Users\\Damian\\Desktop\\Borrar\\TD light experience\\assets\\ies\\XAL__14_09_BO_semi-recessed___surface_ies\\XAL__25_07_BO_55_surface_049-6240417F011_002-90726_oval_lens_BO_55_007-1965890.ies", "iesActivo": true, "intensidad": "1692.0", "unidadIntensidad": "1" },
+    { "nombre": "Corona Light031", "clase": "CoronaLight", "pos": [31.2217, -160.9877, 108.0926], "giroZ": -90.0000, "apunta": [0.0000, 0.0000, -1.0000], "ies": "C:\\Users\\Damian\\Desktop\\Borrar\\TD light experience\\assets\\ies\\XAL__14_09_BO_semi-recessed___surface_ies\\XAL__25_07_BO_55_surface_049-6240417F011_002-90726_oval_lens_BO_55_007-1965890.ies", "iesActivo": true, "intensidad": "1692.0", "unidadIntensidad": "1" },
+    { "nombre": "Corona Light032", "clase": "CoronaLight", "pos": [59.9213, -109.5845, 111.0385], "giroZ": -90.0000, "apunta": [0.0000, 0.0000, -1.0000], "ies": "C:\\Users\\Damian\\Desktop\\Borrar\\TD light experience\\assets\\ies\\bitpop_c_2.2_ies\\bitpop_c_2.2_ies\\BITPOP C 2.2 L 42° [2700K 18W 230Vac].IES", "iesActivo": true, "intensidad": "930.0", "unidadIntensidad": "1" },
+    { "nombre": "Corona Light033", "clase": "CoronaLight", "pos": [90.2592, -49.8799, 108.0926], "giroZ": -90.0000, "apunta": [0.0000, 0.0000, -1.0000], "ies": "C:\\Users\\Damian\\Desktop\\Borrar\\TD light experience\\assets\\ies\\XAL__14_09_BO_semi-recessed___surface_ies\\XAL__25_07_BO_55_surface_049-6240417F011_002-90726_oval_lens_BO_55_007-1965890.ies", "iesActivo": true, "intensidad": "1692.0", "unidadIntensidad": "1" },
+    { "nombre": "Corona Light034", "clase": "CoronaLight", "pos": [90.2592, -160.9877, 108.0926], "giroZ": -90.0000, "apunta": [0.0000, 0.0000, -1.0000], "ies": "C:\\Users\\Damian\\Desktop\\Borrar\\TD light experience\\assets\\ies\\XAL__14_09_BO_semi-recessed___surface_ies\\XAL__25_07_BO_55_surface_049-6240417F011_002-90726_oval_lens_BO_55_007-1965890.ies", "iesActivo": true, "intensidad": "1692.0", "unidadIntensidad": "1" }
+  ],
+  "camara": { "nombre": "Corona Camera001", "pos": [91.9014, -291.3952, 66.9291], "objetivo": [91.9939, -185.7349, 56.9750], "fovHorizontal": 73.2337 },
+  "caja": { "nombre": "Plane4536", "min": [9.7031, -209.7052, -0.0001], "max": [171.9677, -9.3499, 0.0000] }
+}

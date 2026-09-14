@@ -512,27 +512,32 @@
     {
       "id": "office-bitpop-mapa-de-luz",
       "name": {
-        "es": "Colección Oficina Bitpop",
-        "en": "Office Bitpop Collection"
+        "es": "Colección Oficina BO & Bitpop",
+        "en": "Office BO & Bitpop Collection"
       },
       "tagline": {
-        "es": "Sala de reuniones con la luz calculada",
-        "en": "Meeting room with calculated lighting"
+        "es": "Iluminación de oficina calculada, lista para especificar",
+        "en": "Calculated office lighting, ready to specify"
       },
       "description": {
-        "es": "Una sala de reuniones iluminada con tres downlights Bitpop. Activá el mapa de luz para ver cómo se reparte la luz en el espacio, calculada con la fotometría real de la luminaria, y probá las distintas ópticas.",
-        "en": "A meeting room lit by three Bitpop downlights. Turn on the light map to see how the light spreads across the space, calculated from the luminaire's real photometry, and try the different optics."
+        "es": "Una sala de reuniones con spots BO 55 para la luz general y dos Bitpop como acento. Activá el mapa de luz para ver cómo se reparte la luz en el espacio, calculada con la fotometría real de cada luminaria, y cambiá la terminación de los artefactos.",
+        "en": "A meeting room with BO 55 spotlights for general lighting and two Bitpop as accents. Turn on the light map to see how the light spreads across the space, calculated from each luminaire's real photometry, and switch the fixtures' finish."
       },
       "image": "assets/Spaces/Office 03/Office 03.jpeg",
       "gallery": [
         "assets/Spaces/Office 03/Office 03.jpeg"
       ],
-      "heroProduct": "bitpop-downlight",
+      "heroProduct": "bo55-surface",
       "hotspots": [
         {
+          "productId": "bo55-surface",
+          "x": 49,
+          "y": 15
+        },
+        {
           "productId": "bitpop-downlight",
-          "x": 50,
-          "y": 27
+          "x": 60.6,
+          "y": 21.5
         }
       ]
     },

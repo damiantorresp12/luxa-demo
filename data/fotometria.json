@@ -1,6 +1,12 @@
 {
   "_readme": "Qué archivo fotométrico (IES) corresponde a cada producto. Lo lee la ficha de producto de la app para la sección Fotometría: curva, datos y descarga. Cuando un producto tiene IES, la potencia y el flujo de la ficha salen de este archivo, que es el dato del fabricante. No lo toca el Product Data Generator.",
   "productos": {
+    "bo55-surface": {
+      "ies": "assets/ies/XAL__14_09_BO_semi-recessed___surface_ies/XAL__25_07_BO_55_surface_049-6240417F011_002-90726.ies",
+      "fabricante": "XAL",
+      "mostrarFabricante": false,
+      "version": { "es": "flood 37° · 2700K", "en": "flood 37° · 2700K" }
+    },
     "bitpop-downlight": {
       "ies": "assets/ies/bitpop_c_2.2_ies/bitpop_c_2.2_ies/BITPOP C 2.2 F 30° [3000K 18W 230Vac].IES",
       "fabricante": "Luce&Light",

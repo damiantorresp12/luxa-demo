@@ -28,6 +28,15 @@
 var LISTA   = 'offline-files.json';
 var PREFIJO = 'luxa-offline-';
 
+/* Huella del contenido (fotos, ambientes, videos). La escribe sola
+   tools/build-offline-list.ps1 — NO editar a mano.
+   Por qué está acá: el navegador solo reinstala el guardián cuando cambia ESTE
+   archivo, y recién al reinstalarse tira la copia vieja. Si se reemplaza un render
+   con el mismo nombre y este archivo no cambia, el cliente sigue viendo la foto
+   vieja para siempre. Con la huella acá adentro, cambiar contenido cambia el
+   guardián. */
+var VERSION_CONTENIDO = '915be105565e';
+
 /* Los archivos se guardan por su ruta limpia ('css/styles.css'), pero la página
    los pide con la marca de versión pegada atrás ('css/styles.css?v=11'). Sin
    esto no los reconocería como el mismo archivo y sin internet la app abriría
@@ -361,6 +370,17 @@ self.addEventListener('fetch', function (evento) {
   // El Mapa de luz también es herramienta interna, y trabaja con renders que
   // Damian reemplaza seguido: si se guardara copia, calcularía sobre la foto vieja.
   if (url.pathname.indexOf('/mapa-de-luz/') !== -1) return;
+
+  // En el servidor local (la computadora de Damian) todo sale EN VIVO: ahí se
+  // reemplazan renders con el mismo nombre todo el tiempo, y una copia vieja hace
+  // creer que el cambio no se guardó. La copia queda solo por si el servidor está
+  // apagado. En el sitio publicado sigue la regla de siempre (abajo).
+  if (self.location.hostname === 'localhost' || self.location.hostname === '127.0.0.1') {
+    evento.respondWith(fetch(pedido).catch(function () {
+      return caches.match(pedido, IGNORAR_VERSION);
+    }));
+    return;
+  }
 
   /* --------------------------------------------------------------------------
      LA REGLA DE FONDO — de dónde sale cada cosa

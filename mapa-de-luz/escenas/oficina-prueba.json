@@ -1,103 +1,85 @@
 {
-  "_readme": "Escena de prueba del Mapa de luz. Los numeros de 'max' son los que muestra 3ds Max (pulgadas). La herramienta los pasa a metros sola. Lo marcado 'estimado' salio de medir sobre la captura de la vista superior.",
-  "nombre": "Oficina de prueba",
-  "producto": "Bitpop C 2.2 · Luce&Light",
+  "_readme": "Escena del Mapa de luz. Luces, camara y medidas salen de oficina-prueba-max.json (script de 3ds Max); lo de 'max' aca es solo el respaldo si ese archivo falta. La herramienta trabaja SOLO sobre el render vacio con artefactos blancos (piso y paredes con el Mask ID). Las fotos con muebles y la terminacion negra son exclusivas de la app: estan en 'paraApp.terminaciones'. 'paraApp.variantes' genera una propuesta por cada optica del BO 55.",
+  "nombre": "Sala de reuniones",
+  "importar3dsMax": "oficina-prueba-max.json",
+  "producto": "BO 55 Surface + Bitpop C 2.2",
 
   "max": {
     "pulgada": 0.0254,
-    "cajaAncho": 175.338,
-    "cajaLargo": 394.017,
-    "esquina": { "X": 9.02, "Y": -404.37, "estimado": true },
-    "luces": [
-      { "id": "L1", "X": 104.913, "Y": -105.807, "Z": 118.105 },
-      { "id": "L2", "X": 104.913, "Y": -202.959, "Z": 118.105 },
-      { "id": "L3", "X": 104.913, "Y": -298.419, "Z": 118.105 }
-    ],
+    "cajaAncho": 162.2646,
+    "cajaLargo": 200.3553,
+    "esquina": { "X": 9.7031, "Y": -209.7052 },
+    "luces": [],
     "camara": {
-      "alturaM": 1.70,
-      "objetivo": { "X": 104.436, "Y": -256.129, "Z": 56.975 },
-      "distanciaObjetivo": 106.136,
-      "fovHorizontal": 73.234,
-      "mira": "+Y",
-      "_nota": "La X e Y de la cámara se deducen: misma X que el objetivo, hacia atrás en Y según la distancia al objetivo."
+      "X": 91.9014, "Y": -291.3952, "Z": 66.9291,
+      "objetivo": { "X": 91.9939, "Y": -185.7349, "Z": 56.9750 },
+      "fovHorizontal": 73.2337
     }
   },
 
-  "altoTecho": 3.10,
-  "altoTechoSupuesto": true,
+  "altoTecho": 3.00,
 
   "vidrios": [
-    { "pared": "derecha", "desde": 0, "hasta": 10.008, "alto": 3.10, "nombre": "Tabique de vidrio" },
-    { "pared": "izquierda", "desde": 3.02, "hasta": 7.04, "alto": 1.50, "nombre": "Ventana" }
+    { "pared": "derecha", "desde": 0, "hasta": 5.09, "alto": 3.00, "nombre": "Tabique de vidrio" },
+    { "pared": "izquierda", "desde": 1.10, "hasta": 3.90, "alto": 1.50, "nombre": "Ventana", "estimado": true }
   ],
 
   "reflectancias": { "techo": 0.80, "paredes": 0.70, "piso": 0.20, "vidrio": 0.10 },
   "planoTrabajo": 0.75,
-  "referencia": { "nombre": "Escritorio de oficina", "lux": 500, "uniformidad": 0.60, "fuente": "EN 12464-1" },
+  "referencia": { "nombre": "Sala de reuniones", "lux": 500, "uniformidad": 0.60, "fuente": "EN 12464-1" },
 
   "iesCarpeta": "../assets/ies/bitpop_c_2.2_ies/bitpop_c_2.2_ies/",
-  "iesElegido": "BITPOP C 2.2 F 30° [2700K 18W 230Vac].IES",
+  "iesElegido": "BITPOP C 2.2 L 42° [2700K 18W 230Vac].IES",
   "iesOpciones": [
     "BITPOP C 2.2 S 17° [2700K 18W 230Vac].IES",
-    "BITPOP C 2.2 S 17° [3000K 18W 230Vac].IES",
-    "BITPOP C 2.2 S 17° [4000K 18W 230Vac].IES",
     "BITPOP C 2.2 F 30° [2700K 18W 230Vac].IES",
-    "BITPOP C 2.2 F 30° [3000K 18W 230Vac].IES",
-    "BITPOP C 2.2 F 30° [4000K 18W 230Vac].IES",
     "BITPOP C 2.2 L 42° [2700K 18W 230Vac].IES",
-    "BITPOP C 2.2 L 42° [3000K 18W 230Vac].IES",
-    "BITPOP C 2.2 L 42° [4000K 18W 230Vac].IES",
-    "BITPOP C 2.2 W 17°x45° [2700K 18W 230Vac].IES",
-    "BITPOP C 2.2 W 17°x45° [3000K 18W 230Vac].IES",
-    "BITPOP C 2.2 W 17°x45° [4000K 18W 230Vac].IES"
+    "BITPOP C 2.2 W 17°x45° [2700K 18W 230Vac].IES"
   ],
 
-  "renderNoche": "oficina-prueba-noche.jpg",
+  "renderNoche": null,
   "imagenes": {
     "render": [
-      { "archivo": "oficina-prueba-dia.jpg", "nombre": "Día",
-        "_nota": "Versión PISO para la app: el mapa sobre el ambiente vacío. Los números de la tarjeta salen de la planta entera (no solo lo que ve la cámara), y aparte se guarda la altura de trabajo, que es donde se mide la referencia.",
+      { "archivo": "oficina-prueba-dia.jpg", "nombre": "Vacía · artefactos blancos",
+        "conMuebles": "oficina-prueba-dia-muebles.jpg",
+        "superficies": [
+          { "nombre": "Piso", "maskId": "oficina-prueba-id.png", "altura": 0 },
+          { "nombre": "Pared de la ventana", "maskId": "oficina-prueba-id.png", "pared": "izquierda" },
+          { "nombre": "Pared del fondo", "maskId": "oficina-prueba-id.png", "pared": "fondo" }
+        ],
         "paraApp": {
           "carpeta": "assets/Spaces/Office 03/",
           "base": "Office 03",
-          "sufijo": "piso",
-          "fotoEscena": "oficina-prueba-dia-muebles.jpg",
           "estadisticas": "planta",
           "trabajo": 0.75,
-          "producto": { "id": "bitpop-downlight", "nombre": "Bitpop C 2.2" },
           "superficie": { "es": "Sobre el piso", "en": "On the floor" },
           "referencia": { "lux": 500, "nombre": { "es": "Recomendado en salas de reunión", "en": "Recommended for meeting rooms" } },
-          "inicial": "30",
-          "opticas": [
-            { "id": "17", "nombre": { "es": "17°", "en": "17°" }, "ies": "BITPOP C 2.2 S 17° [2700K 18W 230Vac].IES" },
-            { "id": "30", "nombre": { "es": "30°", "en": "30°" }, "ies": "BITPOP C 2.2 F 30° [2700K 18W 230Vac].IES" },
-            { "id": "42", "nombre": { "es": "42°", "en": "42°" }, "ies": "BITPOP C 2.2 L 42° [2700K 18W 230Vac].IES" },
-            { "id": "oval", "nombre": { "es": "Oval", "en": "Oval" }, "ies": "BITPOP C 2.2 W 17°x45° [2700K 18W 230Vac].IES" }
+          "propuesta": { "id": "oval", "nombre": { "es": "Lente oval", "en": "Oval lens" } },
+          "inicial": "oval",
+          "variantes": [
+            { "id": "oval", "nombre": { "es": "Lente oval", "en": "Oval lens" },
+              "ies": { "BO_55_surface": "../assets/ies/XAL__14_09_BO_semi-recessed___surface_ies/XAL__25_07_BO_55_surface_049-6240417F011_002-90726_oval_lens_BO_55_007-1965890.ies" },
+              "detalle": { "bo55-surface": { "es": "lente oval · 2700K", "en": "oval lens · 2700K" } } },
+            { "id": "soft", "nombre": { "es": "Lente soft", "en": "Soft lens" },
+              "ies": { "BO_55_surface": "../assets/ies/XAL__14_09_BO_semi-recessed___surface_ies/XAL__25_07_BO_55_surface_049-6240417F011_002-90726_soft_lens_BO_55_007-1965990.ies" },
+              "detalle": { "bo55-surface": { "es": "lente soft · 2700K", "en": "soft lens · 2700K" } } },
+            { "id": "37", "nombre": { "es": "Haz 37°", "en": "37° beam" },
+              "ies": { "BO_55_surface": "../assets/ies/XAL__14_09_BO_semi-recessed___surface_ies/XAL__25_07_BO_55_surface_049-6240417F011_002-90726.ies" },
+              "detalle": { "bo55-surface": { "es": "haz 37° · 2700K", "en": "37° beam · 2700K" } } },
+            { "id": "30", "nombre": { "es": "Haz 30°", "en": "30° beam" },
+              "ies": { "BO_55_surface": "../assets/ies/XAL__14_09_BO_semi-recessed___surface_ies/XAL__25_07_BO_55_surface_049-6240417M011_002-90726.ies" },
+              "detalle": { "bo55-surface": { "es": "haz 30° · 2700K", "en": "30° beam · 2700K" } } }
+          ],
+          "terminaciones": [
+            { "id": "white", "nombre": { "es": "Blanco", "en": "White" }, "fondoMapa": "oficina-prueba-dia.jpg", "foto": "oficina-prueba-dia-muebles.jpg" },
+            { "id": "black", "nombre": { "es": "Negro", "en": "Black" }, "fondoMapa": "oficina-prueba-dia-negro.jpg", "foto": "oficina-prueba-dia-muebles-negro.jpg" }
+          ],
+          "productos": [
+            { "ies": "BO_55_surface", "id": "bo55-surface", "nombre": "BO 55 Surface", "detalle": { "es": "2700K", "en": "2700K" } },
+            { "ies": "BITPOP C 2.2", "id": "bitpop-downlight", "nombre": "Bitpop C 2.2", "detalle": { "es": "42° · 2700K", "en": "42° · 2700K" } }
           ]
-        },
-        "superficies": [ { "nombre": "Piso", "mascara": "oficina-prueba-piso.jpg", "altura": 0 } ] },
-      { "archivo": "oficina-prueba-dia-muebles.jpg", "nombre": "Día con muebles",
-        "_nota": "Versión MESA para la app. Para volver a ella: elegir este fondo y tocar Guardar para la app.",
-        "paraApp": {
-          "carpeta": "assets/Spaces/Office 03/",
-          "base": "Office 03",
-          "sufijo": "mesa",
-          "fotoEscena": "oficina-prueba-dia-muebles.jpg",
-          "producto": { "id": "bitpop-downlight", "nombre": "Bitpop C 2.2" },
-          "superficie": { "es": "Sobre la mesa", "en": "On the table" },
-          "referencia": { "lux": 500, "nombre": { "es": "Recomendado en salas de reunión", "en": "Recommended for meeting rooms" } },
-          "inicial": "30",
-          "opticas": [
-            { "id": "17", "nombre": { "es": "17°", "en": "17°" }, "ies": "BITPOP C 2.2 S 17° [2700K 18W 230Vac].IES" },
-            { "id": "30", "nombre": { "es": "30°", "en": "30°" }, "ies": "BITPOP C 2.2 F 30° [2700K 18W 230Vac].IES" },
-            { "id": "42", "nombre": { "es": "42°", "en": "42°" }, "ies": "BITPOP C 2.2 L 42° [2700K 18W 230Vac].IES" },
-            { "id": "oval", "nombre": { "es": "Oval", "en": "Oval" }, "ies": "BITPOP C 2.2 W 17°x45° [2700K 18W 230Vac].IES" }
-          ]
-        },
-        "superficies": [ { "nombre": "Mesa", "mascara": "tapa.jpg", "altura": 0.81, "_nota": "Mesa hecha con IA: altura medida en la imagen con la cámara calibrada (pata en el piso y borde de la tapa): 0,81 m ± 0,02." } ] },
-      { "archivo": "oficina-prueba-noche.jpg", "nombre": "Noche · solo Bitpop",
-        "superficies": [ { "nombre": "Piso", "mascara": "oficina-prueba-piso.jpg", "altura": 0 } ] }
-    ],
-    "piso": "oficina-prueba-piso.jpg"
+        }
+      }
+    ]
   }
 }

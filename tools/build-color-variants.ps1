@@ -34,6 +34,44 @@ if (-not (Test-Path $source)) {
 # del array dentro del JSON.
 $colorOrder = @{ white = 0; black = 1; gold = 2 }
 
+# Huella chica de una imagen (32x32 pixeles) para saber si dos archivos son "la misma
+# foto" aunque se hayan vuelto a exportar u optimizar.
+Add-Type -AssemblyName System.Drawing
+function Get-Huella([string]$ruta) {
+  $img = [System.Drawing.Image]::FromFile($ruta)
+  try {
+    $bmp = New-Object System.Drawing.Bitmap 32, 32
+    $g = [System.Drawing.Graphics]::FromImage($bmp)
+    $g.InterpolationMode = [System.Drawing.Drawing2D.InterpolationMode]::HighQualityBilinear
+    $g.DrawImage($img, 0, 0, 32, 32)
+    $g.Dispose()
+    $v = New-Object 'int[]' 3072
+    $k = 0
+    for ($y = 0; $y -lt 32; $y++) {
+      for ($x = 0; $x -lt 32; $x++) {
+        $c = $bmp.GetPixel($x, $y)
+        $v[$k++] = $c.R; $v[$k++] = $c.G; $v[$k++] = $c.B
+      }
+    }
+    $bmp.Dispose()
+    return ,$v
+  } finally { $img.Dispose() }
+}
+# Diferencia media SOLO donde hay artefacto: los renders de producto son casi todo fondo
+# blanco, y comparando la imagen entera dos lamparas de distinto color parecen iguales.
+function Get-Diferencia($a, $b) {
+  $s = 0; $n = 0
+  for ($i = 0; $i -lt $a.Length; $i += 3) {
+    $fondoA = ($a[$i] -gt 235) -and ($a[$i + 1] -gt 235) -and ($a[$i + 2] -gt 235)
+    $fondoB = ($b[$i] -gt 235) -and ($b[$i + 1] -gt 235) -and ($b[$i + 2] -gt 235)
+    if ($fondoA -and $fondoB) { continue }
+    $s += [math]::Abs($a[$i] - $b[$i]) + [math]::Abs($a[$i + 1] - $b[$i + 1]) + [math]::Abs($a[$i + 2] - $b[$i + 2])
+    $n += 3
+  }
+  if ($n -eq 0) { return 0 }
+  return $s / $n
+}
+
 # Leer el manifest anterior (si existe) para detectar diffs y preservar el _readme.
 $previousVariants = @{}
 $readme = 'Manifest de variantes de color para luminarias del catalogo. Generado a partir de las subcarpetas de assets/Imagenes/Imagenes_colors/. La key de cada entry es el basename del filename original del render (assets.image del producto, sin extension). La app lo lee al boot y attacha las variantes al producto correspondiente. Para regenerar despues de agregar/quitar variantes, correr tools/build-color-variants.ps1.'
@@ -68,6 +106,27 @@ foreach ($d in $dirs) {
       id    = $f.BaseName.ToLower()
       image = "assets/Imagenes/Imagenes_colors/$($d.Name)/$($f.Name)"
     }
+  }
+  # Si la foto principal del catalogo ES una de estas variantes (la misma imagen), se
+  # marca como "original": asi la app no le inventa un color aparte a la foto principal.
+  $principal = Get-ChildItem -LiteralPath (Join-Path $root 'assets/Imagenes') -File |
+               Where-Object { $_.BaseName -eq $d.Name -and $_.Extension -match '^\.(jpe?g|png|webp)$' } |
+               Select-Object -First 1
+  if ($principal) {
+    try {
+      $hp = Get-Huella $principal.FullName
+      $mejor = $null; $mejorDif = 999
+      foreach ($v in $list) {
+        $dif = Get-Diferencia $hp (Get-Huella (Join-Path $root $v.image))
+        if ($dif -lt $mejorDif) { $mejorDif = $dif; $mejor = $v }
+      }
+      # Limite muy estricto: la misma foto re-exportada da 0,0-0,1, y dos colores que
+      # solo difieren en detalles chicos (ej. Aballs M dorado vs negro) ya dan ~2.
+      if ($mejor -and $mejorDif -lt 1) {
+        $mejor.original = $true
+        Write-Host ("  = {0}: la foto principal es la variante '{1}' (diferencia {2:N1})" -f $d.Name, $mejor.id, $mejorDif) -ForegroundColor DarkGray
+      }
+    } catch { }
   }
   $variants[$d.Name] = $list
 }
@@ -118,7 +177,9 @@ foreach ($k in $keys) {
   [void]$lines.Add('    ' + ($k | ConvertTo-Json) + ': [')
   for ($i = 0; $i -lt $list.Count; $i++) {
     $v = $list[$i]
-    $line = '      { "id": ' + ($v.id | ConvertTo-Json) + ', "image": ' + ($v.image | ConvertTo-Json) + ' }'
+    $marca = ''
+    if ($v.original) { $marca = ', "original": true' }
+    $line = '      { "id": ' + ($v.id | ConvertTo-Json) + ', "image": ' + ($v.image | ConvertTo-Json) + $marca + ' }'
     if ($i -lt $list.Count - 1) { $line += ',' }
     [void]$lines.Add($line)
   }
