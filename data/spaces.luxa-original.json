@@ -532,12 +532,14 @@
         {
           "productId": "bo55-surface",
           "x": 49,
-          "y": 15
+          "y": 15,
+          "closeUpImage": "assets/Spaces/Office 03/Office 03 contexto BO.jpeg"
         },
         {
           "productId": "bitpop-downlight",
           "x": 60.6,
-          "y": 21.5
+          "y": 21.5,
+          "closeUpImage": "assets/Spaces/Office 03/Office 03 contexto Bitpop.jpeg"
         }
       ]
     },

@@ -42,6 +42,7 @@
     "render": [
       { "archivo": "oficina-prueba-dia.jpg", "nombre": "Vacía · artefactos blancos",
         "conMuebles": "oficina-prueba-dia-muebles.jpg",
+        "porEncendido": { "general": "oficina-prueba-dia-bo.jpg", "acento": "oficina-prueba-dia-bitpop.jpg" },
         "superficies": [
           { "nombre": "Piso", "maskId": "oficina-prueba-id.png", "altura": 0 },
           { "nombre": "Pared de la ventana", "maskId": "oficina-prueba-id.png", "pared": "izquierda" },
@@ -70,8 +71,14 @@
               "ies": { "BO_55_surface": "../assets/ies/XAL__14_09_BO_semi-recessed___surface_ies/XAL__25_07_BO_55_surface_049-6240417M011_002-90726.ies" },
               "detalle": { "bo55-surface": { "es": "haz 30° · 2700K", "en": "30° beam · 2700K" } } }
           ],
+          "encendidoTodo": { "es": "Todo", "en": "All" },
+          "encendidos": [
+            { "id": "general", "nombre": { "es": "General", "en": "General" }, "productos": ["bo55-surface"] },
+            { "id": "acento", "nombre": { "es": "Acento", "en": "Accent" }, "productos": ["bitpop-downlight"] }
+          ],
           "terminaciones": [
-            { "id": "white", "nombre": { "es": "Blanco", "en": "White" }, "fondoMapa": "oficina-prueba-dia.jpg", "foto": "oficina-prueba-dia-muebles.jpg" },
+            { "id": "white", "nombre": { "es": "Blanco", "en": "White" }, "fondoMapa": "oficina-prueba-dia.jpg", "foto": "oficina-prueba-dia-muebles.jpg",
+              "fondoPorEncendido": { "general": "oficina-prueba-dia-bo.jpg", "acento": "oficina-prueba-dia-bitpop.jpg" } },
             { "id": "black", "nombre": { "es": "Negro", "en": "Black" }, "fondoMapa": "oficina-prueba-dia-negro.jpg", "foto": "oficina-prueba-dia-muebles-negro.jpg" }
           ],
           "productos": [

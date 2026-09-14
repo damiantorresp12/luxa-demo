@@ -539,7 +539,9 @@
     if (opciones && opciones.archivo && !forzado && lista[0]) forzado = { ...lista[0], archivo: opciones.archivo };
     const orden = forzado ? [forzado] : (lista[estado.fondo] ? [lista[estado.fondo], ...lista] : lista);
     let render = null, base = null;
-    for (const r of orden) { base = await cargarImagen('escenas/' + r.archivo); if (base) { render = r; break; } }
+    // Con un encendido elegido (ej. solo General), el render con solo esas luces prendidas
+    const archivoDe = (r) => (!forzado && estado.encendido && r.porEncendido && r.porEncendido[estado.encendido]) || r.archivo;
+    for (const r of orden) { base = await cargarImagen('escenas/' + archivoDe(r)); if (base) { render = r; break; } }
     const Wi = base ? base.naturalWidth : 2000;
     const Hi = base ? base.naturalHeight : 1333;
 
@@ -685,7 +687,7 @@
       if (muebles) $('#compuesto-muebles').src = 'escenas/' + muebles;
       else if (bMuebles.classList.contains('activo')) $('#switch-app [data-capa="mapa"]').click();
     }
-    const partes = [base ? `Render: ${render.archivo}` : 'Sin render: guardalo en <code>mapa-de-luz/escenas/</code>'];
+    const partes = [base ? `Render: ${archivoDe(render)}` :'Sin render: guardalo en <code>mapa-de-luz/escenas/</code>'];
     if (sinMascaras) partes.push('sin máscara: se pinta la caja del piso');
     for (const st of estado.statsSuperficies) {
       const donde = st.pared ? '' : ` a ${fmt(st.altura, 2)} m`;
@@ -782,6 +784,27 @@
         mostrarFicha(); dibujarPolar(); recalcularTodo();
       } catch (e) { alert(e.message); }
     });
+
+    // Encendido: Todo / General / Acento, como en la app. Apaga las luces de los otros
+    // productos, recalcula y muestra el render con solo esas luces si la escena lo tiene.
+    const cfgApp = (listaRenders().find((r) => r.paraApp) || {}).paraApp;
+    estado.todasLuces = estado.todasLuces || estado.geo.luces;
+    const encendidosApp = (cfgApp && cfgApp.encendidos) || [];
+    const textoDe = (n) => (n && typeof n === 'object' ? (n.es || n.en || '') : (n || ''));
+    $('#bloque-encendido').hidden = !encendidosApp.length;
+    if (encendidosApp.length) {
+      const seg = $('#seg-encendido');
+      seg.innerHTML = [{ id: '', nombre: cfgApp.encendidoTodo || 'Todo' }].concat(encendidosApp)
+        .map((e) => `<button data-enc="${e.id}"${e.id ? '' : ' class="activo"'}>${textoDe(e.nombre)}</button>`).join('');
+      seg.addEventListener('click', (ev) => {
+        const b = ev.target.closest('button'); if (!b) return;
+        seg.querySelectorAll('button').forEach((x) => x.classList.toggle('activo', x === b));
+        estado.encendido = b.dataset.enc || null;
+        const enc = encendidosApp.find((e) => e.id === estado.encendido);
+        encender(enc ? enc.productos : null, cfgApp, estado.todasLuces);
+        redibujar();
+      });
+    }
 
     $('#seg-plano').addEventListener('click', (ev) => {
       const b = ev.target.closest('button'); if (!b) return;
@@ -938,6 +961,19 @@
       }
     });
 
+    // Grupos por fotometría de las luces que están en la escena: los usan la lista de
+    // productos, el título y la ficha.
+    function reagrupar() {
+      if (!estado.modoPorLuz) return;
+      const grupos = new Map();
+      for (const l of estado.geo.luces) {
+        if (!l.ies) continue;
+        if (!grupos.has(l.ies)) grupos.set(l.ies, { ies: l.ies, datos: l.datos, n: 0 });
+        grupos.get(l.ies).n++;
+      }
+      estado.iesPorLuz = [...grupos.values()].sort((a, b) => b.n - a.n);
+    }
+
     // Aplica la fotometría de una variante a las luces que coinciden (o vuelve a la de
     // 3ds Max con prop = null) y recalcula. Ej.: el BO 55 con lente oval, soft o sin lente.
     async function aplicarVariante(prop, originales) {
@@ -957,21 +993,25 @@
           }
         }
       }
-      // Grupos por fotometría: los usan la lista de productos, el título y la ficha
-      if (estado.modoPorLuz) {
-        const grupos = new Map();
-        for (const l of estado.geo.luces) {
-          if (!l.ies) continue;
-          if (!grupos.has(l.ies)) grupos.set(l.ies, { ies: l.ies, datos: l.datos, n: 0 });
-          grupos.get(l.ies).n++;
-        }
-        estado.iesPorLuz = [...grupos.values()].sort((a, b) => b.n - a.n);
-      }
+      reagrupar();
       calcularGrilla();
       calcularRebote();
     }
 
-    // Productos de la escena con sus cantidades, según la fotometría que tiene cada luz ahora
+    // Escena de encendido: deja prendidas solo las luces de esos productos del catálogo
+    // (null = todas) y recalcula. Ej.: solo la luz general (BO) o solo el acento (Bitpop).
+    function encender(idsProductos, cfg, todas) {
+      estado.geo.luces = !idsProductos ? todas : todas.filter((l) => {
+        const clave = `${l.iesRuta || ''} ${l.ies ? l.ies.nombre : ''}`.toLowerCase();
+        const p = (cfg.productos || []).find((x) => clave.includes(x.ies.toLowerCase()));
+        return !!p && idsProductos.includes(p.id);
+      });
+      reagrupar();
+      calcularGrilla();
+      calcularRebote();
+    }
+
+    // Productos de la escena con sus cantidades, según las luces prendidas y su fotometría
     function productosDeLaEscena(cfg, prop) {
       const grupos = (estado.modoPorLuz && estado.iesPorLuz)
         ? estado.iesPorLuz.map((g) => {
@@ -992,8 +1032,9 @@
     // Guarda PROPUESTAS de iluminación para la app. Con "variantes" en la escena, genera
     // una propuesta por variante (la misma distribución con otra óptica); si no, una sola.
     // Por cada propuesta: un mapa por terminación de los artefactos (blancos, negros…),
-    // los números (piso, altura de trabajo y paredes) y la lista de productos. Las fotos
-    // de la escena (una por terminación) se guardan una sola vez.
+    // los números (piso, altura de trabajo y paredes) y la lista de productos. Con
+    // "encendidos", lo mismo para cada escena de encendido (ej. solo general, solo acento).
+    // Las fotos de la escena (una por terminación) se guardan una sola vez.
     async function guardarPropuesta(cfg, btn) {
       clearTimeout(pendienteRender);
       btn.disabled = true;
@@ -1007,23 +1048,27 @@
         return j;
       };
       const redondear = (s) => ({ promedio: Math.round(s.prom), minimo: Math.round(s.min), maximo: Math.round(s.max), uniformidad: Math.round(s.uni * 100) / 100 });
-      const originales = estado.geo.luces.map((l) => ({ l, ies: l.ies, datos: l.datos }));
+      const todas = estado.todasLuces || estado.geo.luces;
+      estado.geo.luces = todas;
+      const originales = todas.map((l) => ({ l, ies: l.ies, datos: l.datos }));
       try {
         const conVariantes = !!(cfg.variantes && cfg.variantes.length);
         const variantes = conVariantes ? cfg.variantes : [{ id: cfg.propuesta.id, nombre: cfg.propuesta.nombre }];
         const terms = cfg.terminaciones && cfg.terminaciones.length ? cfg.terminaciones : [{ id: 'base', fondoMapa: null, foto: cfg.fotoEscena }];
+        const encendidos = cfg.encendidos || [];
         const nuevas = [];
         const fotos = [];
 
-        for (let vi = 0; vi < variantes.length; vi++) {
-          const prop = variantes[vi];
-          await aplicarVariante(conVariantes ? prop : null, originales);
+        // Mapas, números y productos de lo que está prendido ahora, uno por terminación
+        const generar = async (prop, enc, conFotos) => {
           const imagenes = {};
           let st = null, trabajo = null, paredes = null;
           for (let i = 0; i < terms.length; i++) {
             const tm = terms[i];
-            btn.textContent = `Guardando «${tx2(prop.nombre)}» · ${i + 1} de ${terms.length}…`;
-            await dibujarSobreRender(tm.fondoMapa ? { archivo: tm.fondoMapa } : null);
+            btn.textContent = `Guardando «${tx2(prop.nombre)}»${enc ? ' · ' + tx2(enc.nombre) : ''} · ${i + 1} de ${terms.length}…`;
+            // Fondo del mapa: el render de esa terminación, o el de solo esas luces si existe
+            const fondo = (enc && tm.fondoPorEncendido && tm.fondoPorEncendido[enc.id]) || tm.fondoMapa;
+            await dibujarSobreRender(fondo ? { archivo: fondo } : null);
             const sup = estado.statsSuperficies.find((s) => !s.pared);
             if (!sup) throw new Error('Falta la máscara del piso: no hay mapa para guardar.');
             if (!st) {
@@ -1041,10 +1086,10 @@
             const mapa = $('#compuesto');
             const escala = Math.min(1, 1800 / Math.max(mapa.width, mapa.height));
             const w = Math.round(mapa.width * escala), h = Math.round(mapa.height * escala);
-            const nombreMapa = `${cfg.base} mapa ${prop.id}${terms.length > 1 ? ' ' + tm.id : ''}.jpeg`;
+            const nombreMapa = `${cfg.base} mapa ${prop.id}${enc ? ' ' + enc.id : ''}${terms.length > 1 ? ' ' + tm.id : ''}.jpeg`;
             await subir(nombreMapa, await imagenParaApp(mapa, w, h));
             imagenes[tm.id] = cfg.carpeta + nombreMapa;
-            if (vi === 0 && tm.foto) {
+            if (conFotos && tm.foto) {
               const foto = await cargarImagen('escenas/' + tm.foto);
               if (!foto) throw new Error('No encuentro el render ' + tm.foto);
               // La foto va exactamente al tamaño del mapa: así las capas calzan en la app
@@ -1054,13 +1099,30 @@
               fotos.push({ id: tm.id, nombre: tm.nombre || { es: tm.id, en: tm.id }, foto: cfg.carpeta + nombreFoto });
             }
           }
-          nuevas.push({
-            id: prop.id, nombre: prop.nombre, imagenes,
+          return {
+            imagenes,
             productos: productosDeLaEscena(cfg, conVariantes ? prop : null),
             ...redondear(st),
             trabajo: trabajo ? { altura: cfg.trabajo, ...redondear(trabajo) } : null,
             paredes
-          });
+          };
+        };
+
+        for (let vi = 0; vi < variantes.length; vi++) {
+          const prop = variantes[vi];
+          encender(null, cfg, todas);
+          await aplicarVariante(conVariantes ? prop : null, originales);
+          const nueva = { id: prop.id, nombre: prop.nombre, ...(await generar(prop, null, vi === 0)) };
+          if (encendidos.length) {
+            nueva.porEncendido = {};
+            for (const enc of encendidos) {
+              encender(enc.productos, cfg, todas);
+              if (!estado.geo.luces.length) throw new Error(`El encendido «${tx2(enc.nombre)}» no tiene luces: revisá sus productos en la escena.`);
+              nueva.porEncendido[enc.id] = await generar(prop, enc, false);
+            }
+            encender(null, cfg, todas);
+          }
+          nuevas.push(nueva);
         }
 
         // Índice de la app. Con variantes, las propuestas de la escena son exactamente esas;
@@ -1082,6 +1144,9 @@
           superficie: cfg.superficie,
           referencia: cfg.referencia,
           terminaciones: fotos.length > 1 ? fotos : (anterior.terminaciones || undefined),
+          encendidos: encendidos.length
+            ? [{ id: 'todo', nombre: cfg.encendidoTodo || { es: 'Todo', en: 'All' } }].concat(encendidos.map((e) => ({ id: e.id, nombre: e.nombre })))
+            : undefined,
           inicial: existe(cfg.inicial) ? cfg.inicial : (existe(anterior.inicial) ? anterior.inicial : propuestas[0].id),
           propuestas
         };
@@ -1096,7 +1161,11 @@
         btn.textContent = 'Guardar para la app';
         alert(e.message);
       } finally {
+        estado.geo.luces = todas;
         await aplicarVariante(null, originales);
+        // Vuelve al encendido que estaba elegido en el panel
+        const encActual = (cfg.encendidos || []).find((e) => e.id === estado.encendido);
+        if (encActual) encender(encActual.productos, cfg, todas);
         await dibujarSobreRender();
         btn.disabled = false;
       }
@@ -1137,6 +1206,83 @@
         const a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
         a.download = (estado.escena.nombre || 'escena').toLowerCase().replace(/\s+/g, '-') + ' mapa.jpg';
+        a.click();
+        setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+      }, 'image/jpeg', 0.9);
+    });
+
+    // Comparación para presentar: Todo / General / Acento lado a lado, cada uno con su
+    // render (solo esas luces prendidas) y sus números. Sale como una imagen JPG.
+    const btnComparar = $('#btn-comparar');
+    btnComparar.hidden = !encendidosApp.length;
+    btnComparar.addEventListener('click', async () => {
+      btnComparar.disabled = true;
+      const renderApp = listaRenders().find((r) => r.paraApp) || listaRenders()[0];
+      const altura = (cfgApp && cfgApp.trabajo) || 0.75;
+      const ref = estado.escena.referencia;
+      const escenas = [{ id: '', nombre: cfgApp.encendidoTodo || 'Todo', productos: null }].concat(encendidosApp);
+      const columnas = [];
+      try {
+        for (const e of escenas) {
+          encender(e.productos, cfgApp, estado.todasLuces);
+          const archivo = (e.id && renderApp.porEncendido && renderApp.porEncendido[e.id]) || renderApp.archivo;
+          columnas.push({
+            nombre: textoDe(e.nombre),
+            st: statsPlanta(altura),
+            watts: estado.geo.luces.reduce((s, l) => s + (datosDe(l).watts || 0), 0),
+            productos: productosDeLaEscena(cfgApp, null).map((p) => `${p.cantidad} × ${p.nombre}`).join(' + '),
+            img: await cargarImagen('escenas/' + archivo)
+          });
+        }
+      } catch (err) {
+        alert('No se pudo armar la comparación: ' + err.message);
+        return;
+      } finally {
+        const enc = encendidosApp.find((x) => x.id === estado.encendido);
+        encender(enc ? enc.productos : null, cfgApp, estado.todasLuces);
+        btnComparar.disabled = false;
+      }
+
+      const colW = 900, imgH = 675, gap = 28, pad = 56, cabecera = 150, pieCol = 220, pie = 70;
+      const W = pad * 2 + colW * columnas.length + gap * (columnas.length - 1), H = cabecera + imgH + pieCol + pie;
+      const c = document.createElement('canvas'); c.width = W; c.height = H;
+      const x = c.getContext('2d');
+      const letra = (peso, px) => `${peso} ${px}px "Segoe UI", system-ui, sans-serif`;
+      x.fillStyle = '#0f0f12'; x.fillRect(0, 0, W, H);
+      x.fillStyle = '#c9a35a'; x.font = letra(600, 24); x.fillText('TD LIGHT STUDY', pad, 64);
+      x.fillStyle = '#ececec'; x.font = letra(400, 40); x.fillText(`${estado.escena.nombre} · escenas de encendido`, pad, 116);
+      columnas.forEach((col, i) => {
+        const x0 = pad + i * (colW + gap);
+        let y = cabecera;
+        if (col.img) x.drawImage(col.img, x0, y, colW, imgH);
+        else { x.fillStyle = '#26262b'; x.fillRect(x0, y, colW, imgH); }
+        y += imgH + 56;
+        x.fillStyle = '#c9a35a'; x.font = letra(600, 34); x.fillText(col.nombre, x0, y);
+        y += 58;
+        const pct = ref ? Math.round(col.st.prom / ref.lux * 100) : null;
+        x.fillStyle = '#ececec'; x.font = letra(500, 48); x.fillText(`${fmt(col.st.prom)} lx`, x0, y);
+        const anchoLux = x.measureText(`${fmt(col.st.prom)} lx`).width;
+        x.fillStyle = '#9a9aa3'; x.font = letra(400, 24); x.fillText(`  promedio a ${fmt(altura, 2)} m`, x0 + anchoLux, y);
+        y += 44;
+        const cumple = ref && col.st.prom >= ref.lux && col.st.uni >= (ref.uniformidad || 0);
+        const linea = `Pareja ${fmt(col.st.uni, 2)}` + (ref ? ` · ${pct} % de ${fmt(ref.lux)} lx` : '');
+        x.fillStyle = '#9a9aa3'; x.font = letra(400, 26); x.fillText(linea, x0, y);
+        if (ref) {
+          x.fillStyle = cumple ? '#6cc28e' : '#e26565';
+          x.fillText(cumple ? '  ✓ cumple' : '  no cumple', x0 + x.measureText(linea).width, y);
+        }
+        y += 40;
+        x.fillStyle = '#9a9aa3'; x.font = letra(400, 24);
+        x.fillText(`${fmt(col.watts)} W · ${col.productos}`, x0, y);
+      });
+      x.fillStyle = '#6a6a73'; x.font = letra(400, 22);
+      x.fillText('Valores indicativos, calculados con la fotometría del fabricante. No reemplazan un estudio lumínico.' +
+        (ref ? ` Referencia: ${ref.nombre} (${ref.fuente || ''}) ${fmt(ref.lux)} lx, uniformidad ${fmt(ref.uniformidad || 0, 2)}.` : ''), pad, H - 30);
+
+      c.toBlob((blob) => {
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = (estado.escena.nombre || 'escena').toLowerCase().replace(/\s+/g, '-') + ' comparacion encendidos.jpg';
         a.click();
         setTimeout(() => URL.revokeObjectURL(a.href), 2000);
       }, 'image/jpeg', 0.9);

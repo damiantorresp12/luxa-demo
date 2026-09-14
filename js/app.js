@@ -1617,12 +1617,24 @@
     var terms = lm.terminaciones || [];
     var actual = props.filter(function (p) { return p.id === lm.inicial; })[0] || props[0];
     var term = terms.length ? terms[0].id : null;
+    var encs = lm.encendidos || [];
+    var enc = encs.length ? encs[0].id : null;
 
-    function imagenDe(p, tId) {
-      var im = p.imagenes || {};
+    // Lo que se ve: la propuesta con todo encendido, o una de sus escenas de encendido
+    // (ej. solo la luz general), que trae su propio mapa, números y productos.
+    function vistaDe(p, eId) {
+      var parte = eId && p.porEncendido && p.porEncendido[eId];
+      if (!parte) return p;
+      var v = {};
+      Object.keys(p).forEach(function (k) { v[k] = p[k]; });
+      Object.keys(parte).forEach(function (k) { v[k] = parte[k]; });
+      return v;
+    }
+    function imagenDe(p, eId, tId) {
+      var im = vistaDe(p, eId).imagenes || {};
       return im[tId] || im.base || im[Object.keys(im)[0]];
     }
-    function claveCapa(p, tId) { return p.id + '|' + (tId || 'base'); }
+    function claveCapa(p, eId, tId) { return p.id + '|' + (eId || 'todo') + '|' + (tId || 'base'); }
 
     // Foto de cada terminación extra (la primera ya es la foto principal de la escena)
     var fotosTerm = {};
@@ -1641,19 +1653,23 @@
     // Una capa de mapa por propuesta y terminación, apiladas: cambiar es un fundido
     // entre capas, sin cambiar el src de una imagen visible (eso daría un parpadeo).
     var capas = {};
+    function asegurarCapa(p, eId, tId) {
+      var key = claveCapa(p, eId, tId), src = imagenDe(p, eId, tId);
+      if (!src || capas[key]) return key;
+      var img = document.createElement('img');
+      img.className = 'space-stage-img space-stage-img-map';
+      img.src = uri(src);
+      img.alt = '';
+      img.setAttribute('aria-hidden', 'true');
+      // Las capas que se crean después van debajo de la tarjeta y los botones
+      stage.insertBefore(img, card || null);
+      capas[key] = img;
+      return key;
+    }
+    // Las capas del encendido inicial se cargan ya; las de otras escenas, cuando se piden
     var idsTerm = terms.length ? terms.map(function (tm) { return tm.id; }) : [null];
     props.forEach(function (p) {
-      idsTerm.forEach(function (tId) {
-        var key = claveCapa(p, tId), src = imagenDe(p, tId);
-        if (!src || capas[key]) return;
-        var img = document.createElement('img');
-        img.className = 'space-stage-img space-stage-img-map';
-        img.src = uri(src);
-        img.alt = '';
-        img.setAttribute('aria-hidden', 'true');
-        stage.appendChild(img);
-        capas[key] = img;
-      });
+      idsTerm.forEach(function (tId) { asegurarCapa(p, enc, tId); });
     });
     stage.classList.add('has-light-map');
     stage.dataset.mapa = 'off';
@@ -1682,6 +1698,19 @@
       stage.appendChild(selector);
     }
 
+    // Escenas de encendido (ej. Todo · General · Acento): misma distribución, otras luces prendidas
+    var escenas = null;
+    if (encs.length > 1) {
+      escenas = el('div', 'light-map-optics light-map-scenes' + (selector ? ' is-second' : ''));
+      if (selector) stage.classList.add('has-scenes');
+      escenas.setAttribute('role', 'group');
+      escenas.setAttribute('aria-label', t('lightMap.scene'));
+      escenas.innerHTML = encs.map(function (e) {
+        return '<button type="button" data-enc="' + e.id + '">' + tx(e.nombre) + '</button>';
+      }).join('');
+      stage.appendChild(escenas);
+    }
+
     var finish = null;
     if (terms.length > 1) {
       finish = el('div', 'space-finish');
@@ -1703,9 +1732,20 @@
 
     // Cambio sin parpadeo: la capa anterior queda fija debajo (is-prev) mientras la nueva
     // aparece encima; recién cuando la nueva ya cubre todo, la anterior se apaga.
-    var soltarAnterior = null;
-    function activarCapa(key, desde) {
+    var soltarAnterior = null, visible = null, pedida = null;
+    function activarCapa(key) {
+      pedida = key;
+      var img = capas[key];
+      // Una capa recién creada se muestra cuando terminó de cargar, así no aparece vacía
+      if (img && !img.complete) {
+        var listo = function () { if (pedida === key) activarCapa(key); };
+        img.addEventListener('load', listo, { once: true });
+        img.addEventListener('error', listo, { once: true });
+        return;
+      }
       clearTimeout(soltarAnterior);
+      var desde = visible;
+      visible = key;
       Object.keys(capas).forEach(function (k) {
         capas[k].classList.toggle('is-active', k === key);
         capas[k].classList.toggle('is-prev', k === desde && k !== key);
@@ -1714,7 +1754,8 @@
         soltarAnterior = setTimeout(function () { capas[desde].classList.remove('is-prev'); }, 700);
       }
     }
-    activarCapa(claveCapa(actual, term));
+    function mostrar() { activarCapa(asegurarCapa(actual, enc, term)); }
+    mostrar();
 
     function pintarTerminacion() {
       Object.keys(fotosTerm).forEach(function (id) { fotosTerm[id].classList.toggle('is-active', id === term); });
@@ -1732,25 +1773,31 @@
         b.classList.toggle('is-active', on);
         b.setAttribute('aria-pressed', String(on));
       });
+      if (escenas) $$('button', escenas).forEach(function (b) {
+        var on = b.dataset.enc === enc;
+        b.classList.toggle('is-active', on);
+        b.setAttribute('aria-pressed', String(on));
+      });
+      var v = vistaDe(actual, enc);
 
       // La referencia (ej. 500 lx) se mide a la altura de trabajo. Si el mapa es del
-      // piso, la comparación usa los números de esa altura (actual.trabajo).
-      var ref = lm.referencia, tr = actual.trabajo;
-      var comparado = tr ? tr.promedio : actual.promedio;
+      // piso, la comparación usa los números de esa altura (v.trabajo).
+      var ref = lm.referencia, tr = v.trabajo;
+      var comparado = tr ? tr.promedio : v.promedio;
       var pct = ref ? Math.round(comparado / ref.lux * 100) : null;
       // "a 0,75 m" solo se ve en celular: en computadora ya lo dice la línea de arriba.
       var refTexto = ref && (t('lightMap.ofRef', { pct: pct, lux: fmtNum(ref.lux) }) +
         (tr ? '<span class="ref-at"> ' + t('lightMap.at', { h: fmtNum(tr.altura, 2) }) + '</span>' : ''));
       card.innerHTML =
         (lm.superficie ? '<p class="light-map-surface">' + tx(lm.superficie) + '</p>' : '') +
-        '<p class="light-map-value"><b>' + fmtNum(actual.promedio) + '</b> ' + t('lightMap.average') + '</p>' +
+        '<p class="light-map-value"><b>' + fmtNum(v.promedio) + '</b> ' + t('lightMap.average') + '</p>' +
         '<div class="light-map-stats">' +
-          '<span>' + t('lightMap.min') + '<b>' + fmtNum(actual.minimo) + '</b></span>' +
-          '<span>' + t('lightMap.max') + '<b>' + fmtNum(actual.maximo) + '</b></span>' +
-          '<span>' + t('lightMap.even') + '<b>' + fmtNum(actual.uniformidad, 2) + '</b></span>' +
+          '<span>' + t('lightMap.min') + '<b>' + fmtNum(v.minimo) + '</b></span>' +
+          '<span>' + t('lightMap.max') + '<b>' + fmtNum(v.maximo) + '</b></span>' +
+          '<span>' + t('lightMap.even') + '<b>' + fmtNum(v.uniformidad, 2) + '</b></span>' +
         '</div>' +
         (tr ? '<p class="light-map-work">' + t('lightMap.workLine', { h: fmtNum(tr.altura, 2), v: fmtNum(tr.promedio) }) + '</p>' : '') +
-        (actual.paredes ? '<p class="light-map-walls">' + t('lightMap.walls', { v: fmtNum(actual.paredes.promedio) }) + '</p>' : '') +
+        (v.paredes ? '<p class="light-map-walls">' + t('lightMap.walls', { v: fmtNum(v.paredes.promedio) }) + '</p>' : '') +
         (ref
           ? '<div class="light-map-bar"><i style="width:' + Math.min(100, pct) + '%"></i></div>' +
             '<p class="light-map-ref"><span class="ref-pct">' + refTexto + '</span>' +
@@ -1762,7 +1809,7 @@
 
       // Especificación: una línea por producto (se toca para abrir su ficha) y totales
       var totalW = 0, totalLm = 0;
-      var filas = (actual.productos || []).map(function (pr) {
+      var filas = (v.productos || []).map(function (pr) {
         var n = pr.cantidad || 1;
         if (pr.watts) totalW += pr.watts * n;
         if (pr.lumenes) totalLm += pr.lumenes * n;
@@ -1779,7 +1826,8 @@
       if (totalW) totales.push(t('lightMap.totalW', { w: fmtNum(totalW) }));
       if (totalLm) totales.push(fmtNum(totalLm) + ' lm');
       spec.innerHTML =
-        '<span class="space-spec-label">' + t('lightMap.spec') + (props.length > 1 ? ' · ' + tx(actual.nombre) : '') + '</span>' +
+        '<span class="space-spec-label">' + t('lightMap.spec') + (props.length > 1 ? ' · ' + tx(actual.nombre) : '') +
+          (escenas && enc !== encs[0].id ? ' · ' + tx(encs.filter(function (e) { return e.id === enc; })[0].nombre) : '') + '</span>' +
         '<ul class="space-spec-list">' + filas + '</ul>' +
         (totales.length ? '<span class="space-spec-total">' + totales.join(' · ') + '</span>' : '');
     }
@@ -1794,17 +1842,22 @@
     if (selector) selector.addEventListener('click', function (ev) {
       var b = ev.target.closest('button[data-optica]');
       if (!b || b.dataset.optica === actual.id) return;
-      var desde = claveCapa(actual, term);
       actual = props.filter(function (p) { return p.id === b.dataset.optica; })[0] || actual;
-      activarCapa(claveCapa(actual, term), desde);
+      mostrar();
+      pintar();
+    });
+    if (escenas) escenas.addEventListener('click', function (ev) {
+      var b = ev.target.closest('button[data-enc]');
+      if (!b || b.dataset.enc === enc) return;
+      enc = b.dataset.enc;
+      mostrar();
       pintar();
     });
     if (finish) finish.addEventListener('click', function (ev) {
       var b = ev.target.closest('button[data-term]');
       if (!b || b.dataset.term === term) return;
-      var desde = claveCapa(actual, term);
       term = b.dataset.term;
-      activarCapa(claveCapa(actual, term), desde);
+      mostrar();
       pintarTerminacion();
     });
     spec.addEventListener('click', function (ev) {

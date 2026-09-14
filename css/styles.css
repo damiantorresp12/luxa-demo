@@ -2219,6 +2219,8 @@ svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width:
 }
 .light-map-optics button:hover { color: var(--ink); }
 .light-map-optics button.is-active { background: var(--brass); color: #16120a; }
+/* Escenas de encendido (Todo · General · Acento): segunda fila si hay selector de óptica */
+.light-map-scenes.is-second { top: 98px; }
 
 /* Línea de especificación en el panel de la escena */
 .space-spec {
@@ -2376,6 +2378,7 @@ button.space-spec-prod:hover, button.space-spec-prod:focus-visible { color: var(
      en la mitad de abajo y arriba sobra techo. La tarjeta pasa a ser una franja
      fina arriba, debajo del botón. */
   .light-map-optics { top: 42px; left: 10px; }
+  .light-map-scenes.is-second { top: 72px; }
   .light-map-optics button { font-size: 0.6rem; padding: 3px 9px; }
   /* Dos líneas: "225 lx promedio · 45 % de 500 lx" y "mín · máx · pareja".
      El resto (barra, nombre de la referencia, escala, nota) se ve en computadora. */
@@ -2385,6 +2388,8 @@ button.space-spec-prod:hover, button.space-spec-prod:focus-visible { color: var(
     padding: 4px 10px;
     display: grid; grid-template-columns: auto 1fr; column-gap: 10px; align-items: baseline;
   }
+  /* Con ópticas y escenas de encendido hay dos filas de botones: la tarjeta va debajo */
+  .space-stage.has-scenes .light-map-card { top: 100px; }
   .light-map-surface,
   .light-map-work,
   .light-map-walls { display: none; }
