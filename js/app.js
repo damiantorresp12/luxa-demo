@@ -412,6 +412,96 @@
     });
   }
 
+  /* Estudio de luz en la portada: la primera escena que tiene mapa de luz, grande,
+     alternando sola entre la foto y el mapa, con tres datos y un botón que abre la
+     escena con el mapa ya prendido. Se oculta si ninguna escena tiene mapa. */
+  var homeLightTimer = null;
+  var pedidoEstudioDeLuz = false;   // la app se abrió con #estudio-de-luz
+  function renderHomeLightStudy() {
+    var wrap = $('#homeLight');
+    if (!wrap) return;
+    getLightMaps(function (mapas) {
+      var sp = (DATA.spaces || []).filter(function (s) { return s.image && mapas[s.image]; })[0];
+      var lm = sp ? normalizarMapa(mapas[sp.image]) : null;
+      var props = (lm && lm.propuestas) || [];
+      clearInterval(homeLightTimer);
+      if (!sp || !props.length) { wrap.hidden = true; wrap.innerHTML = ''; return; }
+
+      var p = props.filter(function (x) { return x.id === lm.inicial; })[0] || props[0];
+      var im = p.imagenes || {};
+      var termId = lm.terminaciones && lm.terminaciones[0] ? lm.terminaciones[0].id : null;
+      var mapaSrc = (termId && im[termId]) || im.base || im[Object.keys(im)[0]];
+      var tr = p.trabajo;
+      var lux = tr ? tr.promedio : p.promedio;
+      var ref = lm.referencia;
+      var luminarias = 0, watts = 0;
+      (p.productos || []).forEach(function (pr) {
+        var n = pr.cantidad || 1;
+        luminarias += n;
+        watts += (pr.watts || 0) * n;
+      });
+      function dato(valor, texto) {
+        return '<div class="home-light-stat"><b>' + valor + '</b><span>' + texto + '</span></div>';
+      }
+
+      wrap.hidden = false;
+      wrap.classList.remove('is-map');
+      wrap.innerHTML =
+        '<div class="home-light-media" role="button" tabindex="0" aria-label="' + t('homeLight.cta') + '">' +
+          '<img class="home-light-photo" src="' + uri(sp.image) + '" alt="' + tx(sp.name) + '" />' +
+          '<img class="home-light-map" src="' + uri(mapaSrc) + '" alt="" aria-hidden="true" />' +
+          '<span class="home-light-chip"><i aria-hidden="true"></i>' +
+            '<span class="is-photo">' + t('homeLight.photo') + '</span>' +
+            '<span class="is-map">' + t('lightMap.toggle') + '</span></span>' +
+        '</div>' +
+        '<div class="home-light-body">' +
+          '<p class="eyebrow">' + t('homeLight.eyebrow') + '</p>' +
+          '<h2 class="home-light-title">' + t('homeLight.title') + '</h2>' +
+          '<p class="home-light-sub">' + t('homeLight.sub') + '</p>' +
+          '<div class="home-light-stats">' +
+            dato(fmtNum(lux) + ' lx', tr ? t('homeLight.statLux', { h: fmtNum(tr.altura, 2) }) : t('lightMap.average')) +
+            (ref ? dato(Math.round(lux / ref.lux * 100) + ' %', t('homeLight.statRef', { lux: fmtNum(ref.lux) })) : '') +
+            (watts ? dato(fmtNum(watts) + ' W', t('homeLight.statW', { n: luminarias })) : '') +
+          '</div>' +
+          '<p class="home-light-scene">' + tx(sp.name) + '</p>' +
+          '<button class="btn btn-primary home-light-cta" type="button">' + t('homeLight.cta') + '</button>' +
+        '</div>';
+
+      var abrir = function () { abrirEstudioDeLuz(sp.id); };
+      wrap.querySelector('.home-light-cta').addEventListener('click', abrir);
+      var media = wrap.querySelector('.home-light-media');
+      media.addEventListener('click', abrir);
+      media.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); abrir(); }
+      });
+      // Foto ↔ mapa con un fundido lento, para que se entienda sin tocar nada
+      function alternar() {
+        clearInterval(homeLightTimer);
+        homeLightTimer = setInterval(function () { wrap.classList.toggle('is-map'); }, 3500);
+      }
+      alternar();
+      // Con mouse: al pasar el cursor por la foto aparece el mapa y se pausa el cambio
+      // automático; al salir vuelve la foto y sigue alternando. En celular no hay hover.
+      media.addEventListener('mouseenter', function () {
+        clearInterval(homeLightTimer);
+        wrap.classList.add('is-hover', 'is-map');
+      });
+      media.addEventListener('mouseleave', function () {
+        wrap.classList.remove('is-map');
+        setTimeout(function () { wrap.classList.remove('is-hover'); }, 500);
+        alternar();
+      });
+      if (pedidoEstudioDeLuz) { pedidoEstudioDeLuz = false; abrir(); }
+    });
+  }
+
+  // Abre la escena del estudio de luz (desde la portada o con #estudio-de-luz). Se ve
+  // primero el espacio; el mapa lo prende la persona con el botón "Mapa de luz".
+  function abrirEstudioDeLuz(spaceId) {
+    setActiveSpace(spaceId);
+    go('spaces', { preserveSpace: true });
+  }
+
   /* Bridge: render limpio del producto (catálogo) + close-up del producto (en contexto).
      Puente narrativo entre la card aislada y el ambiente. Click en cada lado abre
      el detalle del producto en el modo correspondiente (catálogo o close-up). */
@@ -620,6 +710,7 @@
     }
     initHomeHeroSlides(imgs);
 
+    renderHomeLightStudy();
     renderHomeBridge();
     renderHomeTypes();
     renderHomeSpaces();
@@ -1267,12 +1358,20 @@
   }
 
   function visibleSpaces() {
-    return spacesByCatalog().filter(function (sp) {
+    var lista = spacesByCatalog().filter(function (sp) {
       var tags = parseSceneTags(sp);
       if (activeSpaceFilters.spaces.length && activeSpaceFilters.spaces.indexOf(tags.space) === -1) return false;
       if (activeSpaceFilters.collections.length && activeSpaceFilters.collections.indexOf(tags.collection) === -1) return false;
       return true;
     });
+    // Las escenas con mapa de luz van primero (son las que más muestran); el resto
+    // conserva su orden.
+    if (!lightMapsCache) return lista;
+    var sinMapa = function (sp) { return sp.image && lightMapsCache[sp.image] ? 0 : 1; };
+    return lista
+      .map(function (sp, i) { return { sp: sp, i: i }; })
+      .sort(function (a, b) { return (sinMapa(a.sp) - sinMapa(b.sp)) || (a.i - b.i); })
+      .map(function (x) { return x.sp; });
   }
 
   function spaceTagsInUse() {
@@ -1498,6 +1597,7 @@
     wrap.appendChild(header);
 
     var grid = el('div', 'space-type-grid');
+    var cardsPorTipo = {};
     types.forEach(function (tag) {
       var label = t('roomType.' + tag);
       var n = byType[tag];
@@ -1515,8 +1615,18 @@
         '</div>';
       card.addEventListener('click', function () { pickRoomType(tag); });
       grid.appendChild(card);
+      cardsPorTipo[tag] = card;
     });
     wrap.appendChild(grid);
+
+    // Etiqueta "Con mapa de luz" en los tipos que tienen al menos una escena con mapa
+    getLightMaps(function (mapas) {
+      all.forEach(function (sp) {
+        var card = cardsPorTipo[parseSceneTags(sp).space];
+        if (!card || !sp.image || !mapas[sp.image] || card.querySelector('.space-light-badge')) return;
+        card.appendChild(el('span', 'space-light-badge', '<i aria-hidden="true"></i>' + t('lightMap.badge')));
+      });
+    });
   }
 
   function pickRoomType(tag) {
@@ -1571,13 +1681,17 @@
   var LIGHT_MAP_COLORS = ['#0d1846', '#1c3aa8', '#1f7bd6', '#23b3c4', '#2fbf86', '#58c24a',
                           '#9fcf3c', '#d7d839', '#f2c233', '#f28a2e', '#e5472d', '#b3164f'];
   var lightMapsIndex = null;
+  var lightMapsCache = null;   // el índice ya cargado: sirve para ordenar las escenas con mapa primero
   function getLightMaps(cb) {
     if (!lightMapsIndex) {
       lightMapsIndex = fetch('data/mapas-de-luz.json', { cache: 'no-store' })
         .then(function (r) { return r.ok ? r.json() : null; })
         .catch(function () { return null; });
     }
-    lightMapsIndex.then(function (idx) { cb((idx && idx.escenas) || {}); });
+    lightMapsIndex.then(function (idx) {
+      lightMapsCache = (idx && idx.escenas) || {};
+      cb(lightMapsCache);
+    });
   }
 
   function fmtNum(n, dec) {
@@ -1840,8 +1954,7 @@
       stage.dataset.mapa = on ? 'on' : 'off';
       btn.setAttribute('aria-pressed', String(on));
       card.setAttribute('aria-hidden', String(!on));
-    });
-    if (selector) selector.addEventListener('click', function (ev) {
+    });    if (selector) selector.addEventListener('click', function (ev) {
       var b = ev.target.closest('button[data-optica]');
       if (!b || b.dataset.optica === actual.id) return;
       actual = props.filter(function (p) { return p.id === b.dataset.optica; })[0] || actual;
@@ -2007,7 +2120,11 @@
     // capas encima del render, con botón, selector de óptica y especificación.
     // Llega asíncrono, así que para entonces el panel de la escena ya existe.
     if (bg) getLightMaps(function (mapas) {
-      if (mapas[bg]) addLightMap(section, stage, mapas[bg]);
+      if (!mapas[bg]) return;
+      addLightMap(section, stage, mapas[bg]);
+      var eyebrow = section.querySelector('.space-info > .eyebrow');
+      if (eyebrow) eyebrow.insertAdjacentHTML('afterend',
+        '<span class="space-light-badge"><i aria-hidden="true"></i>' + t('lightMap.badge') + '</span>');
     });
 
     // If the scene ships an "off" variant of its main image, surface a small
@@ -2763,6 +2880,7 @@
     $('#sidebarBackdrop').addEventListener('click', closeSidebar);
 
     window.addEventListener('hashchange', function () {
+      if (window.location.hash === '#estudio-de-luz') { pedidoEstudioDeLuz = true; renderHomeLightStudy(); return; }
       go((window.location.hash || '').replace('#', ''));
     });
     window.addEventListener('resize', function () {
@@ -2899,6 +3017,8 @@
     initSidebarSocial();
 
     var start = (window.location.hash || '').replace('#', '');
+    // Link directo al estudio de luz: la escena con mapa se abre cuando llegan los datos
+    if (start === 'estudio-de-luz') pedidoEstudioDeLuz = true;
     go(ROUTES[start] ? start : 'home');
   }
 
@@ -2919,6 +3039,8 @@
       renderProducts();
       // Home cards también dependen de DATA.spaces (cargado async)
       renderHomeSpaces();
+      // Estudio de luz: busca en DATA.spaces la escena que tiene mapa
+      renderHomeLightStudy();
       // Bridge necesita findSpaceFor() para el caption "En contexto"
       renderHomeBridge();
       // Types collage usa los close-ups de spaces para el "más destacado"

@@ -119,6 +119,15 @@
         'homeBridge.catalogLabel':  'Catálogo',
         'homeBridge.contextLabel':  'En contexto',
         'homeBridge.cta':           'Ver todos los productos →',
+        'homeLight.eyebrow':        'Estudio de luz',
+        'homeLight.title':          'Luz calculada, no imaginada',
+        'homeLight.sub':            'Cada luminaria con su fotometría real: mirá cuánta luz llega a cada punto del espacio antes de instalar.',
+        'homeLight.photo':          'Foto',
+        'homeLight.statLux':        'promedio a {h} m, altura de trabajo',
+        'homeLight.statRef':        'de los {lux} lx recomendados',
+        'homeLight.statW':          '{n} luminarias en total',
+        'homeLight.cta':            'Ver el estudio de luz',
+        'lightMap.badge':           'Con mapa de luz',
 
         // Home — CTA cierre comercial (WhatsApp)
         'homeCta.eyebrow':     'Hablemos',
@@ -359,6 +368,15 @@
         'homeBridge.catalogLabel':  'Catalog',
         'homeBridge.contextLabel':  'In context',
         'homeBridge.cta':           'View all products →',
+        'homeLight.eyebrow':        'Light study',
+        'homeLight.title':          'Light calculated, not imagined',
+        'homeLight.sub':            'Every luminaire with its real photometry: see how much light reaches each point of the space before installing.',
+        'homeLight.photo':          'Photo',
+        'homeLight.statLux':        'average at {h} m, working height',
+        'homeLight.statRef':        'of the recommended {lux} lx',
+        'homeLight.statW':          '{n} luminaires in total',
+        'homeLight.cta':            'See the light study',
+        'lightMap.badge':           'With light map',
 
         // Home — Closing CTA (WhatsApp)
         'homeCta.eyebrow':     'Let’s talk',
