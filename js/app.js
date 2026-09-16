@@ -425,6 +425,8 @@
       var lm = sp ? normalizarMapa(mapas[sp.image]) : null;
       var props = (lm && lm.propuestas) || [];
       clearInterval(homeLightTimer);
+      var heroBtn = $('#homeHeroLightCta');
+      if (heroBtn) heroBtn.hidden = !sp;
       if (!sp || !props.length) { wrap.hidden = true; wrap.innerHTML = ''; return; }
 
       var p = props.filter(function (x) { return x.id === lm.inicial; })[0] || props[0];
@@ -468,6 +470,7 @@
         '</div>';
 
       var abrir = function () { abrirEstudioDeLuz(sp.id); };
+      if (heroBtn) { heroBtn.hidden = false; heroBtn.onclick = abrir; }
       wrap.querySelector('.home-light-cta').addEventListener('click', abrir);
       var media = wrap.querySelector('.home-light-media');
       media.addEventListener('click', abrir);
@@ -2319,16 +2322,7 @@
     var card    = $('#transitionCard');
     var skipBtn = $('#transitionSkip');
     var btnDetail = $('#transitionCardDetail');
-    var btnCompare = $('#transitionCardCompare');
-    var btnClose  = $('#transitionCardClose');
     if (!overlay || !video || !card) return;
-    if (btnCompare) {
-      btnCompare.dataset.id = pid;
-      var inCmp = !!(window.LUXA_Compare && window.LUXA_Compare.isIn(pid));
-      btnCompare.classList.toggle('is-in', inCmp);
-      var cmpLbl = btnCompare.querySelector('.compare-btn-label');
-      if (cmpLbl) cmpLbl.textContent = t(inCmp ? 'compare.remove' : 'compare.add');
-    }
 
     // Anchor the overlay to the stage the user clicked from (each scene has
     // its own .space-stage in magazine view). Fall back to the first one if
@@ -2354,19 +2348,6 @@
     $('#transitionCardName').textContent    = prod.name;
     $('#transitionCardCode').textContent    = prod.code || '';
     $('#transitionCardDesc').textContent    = tx(prod.description);
-    var quoteLink = $('#transitionCardQuote');
-    var quoteLbl  = $('#transitionCardQuoteLabel');
-    var waUrl = quoteUrlForProduct(prod);
-    if (quoteLink) {
-      if (waUrl) {
-        quoteLink.href = waUrl;
-        quoteLink.hidden = false;
-      } else {
-        quoteLink.removeAttribute('href');
-        quoteLink.hidden = true;
-      }
-    }
-    if (quoteLbl) quoteLbl.textContent = t('quote.cta');
     card.hidden = true;
     // Always start collapsed; the user expands on tap.
     card.classList.remove('is-expanded');
@@ -2531,7 +2512,6 @@
       video.removeEventListener('ended', revealCard);
       skipBtn.removeEventListener('click', onSkipClick);
       btnDetail.removeEventListener('click', onDetail);
-      btnClose.removeEventListener('click', closeOverlay);
       document.removeEventListener('keydown', onKey);
     }
     function closeOverlay() {
@@ -2567,12 +2547,6 @@
     video.addEventListener('ended', revealCard);
     skipBtn.addEventListener('click', onSkipClick);
     btnDetail.addEventListener('click', onDetail);
-    btnClose.addEventListener('click', closeOverlay);
-    // onclick (not addEventListener) para evitar acumular listeners entre
-    // aperturas sucesivas del hotspot card (mismo DOM reutilizado).
-    if (btnCompare) btnCompare.onclick = function () {
-      if (window.LUXA_Compare) window.LUXA_Compare.toggle(pid);
-    };
     document.addEventListener('keydown', onKey);
   }
 

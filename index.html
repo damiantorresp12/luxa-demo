@@ -165,7 +165,10 @@
             <h2 class="home-hero-title"><span class="serif-xl" id="heroBrand">LUXA</span></h2>
             <p class="home-hero-tag" data-i18n-html="home.tag">Experiencias de iluminación<br/>para espacios modernos</p>
             <p class="home-hero-sub" data-i18n="home.sub">Explorá productos, ambientes y recursos técnicos en un catálogo interactivo.</p>
-            <button class="btn btn-primary home-hero-cta" data-route="products" data-i18n="home.cta">Ingresar al catálogo</button>
+            <div class="home-hero-ctas">
+              <button class="btn btn-primary home-hero-cta" data-route="products" data-i18n="home.cta">Ingresar al catálogo</button>
+              <button class="btn btn-ghost home-hero-cta home-hero-cta-light" id="homeHeroLightCta" type="button" hidden data-i18n="homeLight.cta">Ver el estudio de luz</button>
+            </div>
           </div>
           <div class="home-hero-scroll"><span data-i18n="home.scroll">Deslizá para ver más</span></div>
         </div>
@@ -372,19 +375,7 @@
       <p class="transition-card-code" id="transitionCardCode"></p>
       <p class="transition-card-desc" id="transitionCardDesc"></p>
       <div class="transition-card-actions">
-        <a class="btn btn-primary transition-card-quote" id="transitionCardQuote" target="_blank" rel="noopener noreferrer" hidden>
-          <svg viewBox="0 0 24 24" aria-hidden="true" class="ico-wa">
-            <path d="M20.5 11.5a8.5 8.5 0 1 1-4.1-7.3l4.1-1.1-1.1 4.1a8.5 8.5 0 0 1 1.1 4.3z"/>
-            <path d="M8.5 11.5h.01M12 11.5h.01M15.5 11.5h.01"/>
-          </svg>
-          <span id="transitionCardQuoteLabel">Consultar precio</span>
-        </a>
         <button class="btn btn-ghost transition-card-detail" id="transitionCardDetail" type="button">Ver detalle completo</button>
-        <button class="btn btn-ghost compare-btn transition-card-compare" id="transitionCardCompare" type="button">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="8" height="14" rx="1.5"/><rect x="13" y="5" width="8" height="14" rx="1.5"/></svg>
-          <span class="compare-btn-label">Comparar</span>
-        </button>
-        <button class="btn btn-ghost transition-card-close" id="transitionCardClose" type="button">Volver al ambiente</button>
       </div>
     </div>
   </aside>

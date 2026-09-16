@@ -546,6 +546,9 @@ svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width:
   max-width: 460px;
 }
 .home-hero-cta { padding: 1.1em 2.6em; font-size: 0.84rem; }
+/* Dos accesos en la primera pantalla: catálogo y estudio de luz */
+.home-hero-ctas { display: flex; flex-wrap: wrap; gap: 12px; }
+.home-hero-cta-light { background: transparent; }
 .home-hero-scroll {
   position: absolute;
   left: 50%; bottom: 28px;

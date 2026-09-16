@@ -78,7 +78,7 @@
 
         // Home
         'home.tag':        'Experiencias de iluminación<br/>para espacios modernos',
-        'home.sub':        'Explorá productos, ambientes y recursos técnicos en un catálogo interactivo.',
+        'home.sub':        'Ambientes con la luz calculada a partir de la fotometría real de cada luminaria.',
         'home.cta':        'Ingresar al catálogo',
         'home.scroll':     'Deslizá para ver más',
 
@@ -328,7 +328,7 @@
         'detail.collection':        'Collection',
 
         'home.tag':        'Lighting Experiences<br/>for Modern Spaces',
-        'home.sub':        'Explore products, spaces and technical resources in one interactive catalog.',
+        'home.sub':        'Spaces with their light calculated from each luminaire’s real photometry.',
         'home.cta':        'Enter the catalog',
         'home.scroll':     'Scroll for more',
 
