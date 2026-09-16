@@ -161,6 +161,15 @@ select {
 /* Los muebles (IA) van encima del render vacío; si la foto salió con otra proporción, se recorta apenas */
 .escenario img.capa-muebles { position: absolute; inset: 0; height: 100%; object-fit: cover; opacity: 0; transition: opacity .6s ease; }
 .escenario.ver-muebles img.capa-muebles { opacity: 1; }
+/* Mientras llega la foto: espacio reservado y aviso, nunca el ícono de imagen rota */
+.escenario { aspect-ratio: 4 / 3; }
+.escenario img#compuesto-base { height: 100%; object-fit: cover; }
+.escenario img:not(.lista) { visibility: hidden; }
+.escenario.cargando::before {
+  content: 'Cargando imagen…'; position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--muted); font-size: 12px;
+}
 .switch-app {
   position: absolute; left: 50%; bottom: 14px; transform: translateX(-50%);
   display: flex; gap: 2px; padding: 3px; border-radius: 8px; background: rgba(10,10,12,.82);

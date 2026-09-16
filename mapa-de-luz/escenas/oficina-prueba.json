@@ -41,7 +41,7 @@
   "imagenes": {
     "render": [
       { "archivo": "oficina-prueba-dia.jpg", "nombre": "Vacía · artefactos blancos",
-        "conMuebles": "oficina-prueba-dia-muebles.jpg",
+        "conMuebles": "oficina-prueba-dia-muebles-web.jpg",
         "porEncendido": { "general": "oficina-prueba-dia-bo.jpg", "acento": "oficina-prueba-dia-bitpop.jpg" },
         "superficies": [
           { "nombre": "Piso", "maskId": "oficina-prueba-id.png", "altura": 0 },

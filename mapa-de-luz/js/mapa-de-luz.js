@@ -836,6 +836,18 @@
       else dibujarMapa();
     });
 
+    // Las fotos se muestran recién cuando llegaron completas (en el celular tardan):
+    // así no aparece el ícono de imagen rota.
+    ['#compuesto-base', '#compuesto-muebles'].forEach((s) => {
+      const im = $(s);
+      const listo = () => {
+        im.classList.add('lista');
+        if (s === '#compuesto-base') $('.escenario').classList.remove('cargando');
+      };
+      im.addEventListener('load', listo);
+      if (im.complete && im.naturalWidth) listo();
+    });
+
     // Con muebles / Sin muebles / Mapa de luz, con fundido. El mapa siempre se calcula
     // sobre el render vacío: los muebles (IA) son solo para ver cómo queda.
     $('#switch-app').addEventListener('click', (ev) => {
