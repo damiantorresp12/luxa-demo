@@ -70,8 +70,20 @@ button, select, input { font-family: inherit; }
   .panel-ficha { grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 }
 @media (max-width: 760px) {
-  .layout { grid-template-columns: 1fr; }
+  .layout { grid-template-columns: 1fr; padding: 12px 16px; }
   .panel-ficha { grid-template-columns: 1fr; }
+  /* En el celular lo primero es el mapa; los controles y la ficha van debajo */
+  .panel-mapa { order: -1; }
+  .topbar { flex-direction: column; align-items: flex-start; gap: 6px; padding: 12px 16px; }
+  .escena-titulo { text-align: left; font-size: 12px; }
+  .seg-vista { width: 100%; }
+  /* Botones sobre el render en una sola fila, sin tapar la imagen */
+  .switch-app { bottom: 8px; max-width: calc(100% - 16px); }
+  .switch-app button { padding: 5px 9px; font-size: 11px; white-space: nowrap; }
+  /* Pie: botones en fila y la nota debajo */
+  .render-pie { flex-wrap: wrap; }
+  .render-pie .btn-mini { flex: 1 1 auto; }
+  #compuesto-nota { flex-basis: 100%; order: 3; font-size: 11px; }
 }
 
 .panel { min-width: 0; }
