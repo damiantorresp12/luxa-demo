@@ -7,7 +7,9 @@
   <base href="/mapa-de-luz/" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>TD Light Study · Mapa de luz</title>
-  <link rel="stylesheet" href="css/mapa-de-luz.css" />
+  <!-- El ?v= se sube cuando cambian estos archivos: obliga al navegador a bajar la
+       versión nueva y evita que mezcle programa viejo con página nueva. -->
+  <link rel="stylesheet" href="css/mapa-de-luz.css?v=6" />
 </head>
 <body>
 
@@ -48,6 +50,17 @@
         </div>
       </div>
 
+      <div class="bloque">
+        <h2>Mantenimiento <span class="tag">FM</span></h2>
+        <select id="sel-fm">
+          <option value="1">Inicial · luminaria nueva (1,00)</option>
+          <option value="0.9">Ambiente limpio, limpieza frecuente (0,90)</option>
+          <option value="0.8">Oficina típica (0,80)</option>
+          <option value="0.7">Ambiente sucio o limpieza espaciada (0,70)</option>
+        </select>
+        <p class="ayuda">La norma pide iluminancia <b>mantenida</b>: la que queda al final del período de mantenimiento, no la del día de la instalación.</p>
+      </div>
+
       <div class="bloque" id="bloque-encendido" hidden>
         <h2>Encendido</h2>
         <div class="segmentado" id="seg-encendido"></div>
@@ -57,11 +70,12 @@
       <div class="bloque">
         <h2>Resultado</h2>
         <div class="kpis">
-          <div class="kpi kpi-grande"><span class="kpi-num" id="k-prom">—</span><span class="kpi-lbl">lux promedio</span></div>
-          <div class="kpi"><span class="kpi-num" id="k-min">—</span><span class="kpi-lbl">mínimo</span></div>
-          <div class="kpi"><span class="kpi-num" id="k-max">—</span><span class="kpi-lbl">máximo</span></div>
-          <div class="kpi"><span class="kpi-num" id="k-uni">—</span><span class="kpi-lbl">uniformidad</span></div>
+          <div class="kpi kpi-grande"><span class="kpi-num" id="k-prom">—</span><span class="kpi-lbl">Ē · iluminancia media (lx)</span></div>
+          <div class="kpi"><span class="kpi-num" id="k-min">—</span><span class="kpi-lbl">E<sub>mín</sub> (lx)</span></div>
+          <div class="kpi"><span class="kpi-num" id="k-max">—</span><span class="kpi-lbl">E<sub>máx</sub> (lx)</span></div>
+          <div class="kpi"><span class="kpi-num" id="k-uni">—</span><span class="kpi-lbl">U<sub>0</sub> = E<sub>mín</sub> / Ē</span></div>
         </div>
+        <p class="ayuda" id="fm-nota"></p>
         <div class="referencia" id="referencia"></div>
       </div>
 
@@ -118,16 +132,24 @@
 
     <!-- Ficha de la luminaria + render -->
     <section class="panel panel-ficha">
+      <div id="fichas"></div>
+
       <div class="bloque">
-        <h2>Luminaria</h2>
-        <div class="ficha-nombre" id="f-nombre">—</div>
-        <div class="ficha-fab" id="f-fab"></div>
-        <canvas id="polar" width="300" height="300"></canvas>
-        <div class="polar-leyenda"><span class="c0">C0–C180</span><span class="c90">C90–C270</span><span class="unidad">cd/klm</span></div>
-        <dl class="ficha-datos" id="f-datos"></dl>
+        <h2>La escena</h2>
+        <dl class="ficha-datos" id="escena-datos"></dl>
       </div>
 
       <div class="bloque">
+        <h2>Cómo se calcula</h2>
+        <ul class="metodo">
+          <li><b>Luz directa:</b> punto por punto desde el archivo fotométrico del fabricante (IESNA LM-63), con la posición, la altura y el giro reales de cada luminaria en 3ds Max.</li>
+          <li><b>Luz indirecta:</b> una sola componente <b>estimada</b>, pareja en todo el local, por el método del flujo total con las reflectancias de arriba (esfera integradora). No es un cálculo de radiosidad.</li>
+          <li><b>No contempla:</b> muebles ni obstrucciones, luz natural, deslumbramiento (UGR), ni depreciación más allá del factor de mantenimiento.</li>
+          <li><b>Para qué sirve:</b> comparar propuestas y verificar niveles. No reemplaza un estudio lumínico firmado.</li>
+        </ul>
+      </div>
+
+      <div class="bloque" id="bloque-noche" hidden>
         <h2>Render de noche</h2>
         <img id="render" alt="Render de la escena solo con las luminarias" hidden />
         <p class="ayuda" id="render-falta" hidden>Guardá el render de noche como <code>mapa-de-luz/escenas/oficina-prueba-noche.jpg</code> y aparece acá para comparar.</p>
@@ -140,7 +162,7 @@
     Valores indicativos, calculados con la fotometría publicada por el fabricante. No reemplazan un estudio lumínico.
   </footer>
 
-  <script src="../js/ies.js"></script>
-  <script src="js/mapa-de-luz.js"></script>
+  <script src="../js/ies.js?v=6"></script>
+  <script src="js/mapa-de-luz.js?v=6"></script>
 </body>
 </html>

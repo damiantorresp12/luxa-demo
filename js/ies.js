@@ -65,6 +65,8 @@
     const aMetros = unidades === 1 ? 0.3048 : 1;
     return {
       claves,
+      // Primera linea del archivo: IESNA:LM-63-1995 / LM-63-2002 / LM-63-2019
+      formato: (lineas[0] || '').trim().replace(/^FEFF/, ''),
       fabricante: claves.MANUFAC || '',
       codigo: claves.LUMCAT || claves.LUMINAIRE || '',
       nombre: claves.LUMINAIRE || claves.LUMCAT || '',

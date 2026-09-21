@@ -37,7 +37,7 @@
   const estado = {
     escena: null, geo: null,
     ies: null, iesNombre: '', datosIes: null, cacheIes: {},
-    plano: 0, rebote: true, rho: {}, numeros: true, borde: true,
+    plano: 0, rebote: true, fm: 1, rho: {}, numeros: true, borde: true,
     directa: null, nx: 0, ny: 0, eInd: 0, reboteInfo: null,
     vista: null, vistaMapa: 'planta', fondo: 0,
     modoPorLuz: false        // true = cada luz con su propio IES (el que trae de 3ds Max)
@@ -208,8 +208,12 @@
     estado.reboteInfo = { phiPiso, phiTotal };
   }
 
+  // Factor de mantenimiento: la norma pide iluminancia MANTENIDA (la que queda al final
+  // del período de mantenimiento). El cálculo físico no cambia; afecta lo que se informa.
+  function conFM(E) { return E * (estado.fm || 1); }
+
   function valor(i, j) {
-    return estado.directa[j * estado.nx + i] + (estado.rebote ? estado.eInd : 0);
+    return conFM(estado.directa[j * estado.nx + i] + (estado.rebote ? estado.eInd : 0));
   }
 
   function estadisticas() {
@@ -239,7 +243,7 @@
     let suma = 0, n = 0, min = Infinity, max = 0;
     for (let y = m + CELDA / 2; y < L - m; y += CELDA) {
       for (let x = m + CELDA / 2; x < W - m; x += CELDA) {
-        const v = directa(x, y, h) + e;
+        const v = conFM(directa(x, y, h) + e);
         suma += v; n++;
         if (v < min) min = v;
         if (v > max) max = v;
@@ -247,6 +251,163 @@
     }
     const prom = n ? suma / n : 0;
     return { prom, min: n ? min : 0, max, uni: prom ? min / prom : 0 };
+  }
+
+  // Iluminancia media sobre una pared, sin la franja de 0,5 m contra el piso y el techo.
+  function statsPared(nombre) {
+    const pl = planoPared(nombre);
+    if (!pl) return null;
+    const H = estado.geo.H, m = 0.5, e = estado.rebote ? estado.eInd : 0, paso = 0.25;
+    let suma = 0, n = 0, min = Infinity, max = 0;
+    for (let u = paso / 2; u < pl.largo; u += paso) {
+      for (let z = m; z <= H - m + 1e-9; z += paso) {
+        const v = conFM(directaN(pl.punto(u, z), pl.n) + e);
+        suma += v; n++;
+        if (v < min) min = v;
+        if (v > max) max = v;
+      }
+    }
+    const prom = n ? suma / n : 0;
+    return { prom, min: n ? min : 0, max, uni: prom ? min / prom : 0 };
+  }
+
+  // Las cuatro paredes juntas, pesadas por su largo (el alto es el mismo)
+  function statsParedes() {
+    const { W, L } = estado.geo;
+    let suma = 0, largoTotal = 0, min = Infinity;
+    for (const [nombre, largo] of [['izquierda', L], ['derecha', L], ['fondo', W], ['frente', W]]) {
+      const s = statsPared(nombre);
+      if (!s) continue;
+      suma += s.prom * largo; largoTotal += largo;
+      if (s.min < min) min = s.min;
+    }
+    if (!largoTotal) return null;
+    const prom = suma / largoTotal;
+    return { prom, min: min === Infinity ? 0 : min, uni: prom ? min / prom : 0 };
+  }
+
+  // Iluminancia media sobre el techo. Si las luminarias no mandan luz hacia arriba
+  // (100 % hacia abajo), el techo recibe solo el rebote.
+  function luzTecho() {
+    const { W, L, H } = estado.geo, e = estado.rebote ? estado.eInd : 0, paso = 0.5;
+    let suma = 0, n = 0;
+    for (let y = paso / 2; y < L; y += paso) {
+      for (let x = paso / 2; x < W; x += paso) {
+        let E = 0;
+        for (const l of estado.geo.luces) {
+          const dx = x - l.x, dy = y - l.y, dz = l.z - H;
+          if (dz >= 0) continue;
+          const r2 = dx * dx + dy * dy + dz * dz, r = Math.sqrt(r2);
+          const gamma = Math.acos(dz / r) * 180 / Math.PI;   // más de 90°: luz hacia arriba
+          const C = Math.atan2(dy, dx) * 180 / Math.PI - l.rot;
+          E += IES.intensidad(iesDe(l), C, gamma) * (-dz / r) / r2;
+        }
+        suma += conFM(E + e); n++;
+      }
+    }
+    return n ? suma / n : 0;
+  }
+
+  // ---------------------------------------------------------------- UGR
+  // Deslumbramiento molesto, método CIE 117 (el que pide EN 12464-1):
+  //   UGR = 8 · log10( 0,25/Lb · Σ L²·ω / p² )
+  // con L = I/Ap (luminancia de la luminaria hacia el ojo), ω = Ap/r² (ángulo sólido)
+  // y p el índice de posición de Guth. Como L²·ω = I²/(Ap·r²), el término queda I²/(Ap·r²·p²).
+  // Lb (luminancia de fondo) sale de la componente indirecta: Lb = E_indirecta / π.
+
+  // Área luminosa de la cara que emite. En LM-63 una medida negativa = luminaria redonda.
+  function areaLuminosa(ies) {
+    const m = (ies && ies.medidas) || {};
+    const redonda = (m.ancho || 0) < 0 || (m.largo || 0) < 0;
+    const a = Math.abs(m.ancho || 0), b = Math.abs(m.largo || 0);
+    return redonda ? Math.PI / 4 * a * b : a * b;
+  }
+
+  // Área luminosa proyectada hacia el ojo (la que entra en el ángulo sólido).
+  function areaProyectada(ies, gamma) {
+    const m = (ies && ies.medidas) || {};
+    const redonda = (m.ancho || 0) < 0 || (m.largo || 0) < 0;
+    const a = Math.abs(m.ancho || 0), b = Math.abs(m.largo || 0), h = Math.abs(m.alto || 0);
+    const abajo = redonda ? Math.PI / 4 * a * b : a * b;
+    const lado = a * h;
+    const g = gamma * Math.PI / 180;
+    const ap = abajo * Math.abs(Math.cos(g)) + lado * Math.sin(g);
+    return ap > 1e-7 ? ap : 0;
+  }
+
+  // Índice de posición de Guth (aproximación de Levin), con el ojo mirando horizontal:
+  // H = cuánto está la luminaria por encima del ojo, R = distancia hacia adelante, T = a un lado.
+  function indicePosicion(H, T, R) {
+    const sigma = Math.atan(Math.hypot(H, T) / R) * 180 / Math.PI;
+    const alpha = Math.atan2(T, Math.max(H, 1e-6)) * 180 / Math.PI;
+    const ln = (35.2 - 0.31889 * alpha - 1.22 * Math.exp(-2 * alpha / 9)) * 1e-3 * sigma
+             + (21 + 0.26667 * alpha - 0.002963 * alpha * alpha) * 1e-5 * sigma * sigma;
+    return { p: Math.exp(ln), sigma };
+  }
+
+  // Peor UGR entre observadores sentados (ojo a 1,20 m) mirando en las 4 direcciones principales
+  function ugrEstimado() {
+    const { W, L, luces } = estado.geo;
+    const OJO = 1.2, PASO = 0.5, BORDE_OBS = 0.5, LIMITE_VISTA = 60;
+    const Lb = conFM(estado.rebote ? estado.eInd : 0) / Math.PI;
+    if (!luces.length) return null;
+    if (!(Lb > 0.01)) return { sinFondo: true };
+    let sinMedidas = false, peor = null, areaMin = Infinity;
+    for (let oy = BORDE_OBS; oy <= L - BORDE_OBS + 1e-9; oy += PASO) {
+      for (let ox = BORDE_OBS; ox <= W - BORDE_OBS + 1e-9; ox += PASO) {
+        for (const [vx, vy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+          let suma = 0;
+          for (const l of luces) {
+            const dx = l.x - ox, dy = l.y - oy, dz = l.z - OJO;
+            if (dz <= 0) continue;                       // no deslumbra lo que está bajo el ojo
+            const R = dx * vx + dy * vy;
+            if (R <= 0.3) continue;                      // atrás o justo encima
+            const T = Math.abs(-dx * vy + dy * vx);
+            const r2 = dx * dx + dy * dy + dz * dz, r = Math.sqrt(r2);
+            const { p, sigma } = indicePosicion(dz, T, R);
+            if (sigma > LIMITE_VISTA) continue;          // fuera del campo visual considerado
+            const gamma = Math.acos(dz / r) * 180 / Math.PI;
+            const C = Math.atan2(-dy, -dx) * 180 / Math.PI - l.rot;
+            const I = conFM(IES.intensidad(iesDe(l), C, gamma));
+            if (I <= 0) continue;
+            const ap = areaProyectada(iesDe(l), gamma);
+            if (!ap) { sinMedidas = true; continue; }
+            const aReal = areaLuminosa(iesDe(l));
+            if (aReal > 0 && aReal < areaMin) areaMin = aReal;
+            suma += (I * I) / (ap * r2 * p * p);
+          }
+          if (suma > 0) {
+            const ugr = 8 * Math.log10(0.25 / Lb * suma);
+            if (!peor || ugr > peor.ugr) peor = { ugr, x: ox, y: oy };
+          }
+        }
+      }
+    }
+    if (sinMedidas && !peor) return { sinMedidas: true };
+    // CIE 117 vale para áreas luminosas de 0,005 m² en adelante. Con spots chicos el
+    // número sale correcto pero pesimista: se informa como fuera de rango, no como incumplimiento.
+    const fueraDeRango = areaMin < 0.005;   // 50 cm²: piso de validez de CIE 117
+    return peor ? Object.assign(peor, { sinMedidas, areaMin, fueraDeRango }) : null;
+  }
+
+  // Los datos de la escena que un especialista busca antes de mirar los números
+  function mostrarEscena() {
+    const cont = $('#escena-datos');
+    if (!cont || !estado.geo) return;
+    const { W, L, H, luces } = estado.geo;
+    const alturas = [...new Set(luces.map((l) => fmt(l.z, 2)))].join(' / ');
+    const rho = estado.rho;
+    const filas = [
+      ['Local', `${fmt(W, 2)} × ${fmt(L, 2)} m · ${fmt(W * L, 1)} m²`],
+      ['Altura del local', `${fmt(H, 2)} m`],
+      ['Luminarias', `${luces.length} · montadas a ${alturas} m`],
+      ['Plano de cálculo', estado.plano > 0 ? `${fmt(estado.plano, 2)} m` : 'piso (0,00 m)'],
+      ['Grilla', `${fmt(CELDA * 100)} cm`],
+      ['Zona de borde', estado.borde ? `no se cuentan ${fmt(BORDE, 2)} m junto a las paredes` : 'se cuenta todo el local'],
+      ['Reflectancias', `techo ${fmt(rho.techo, 2)} · paredes ${fmt(rho.paredes, 2)} · piso ${fmt(rho.piso, 2)}`],
+      ['Mantenimiento', `FM ${fmt(estado.fm, 2)} · ${estado.fm >= 1 ? 'valores iniciales' : 'valores mantenidos'}`]
+    ];
+    cont.innerHTML = filas.map(([a, b]) => `<dt>${a}</dt><dd>${b}</dd>`).join('');
   }
 
   // ------------------------------------------------------------------- dibujo
@@ -299,7 +460,7 @@
         for (let x = PASO_NUMEROS / 2; x < W; x += PASO_NUMEROS) {
           // no tapar la marca ni el nombre de una luminaria
           if (luces.some((l) => Math.abs(l.y - y) < 0.2 && x > l.x - 0.2 && x < l.x + 0.6)) continue;
-          const lux = directa(x, y, estado.plano) + e;
+          const lux = conFM(directa(x, y, estado.plano) + e);
           ctx.fillStyle = textoSobre(banda(lux)[1]);
           ctx.fillText(fmt(lux), X(x), Y(y));
         }
@@ -365,12 +526,13 @@
   function dibujarLeyenda() {
     const barra = BANDAS.map((b) => `<i style="background:${b[1]}"></i>`).join('');
     const nums = BANDAS.map((b, k) => `<span>${k === BANDAS.length - 1 ? b[0] + '+' : b[0]}</span>`).join('');
-    $('#leyenda').innerHTML = `<div class="leyenda-titulo">lux (lx)</div><div class="leyenda-barra">${barra}</div><div class="leyenda-nums">${nums}</div>`;
+    $('#leyenda').innerHTML = `<div class="leyenda-titulo">Iluminancia (lx)</div><div class="leyenda-barra">${barra}</div><div class="leyenda-nums">${nums}</div>` +
+      '<div class="leyenda-nota">Bandas de color, no una escala lineal. Cada número es la iluminancia en ese punto, en el plano elegido.</div>';
   }
 
-  function dibujarPolar() {
-    const ies = estado.ies, d = estado.datosIes;
-    const canvas = $('#polar'), dpr = window.devicePixelRatio || 1, T = 300;
+  // Curva polar de una fotometría, en el canvas de su ficha
+  function dibujarPolar(canvas, ies, d) {
+    const dpr = window.devicePixelRatio || 1, T = 300;
     canvas.width = T * dpr; canvas.height = T * dpr;
     const ctx = canvas.getContext('2d');
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -418,21 +580,72 @@
     curva(0, '#c9a35a', false);
   }
 
-  function mostrarFicha() {
-    const ies = estado.ies, d = estado.datosIes;
-    $('#f-nombre').textContent = ies.codigo || estado.iesNombre;
-    $('#f-fab').textContent = [ies.fabricante && `Fabricante: ${ies.fabricante}`, ies.claves.TESTDATE && `Medido: ${ies.claves.TESTDATE}`].filter(Boolean).join(' · ');
+  // Una ficha por fotometría distinta de la escena (ej. 6 × BO 55 + 2 × Bitpop).
+  // En modo "Según 3ds Max" son las luces agrupadas por su IES; si se fuerza una
+  // óptica para todas, es una sola.
+  function fichasDeLaEscena() {
+    if (estado.modoPorLuz && estado.iesPorLuz && estado.iesPorLuz.length) {
+      return estado.iesPorLuz.map((g) => {
+        const l = estado.geo.luces.find((x) => x.ies === g.ies);
+        return { ies: g.ies, datos: g.datos, n: g.n, ruta: (l && l.iesRuta) || '' };
+      });
+    }
+    if (!estado.ies) return [];
+    return [{ ies: estado.ies, datos: estado.datosIes, n: estado.geo.luces.length, ruta: estado.iesNombre }];
+  }
+
+  // Ficha de UNA luminaria por vez, elegida en una lista (como la de Óptica), así no
+  // hay que scrollear. La elección se recuerda mientras siga estando en la escena.
+  function mostrarFichas() {
+    const cont = $('#fichas');
+    if (!cont) return;
+    const cfgApp = (listaRenders().find((r) => r.paraApp) || {}).paraApp;
+    const productos = (cfgApp && cfgApp.productos) || [];
+    const fichas = fichasDeLaEscena().map((f) => {
+      const clave = `${f.ruta} ${f.ies.nombre}`.toLowerCase();
+      const prod = productos.find((p) => clave.includes(p.ies.toLowerCase()));
+      return Object.assign({}, f, { nombre: prod ? prod.nombre : (f.ies.codigo || f.ies.nombre) });
+    });
+    if (!fichas.length) { cont.innerHTML = ''; return; }
+
+    let i = fichas.findIndex((f) => f.ies.nombre === estado.fichaSel);
+    if (i < 0) i = 0;
+    estado.fichaSel = fichas[i].ies.nombre;
+    const f = fichas[i], ies = f.ies, d = f.datos;
     const apertura = d.simetrica ? `${fmt(d.aperturaC0)}°` : `${fmt(d.aperturaC0)}° × ${fmt(d.aperturaC90)}°`;
+    const alturas = [...new Set(estado.geo.luces.filter((l) => !estado.modoPorLuz || l.ies === ies).map((l) => fmt(l.z, 2)))].join(' / ');
     const filas = [
-      ['Lúmenes', `${fmt(d.lumenes)} lm`],
+      ['Flujo declarado', `${fmt(d.lumenes)} lm`],
       ['Potencia', d.watts ? `${fmt(d.watts)} W` : '—'],
       ['Eficiencia', d.eficiencia ? `${fmt(d.eficiencia)} lm/W` : '—'],
       ['Apertura', apertura],
       ['Intensidad máxima', `${fmt(d.pico)} cd`],
       ['Luz hacia abajo', `${fmt(d.fraccionAbajo * 100)} %`],
-      ['Chequeo: la curva suma', `${fmt(d.lumenesCalculados)} lm`]
+      ['Flujo integrado de la curva', `${fmt(d.lumenesCalculados)} lm`],
+      ['Montaje', alturas ? `${alturas} m` : '—'],
+      ['Lámpara', ies.claves.LAMP || ies.claves.LAMPCAT || '—'],
+      ['Archivo', ies.formato || 'IESNA LM-63']
     ];
-    $('#f-datos').innerHTML = filas.map(([a, b]) => `<dt>${a}</dt><dd>${b}</dd>`).join('');
+    const sub = [ies.codigo, ies.fabricante && `Fabricante: ${ies.fabricante}`, ies.claves.TESTDATE && `Medido: ${ies.claves.TESTDATE}`]
+      .filter(Boolean).join(' · ');
+
+    cont.innerHTML = `<div class="bloque">
+      <h2>Luminaria</h2>
+      ${fichas.length > 1
+        ? `<select id="sel-ficha">${fichas.map((x, k) => `<option value="${k}"${k === i ? ' selected' : ''}>${x.n} × ${x.nombre}</option>`).join('')}</select>`
+        : `<div class="ficha-nombre">${estado.modoPorLuz ? f.n + ' × ' + f.nombre : f.n + ' luces con esta óptica'}</div>`}
+      ${!estado.modoPorLuz ? '<p class="ayuda">Estás forzando esta óptica: las ' + estado.geo.luces.length + ' luces de la escena usan esta fotometría, sea cual sea su artefacto.</p>' : ''}
+      <div class="ficha-fab">${sub}</div>
+      <canvas class="polar" width="300" height="300"></canvas>
+      <div class="polar-leyenda"><span class="c0">C0–C180</span><span class="c90">C90–C270</span><span class="unidad">cd/klm</span></div>
+      <dl class="ficha-datos">${filas.map(([a, b]) => `<dt>${a}</dt><dd>${b}</dd>`).join('')}</dl>
+    </div>`;
+    dibujarPolar(cont.querySelector('canvas.polar'), ies, d);
+    const sel = $('#sel-ficha');
+    if (sel) sel.addEventListener('change', () => {
+      estado.fichaSel = fichas[parseInt(sel.value, 10)].ies.nombre;
+      mostrarFichas();
+    });
   }
 
   function mostrarResultados() {
@@ -441,24 +654,56 @@
     $('#k-min').textContent = fmt(st.min);
     $('#k-max').textContent = fmt(st.max);
     $('#k-uni').textContent = fmt(st.uni, 2);
+    $('#fm-nota').innerHTML = estado.fm >= 1
+      ? 'Valores <b>iniciales</b> (FM 1,00): luminaria nueva y limpia.'
+      : `Valores <b>mantenidos</b> con FM ${fmt(estado.fm, 2)}.`;
+    mostrarEscena();
 
+    // Cumplimiento: la tarea se mide siempre en el plano de trabajo, aunque en pantalla
+    // se esté mirando el piso. Paredes y techo salen del cálculo, no del render.
     const ref = estado.escena.referencia;
-    if (ref && estado.plano > 0) {
-      const pct = st.prom / ref.lux;
-      const okLux = st.prom >= ref.lux, okUni = st.uni >= ref.uniformidad;
+    if (ref) {
+      const hT = estado.escena.planoTrabajo != null ? estado.escena.planoTrabajo : 0.75;
+      const trabajo = statsPlanta(hT);
+      const paredes = statsParedes();
+      const techo = luzTecho();
+      const pide = Object.assign({ paredes: 75, techo: 50, ugr: 19 }, ref.minimos || {});
+      const ugr = ugrEstimado();
+      const fila = (que, valor, ok, pedido) =>
+        `<span class="que">${que}</span><span class="val">${valor}</span>` +
+        `<span class="${ok ? 'ok' : 'no'}">${ok ? '✓' : '✗'} ${pedido}</span>`;
+      const pct = trabajo.prom / ref.lux;
       $('#referencia').innerHTML =
-        `Referencia · ${ref.nombre} (${ref.fuente}): <b>${fmt(ref.lux)} lx</b> promedio y uniformidad <b>${fmt(ref.uniformidad, 2)}</b>.` +
+        `<div class="cumple-titulo">Chequeo contra la norma · orientativo<br>${ref.nombre} (${ref.fuente})</div>` +
         `<div class="barra"><i style="width:${Math.min(100, pct * 100)}%"></i></div>` +
-        `<span class="${okLux ? 'bien' : 'mal'}">Llega al ${fmt(pct * 100)} % de la luz recomendada</span> · ` +
-        `<span class="${okUni ? 'bien' : 'mal'}">uniformidad ${okUni ? 'suficiente' : 'baja'}</span>.`;
+        `<div class="cumple">` +
+          fila(`Ē en la tarea, a ${fmt(hT, 2)} m`, `${fmt(trabajo.prom)} lx`, trabajo.prom >= ref.lux, `≥ ${fmt(ref.lux)} lx`) +
+          fila('U₀ en ese plano', fmt(trabajo.uni, 2), trabajo.uni >= ref.uniformidad, `≥ ${fmt(ref.uniformidad, 2)}`) +
+          (paredes ? fila('Ē paredes', `${fmt(paredes.prom)} lx`, paredes.prom >= pide.paredes, `≥ ${fmt(pide.paredes)} lx`) : '') +
+          fila('Ē techo', `${fmt(techo)} lx`, techo >= pide.techo, `≥ ${fmt(pide.techo)} lx`) +
+          (ugr && ugr.ugr != null
+            ? (ugr.fueraDeRango
+                ? `<span class="que">UGR · deslumbramiento</span><span class="val">${fmt(ugr.ugr, 1)}</span>` +
+                  `<span class="fuera">fuera de rango</span>`
+                : fila('UGR · deslumbramiento', fmt(ugr.ugr, 1), ugr.ugr <= pide.ugr, `≤ ${fmt(pide.ugr)}`))
+            : '') +
+        `</div>` +
+        `<p class="ayuda">Paredes y techo se calculan sobre toda su superficie, sin la franja de 0,5 m contra el piso y el techo. ` +
+        (ugr && ugr.ugr != null
+          ? `El UGR es el peor caso entre observadores sentados (ojo a 1,20 m) mirando en las cuatro direcciones principales, por el método CIE 117.` +
+            (ugr.fueraDeRango
+              ? ` Ese método vale para áreas luminosas de 0,005 m² en adelante y acá la más chica es de ${fmt(ugr.areaMin * 10000)} cm²: con fuentes tan chicas el valor sale alto y conviene pedirle al fabricante su tabla de UGR.`
+              : '')
+          : (ugr && ugr.sinFondo ? 'El UGR necesita la componente indirecta prendida.' : 'El UGR no se puede estimar: el archivo fotométrico no trae las medidas del área luminosa.')) +
+        ` Los mínimos son los de la norma para oficinas.</p>`;
     } else {
-      $('#referencia').innerHTML = ref ? `La referencia (${ref.nombre.toLowerCase()}, ${fmt(ref.lux)} lx) se mide a 0,75 m, la altura del escritorio.` : '';
+      $('#referencia').innerHTML = '';
     }
 
     const r = estado.reboteInfo;
     $('#rebote-info').innerHTML = estado.rebote
-      ? `Suma <b>${fmt(estado.eInd)} lx</b> parejo en toda la sala. Del total de ${fmt(r.phiTotal)} lm, ${fmt(r.phiPiso)} lm caen directo al piso.`
-      : 'Solo luz directa.';
+      ? `Componente indirecta estimada: suma <b>${fmt(conFM(estado.eInd))} lx</b> parejos en todo el local. De los ${fmt(r.phiTotal)} lm instalados, ${fmt(r.phiPiso)} lm llegan directo al piso.`
+      : 'Solo luz directa: sin componente indirecta.';
   }
 
   // ------------------------------------------------------ mapa sobre el render
@@ -581,11 +826,11 @@
           if (s.pl) {
             const q = P.alPared(bx + B / 2, by + B / 2, s.pl);
             if (!q || q.z < 0 || q.z > estado.geo.H) continue;
-            lux = directaN(q, s.pl.n) + e;
+            lux = conFM(directaN(q, s.pl.n) + e);
           } else {
             const q = P.alPlano(bx + B / 2, by + B / 2, s.altura);
             if (!q || (!s.mk && !dentro(q))) continue;
-            lux = directa(q.x, q.y, s.altura) + e;
+            lux = conFM(directa(q.x, q.y, s.altura) + e);
           }
           col = colores[indice(lux)];
           cual = s;
@@ -657,7 +902,7 @@
         const p = P.aPixel(p3);
         if (!p || p.x < 0 || p.y < 0 || p.x >= Wi || p.y >= Hi) return;
         if (s.mk[((p.y | 0) * Wi + (p.x | 0)) * 4] < 128) return;
-        const lux = calc();
+        const lux = conFM(calc());
         suma += lux; n++;
         if (lux < min) min = lux;
         if (lux > max) max = lux;
@@ -781,7 +1026,7 @@
       try {
         if (sel.value === '__max__') { estado.modoPorLuz = true; usarProductoPrincipal(); }
         else { estado.modoPorLuz = false; await cargarIes(sel.value); }
-        mostrarFicha(); dibujarPolar(); recalcularTodo();
+        mostrarFichas(); recalcularTodo();
       } catch (e) { alert(e.message); }
     });
 
@@ -802,9 +1047,17 @@
         estado.encendido = b.dataset.enc || null;
         const enc = encendidosApp.find((e) => e.id === estado.encendido);
         encender(enc ? enc.productos : null, cfgApp, estado.todasLuces);
+        mostrarFichas();
         redibujar();
       });
     }
+
+    const selFm = $('#sel-fm');
+    selFm.value = String(estado.fm);
+    selFm.addEventListener('change', () => {
+      estado.fm = parseFloat(selFm.value) || 1;
+      redibujar();
+    });
 
     $('#seg-plano').addEventListener('click', (ev) => {
       const b = ev.target.closest('button'); if (!b) return;
@@ -966,7 +1219,7 @@
         // Volver a la óptica que estaba elegida
         await cargarIes(previa);
         $('#sel-ies').value = previa;
-        mostrarFicha(); dibujarPolar();
+        mostrarFichas();
         calcularGrilla(); calcularRebote(); dibujarMapa(); mostrarResultados();
         await dibujarSobreRender();
         btn.disabled = false;
@@ -1288,7 +1541,7 @@
         x.fillText(`${fmt(col.watts)} W · ${col.productos}`, x0, y);
       });
       x.fillStyle = '#6a6a73'; x.font = letra(400, 22);
-      x.fillText('Valores indicativos, calculados con la fotometría del fabricante. No reemplazan un estudio lumínico.' +
+      x.fillText(`Valores ${estado.fm >= 1 ? 'iniciales (FM 1,00)' : 'mantenidos (FM ' + fmt(estado.fm, 2) + ')'}, calculados con la fotometría del fabricante. No reemplazan un estudio lumínico.` +
         (ref ? ` Referencia: ${ref.nombre} (${ref.fuente || ''}) ${fmt(ref.lux)} lx, uniformidad ${fmt(ref.uniformidad || 0, 2)}.` : ''), pad, H - 30);
 
       c.toBlob((blob) => {
@@ -1308,7 +1561,7 @@
       const px = ev.clientX - rect.left, py = ev.clientY - rect.top;
       const x = px / v.s - v.margen, y = estado.geo.L - (py / v.s - v.margen);
       if (x < 0 || y < 0 || x > estado.geo.W || y > estado.geo.L) { tip.hidden = true; return; }
-      const lux = directa(x, y, estado.plano) + (estado.rebote ? estado.eInd : 0);
+      const lux = conFM(directa(x, y, estado.plano) + (estado.rebote ? estado.eInd : 0));
       tip.innerHTML = `<b>${fmt(lux)} lx</b> · a ${fmt(x, 2)} m de la ventana, ${fmt(y, 2)} m del frente`;
       tip.style.left = px + 'px'; tip.style.top = py + 'px'; tip.hidden = false;
     });
@@ -1320,6 +1573,8 @@
     const img = $('#render');
     img.onload = () => { img.hidden = false; };
     img.onerror = () => { $('#render-falta').hidden = false; };
+    // El bloque solo aparece si la escena tiene un render nocturno para comparar
+    $('#bloque-noche').hidden = !esc.renderNoche;
     if (esc.renderNoche) img.src = 'escenas/' + esc.renderNoche;
   }
 
@@ -1409,8 +1664,7 @@
       }
       armarControles();
       dibujarLeyenda();
-      mostrarFicha();
-      dibujarPolar();
+      mostrarFichas();
       recalcularTodo();
     } catch (e) {
       document.querySelector('.layout').innerHTML = `<p class="error">${e.message}</p>`;
