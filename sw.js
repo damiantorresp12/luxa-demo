@@ -360,6 +360,11 @@ self.addEventListener('fetch', function (evento) {
   // listas de archivos viejas y creería que algo no se guardó.
   if (url.pathname.indexOf('/__') === 0) return;
 
+  // La analitica de Vercel (/_vercel/insights/) sale siempre en vivo y no se
+  // guarda copia: es una medicion, no parte del showroom. Si se cacheara, el
+  // script quedaria viejo y las visitas se contarian mal.
+  if (url.pathname.indexOf('/_vercel/') === 0) return;
+
   // Las herramientas internas (Generador y Planificador) quedan siempre en
   // vivo: son de Damian, no del cliente, y guardar una copia solo confunde.
   if (url.pathname.indexOf('/space-planner/') !== -1 ||
