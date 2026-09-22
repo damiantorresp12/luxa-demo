@@ -2981,38 +2981,75 @@ button.space-spec-prod:hover, button.space-spec-prod:focus-visible { color: var(
 }
 
 @media (max-width: 980px) {
+  /* Tres estados en mobile para que la card no tape el producto:
+     1. Default (sin clase modificadora) — botón circular con "+" en la esquina.
+     2. .is-preview — card angosta con el nombre visible por unos segundos al
+        aparecer, después el JS le saca la clase y vuelve al modo botón.
+     3. .is-expanded — full-width con nombre, descripción, código y botones.
+     Damián reportó que la card tapaba la base del producto (mesa, apliques,
+     lámparas de pie). El modo default como botón deja todo el ambiente libre. */
   .transition-card {
-    /* Colapsada: chip mínimo en la esquina inferior derecha (sin eyebrow
-       "DE MESA" arriba, padding vertical bajo, ancho corto). Antes tomaba
-       todo el ancho y tapaba el producto en el close-up. Ahora ocupa solo
-       la esquina y deja el resto del ambiente visible. */
     right: 12px;
     left: auto;
     bottom: 12px;
-    width: min(200px, calc(100% - 24px));
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border-radius: 50%;
     max-height: calc(100% - 24px);
   }
-  .transition-card.is-expanded {
-    /* Expandida: full-width para que las acciones (Ver ficha, Comparar,
-       Volver al ambiente) tengan aire y no queden apretadas. */
-    left: 12px;
-    right: 12px;
-    width: auto;
-    max-width: none;
+  .transition-card .transition-card-header,
+  .transition-card .transition-card-name,
+  .transition-card .transition-card-eyebrow { display: none; }
+  .transition-card-toggle {
+    padding: 0;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
   }
-  .transition-card-toggle { padding: 8px 12px; }
-  .transition-card.is-expanded .transition-card-toggle { padding: 10px 14px; }
-  .transition-card-name {
+
+  /* Preview — se muestra al revelar el close-up y se auto-oculta a los 4s. */
+  .transition-card.is-preview {
+    width: min(200px, calc(100% - 24px));
+    height: auto;
+    border-radius: 14px;
+  }
+  .transition-card.is-preview .transition-card-header,
+  .transition-card.is-preview .transition-card-name { display: block; }
+  .transition-card.is-preview .transition-card-toggle {
+    padding: 8px 12px;
+    justify-content: space-between;
+  }
+  .transition-card.is-preview .transition-card-name {
     font-size: 0.9rem;
     line-height: 1.2;
   }
-  /* Colapsada: escondemos el eyebrow "DE MESA" para bajar altura al mínimo.
-     Reaparece al expandir así el usuario ve la categoría en el detalle. */
-  .transition-card .transition-card-eyebrow { display: none; }
+
+  /* Expandida — full-width con toda la info y acciones. */
+  .transition-card.is-expanded {
+    left: 12px;
+    right: 12px;
+    width: auto;
+    height: auto;
+    padding: 0;
+    border-radius: 14px;
+    max-width: none;
+  }
+  .transition-card.is-expanded .transition-card-header,
+  .transition-card.is-expanded .transition-card-name { display: block; }
   .transition-card.is-expanded .transition-card-eyebrow {
     display: block;
     font-size: 0.55rem;
   }
+  .transition-card.is-expanded .transition-card-toggle {
+    padding: 10px 14px;
+    justify-content: space-between;
+  }
+  .transition-card.is-expanded .transition-card-name {
+    font-size: 0.95rem;
+    line-height: 1.15;
+  }
+
   .transition-card-chevron { width: 22px; height: 22px; }
   .transition-card-body { padding: 0 14px; }
   .transition-card.is-expanded .transition-card-body {

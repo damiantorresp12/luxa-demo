@@ -25,6 +25,12 @@
   var LANG_KEY    = 'luxa.lang';
   var PROJECT_KEY = 'luxa.project.title';
 
+  /* Timer del preview de la transition-card (mobile): la card aparece con
+     nombre unos segundos al revelar el close-up y después se auto-colapsa
+     a un botón mínimo. Vive a nivel módulo para que el handler del toggle
+     pueda cancelarlo si el usuario toca antes del auto-hide. */
+  var previewTimer = null;
+
   /* Lenguaje activo. Default 'es'. */
   var lang = 'en';
   try {
@@ -2304,7 +2310,8 @@
     // Sacar la capa off dinámica si existía (la crea el toggle handler).
     var staleOff = overlay.querySelector('.transition-still-off-layer');
     if (staleOff) staleOff.remove();
-    if (card)  { card.hidden = true; card.classList.remove('is-expanded'); }
+    if (card)  { card.hidden = true; card.classList.remove('is-expanded'); card.classList.remove('is-preview'); }
+    clearTimeout(previewTimer);
     var stale = overlay.querySelector('.transition-lights-toggle');
     if (stale) stale.remove();
     overlay.hidden = true;
@@ -2485,6 +2492,17 @@
         overlay.style.backgroundImage = '';
       }
       card.hidden = false;
+      // Preview: mostrar la card con el nombre por unos segundos así el
+      // usuario ve qué producto está mirando, después colapsar a solo el "+"
+      // circular para no tapar el producto (patrón tipo controles de video).
+      // El CSS de mobile define los 3 estados: default (botón), .is-preview
+      // (con nombre), .is-expanded (full-width con detalles).
+      card.classList.remove('is-expanded');
+      card.classList.add('is-preview');
+      clearTimeout(previewTimer);
+      previewTimer = setTimeout(function () {
+        card.classList.remove('is-preview');
+      }, 4000);
       revealed = true;
       // Show the lights toggle now that the close-up is on screen (if it was
       // created — only happens when an "_off" variant exists for this close-up).
@@ -2526,6 +2544,9 @@
       overlay.hidden = true;
       overlay.style.backgroundImage = '';
       card.hidden = true;
+      card.classList.remove('is-preview');
+      card.classList.remove('is-expanded');
+      clearTimeout(previewTimer);
       if (lightsToggleEl) { lightsToggleEl.remove(); lightsToggleEl = null; }
       // Sacar la capa off dinámica que creamos para el crossfade.
       var offLayer = overlay.querySelector('.transition-still-off-layer');
@@ -2972,6 +2993,10 @@
     var card = $('#transitionCard');
     if (!toggle || !card) return;
     toggle.addEventListener('click', function () {
+      // Si el auto-hide del preview estaba corriendo, lo cortamos: el usuario
+      // tomó control manual y decide él cuándo cerrar.
+      clearTimeout(previewTimer);
+      card.classList.remove('is-preview');
       var nowExpanded = !card.classList.contains('is-expanded');
       card.classList.toggle('is-expanded');
       toggle.setAttribute('aria-expanded', nowExpanded ? 'true' : 'false');
