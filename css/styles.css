@@ -2982,32 +2982,37 @@ button.space-spec-prod:hover, button.space-spec-prod:focus-visible { color: var(
 
 @media (max-width: 980px) {
   .transition-card {
-    /* Colapsada: pill compacta anclada a la esquina inferior derecha.
-       Antes tomaba todo el ancho (left+right 12px) y tapaba la base del
-       producto en el close-up. Ancho fijo compacto — el nombre trunca con
-       ellipsis si no entra. Con width: auto NO alcanza porque el
-       .transition-card-toggle interno tiene width: 100% y empuja al padre
-       a max-width. */
+    /* Colapsada: chip mínimo en la esquina inferior derecha (sin eyebrow
+       "DE MESA" arriba, padding vertical bajo, ancho corto). Antes tomaba
+       todo el ancho y tapaba el producto en el close-up. Ahora ocupa solo
+       la esquina y deja el resto del ambiente visible. */
     right: 12px;
     left: auto;
     bottom: 12px;
-    width: min(240px, calc(100% - 24px));
+    width: min(200px, calc(100% - 24px));
     max-height: calc(100% - 24px);
   }
   .transition-card.is-expanded {
-    /* Expandida: sí toma todo el ancho para que las acciones (Ver ficha,
-       Comparar, etc.) tengan aire y no queden apretadas. */
+    /* Expandida: full-width para que las acciones (Ver ficha, Comparar,
+       Volver al ambiente) tengan aire y no queden apretadas. */
     left: 12px;
     right: 12px;
     width: auto;
     max-width: none;
   }
-  .transition-card-toggle { padding: 10px 14px; }
+  .transition-card-toggle { padding: 8px 12px; }
+  .transition-card.is-expanded .transition-card-toggle { padding: 10px 14px; }
   .transition-card-name {
-    font-size: 0.95rem;
-    line-height: 1.15;
+    font-size: 0.9rem;
+    line-height: 1.2;
   }
-  .transition-card-eyebrow { font-size: 0.55rem; }
+  /* Colapsada: escondemos el eyebrow "DE MESA" para bajar altura al mínimo.
+     Reaparece al expandir así el usuario ve la categoría en el detalle. */
+  .transition-card .transition-card-eyebrow { display: none; }
+  .transition-card.is-expanded .transition-card-eyebrow {
+    display: block;
+    font-size: 0.55rem;
+  }
   .transition-card-chevron { width: 22px; height: 22px; }
   .transition-card-body { padding: 0 14px; }
   .transition-card.is-expanded .transition-card-body {
