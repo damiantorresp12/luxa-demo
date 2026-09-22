@@ -2502,7 +2502,7 @@
       clearTimeout(previewTimer);
       previewTimer = setTimeout(function () {
         card.classList.remove('is-preview');
-      }, 4000);
+      }, 2000);
       revealed = true;
       // Show the lights toggle now that the close-up is on screen (if it was
       // created — only happens when an "_off" variant exists for this close-up).
