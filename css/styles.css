@@ -2982,15 +2982,23 @@ button.space-spec-prod:hover, button.space-spec-prod:focus-visible { color: var(
 
 @media (max-width: 980px) {
   .transition-card {
+    /* Colapsada: pill compacta anclada a la esquina inferior derecha.
+       Antes tomaba todo el ancho (left+right 12px) y tapaba la base del
+       producto en el close-up. Ancho fijo compacto — el nombre trunca con
+       ellipsis si no entra. Con width: auto NO alcanza porque el
+       .transition-card-toggle interno tiene width: 100% y empuja al padre
+       a max-width. */
     right: 12px;
-    left: 12px;
+    left: auto;
     bottom: 12px;
-    width: auto;
-    max-width: none;
-    /* Keep the card from ever covering more than half the stage frame */
+    width: min(240px, calc(100% - 24px));
     max-height: calc(100% - 24px);
   }
   .transition-card.is-expanded {
+    /* Expandida: sí toma todo el ancho para que las acciones (Ver ficha,
+       Comparar, etc.) tengan aire y no queden apretadas. */
+    left: 12px;
+    right: 12px;
     width: auto;
     max-width: none;
   }
