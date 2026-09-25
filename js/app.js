@@ -744,7 +744,7 @@
       : [];
     if (!list.length) { section.hidden = true; return; }
     section.hidden = false;
-    chainVideos(section, list);
+    chainVideos(section.querySelector('.home-video-frame') || section, list);
   }
 
   /* Dos reproductores apilados: mientras pasa uno, el siguiente ya se está

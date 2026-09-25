@@ -82,6 +82,7 @@
         'home.sub':        'Renders · Animación cinematográfica · Showroom interactivo',
         'home.cta':        'Ingresar al catálogo',
         'home.scroll':     'Deslizá para ver más',
+        'homeVideo.title': 'Animación cinematográfica',
 
         // Shortcuts
         'shortcut.products': 'Productos',
@@ -333,6 +334,7 @@
         'home.sub':        'Renders · Cinematic animation · Interactive showroom',
         'home.cta':        'Enter the catalog',
         'home.scroll':     'Scroll for more',
+        'homeVideo.title': 'Cinematic animation',
 
         'shortcut.products':       'Browse Products',
         'shortcut.spaces':         'Explore Spaces',
