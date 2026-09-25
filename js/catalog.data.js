@@ -79,10 +79,11 @@
 
         // Home
         'home.tag':        'Creamos experiencias<br/>para tus productos.',
-        'home.sub':        'Renders · Animación cinematográfica · Showroom interactivo',
+        'home.sub':        'Renders · Animaciones cinematográficas · Showroom interactivo',
         'home.cta':        'Ingresar al catálogo',
         'home.scroll':     'Deslizá para ver más',
-        'homeVideo.title': 'Animación cinematográfica',
+        'homeVideo.title': 'Animaciones cinematográficas',
+        'homeVideo.sub':   'Tus productos, en movimiento',
 
         // Shortcuts
         'shortcut.products': 'Productos',
@@ -331,10 +332,11 @@
         'detail.collection':        'Collection',
 
         'home.tag':        'We create experiences<br/>for your products.',
-        'home.sub':        'Renders · Cinematic animation · Interactive showroom',
+        'home.sub':        'Renders · Cinematic animations · Interactive showroom',
         'home.cta':        'Enter the catalog',
         'home.scroll':     'Scroll for more',
-        'homeVideo.title': 'Cinematic animation',
+        'homeVideo.title': 'Cinematic animations',
+        'homeVideo.sub':   'Your products, in motion',
 
         'shortcut.products':       'Browse Products',
         'shortcut.spaces':         'Explore Spaces',

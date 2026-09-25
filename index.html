@@ -15,12 +15,12 @@
        ====================================================================== -->
   <title>LUXA · Lighting Experience</title>
   <meta name="description" content="LUXA — experiencia interactiva de iluminación por TD Lighting Experience." />
-  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg?v=40" />
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg?v=41" />
 
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://luxa.tdrender.com/" />
   <meta property="og:title" content="LUXA · TD Lighting Experience" />
-  <meta property="og:description" content="Creamos experiencias para tus productos: renders, animación cinematográfica y showroom interactivo. Demo de iluminación." />
+  <meta property="og:description" content="Creamos experiencias para tus productos: renders, animaciones cinematográficas y showroom interactivo. Demo de iluminación." />
   <meta property="og:image" content="https://luxa.tdrender.com/assets/og-preview.jpg" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
@@ -28,13 +28,13 @@
   <meta property="og:image:alt" content="LUXA — Living 01 con luminarias Aballs" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="LUXA · TD Lighting Experience" />
-  <meta name="twitter:description" content="Creamos experiencias para tus productos: renders, animación cinematográfica y showroom interactivo. Demo de iluminación." />
+  <meta name="twitter:description" content="Creamos experiencias para tus productos: renders, animaciones cinematográficas y showroom interactivo. Demo de iluminación." />
   <meta name="twitter:image" content="https://luxa.tdrender.com/assets/og-preview.jpg" />
   <!-- ▲▲▲ FIN DE LA PERSONALIZACIÓN A MANO ▲▲▲ ---------------------------- -->
 
   <!-- Ficha de instalación: nombre, ícono y colores con los que el showroom se
        guarda en el celular. Se genera con tools/aplicar-marca.ps1. -->
-  <link rel="manifest" href="manifest.webmanifest?v=40" />
+  <link rel="manifest" href="manifest.webmanifest?v=41" />
   <meta name="theme-color" content="#08080A" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -43,10 +43,10 @@
 
   <!-- Las tipografías viven en el proyecto (assets/fonts/), no se piden a Google.
        Así la app se ve igual sin internet y carga más rápido. -->
-  <link rel="stylesheet" href="css/fonts.css?v=40" />
+  <link rel="stylesheet" href="css/fonts.css?v=41" />
   <!-- Bump ?v= al pushear cambios grandes de CSS/JS para invalidar el caché de los navegadores de los usuarios.
        Todos los assets versionan a la par para evitar mezclas HTML/CSS/JS de builds distintos. -->
-  <link rel="stylesheet" href="css/styles.css?v=40" />
+  <link rel="stylesheet" href="css/styles.css?v=41" />
 </head>
 <body>
 
@@ -165,7 +165,7 @@
             <p class="eyebrow" id="heroEyebrow">TD Lighting Experience</p>
             <h2 class="home-hero-title"><span class="serif-xl" id="heroBrand">LUXA</span></h2>
             <p class="home-hero-tag" data-i18n-html="home.tag">Creamos experiencias<br/>para tus productos.</p>
-            <p class="home-hero-sub" data-i18n="home.sub">Renders · Animación cinematográfica · Showroom interactivo</p>
+            <p class="home-hero-sub" data-i18n="home.sub">Renders · Animaciones cinematográficas · Showroom interactivo</p>
             <div class="home-hero-ctas">
               <button class="btn btn-primary home-hero-cta" data-route="products" data-i18n="home.cta">Ingresar al catálogo</button>
               <button class="btn btn-ghost home-hero-cta home-hero-cta-light" id="homeHeroLightCta" type="button" hidden data-i18n="homeLight.cta">Ver el estudio de luz</button>
@@ -184,7 +184,8 @@
           <!-- El título une el video con la promesa del slogan de arriba:
                es la muestra del servicio, no decoración. -->
           <header class="home-video-head">
-            <h2 class="home-types-title" data-i18n="homeVideo.title">Animación cinematográfica</h2>
+            <h2 class="home-types-title" data-i18n="homeVideo.title">Animaciones cinematográficas</h2>
+            <p class="home-video-sub" data-i18n="homeVideo.sub">Tus productos, en movimiento</p>
           </header>
           <div class="home-video-frame">
             <video
@@ -405,15 +406,15 @@
 </div>
 
 <!-- brand.config.js va PRIMERO: el resto de la app lee la marca de ahí. -->
-<script src="js/brand.config.js?v=40"></script>
-<script src="js/catalog.data.js?v=40"></script>
+<script src="js/brand.config.js?v=41"></script>
+<script src="js/catalog.data.js?v=41"></script>
 <!-- Lector de archivos IES: curva y datos de la sección "Fotometría" de la ficha. -->
-<script src="js/ies.js?v=40"></script>
-<script src="js/app.js?v=40"></script>
-<script src="js/compare.js?v=40"></script>
+<script src="js/ies.js?v=41"></script>
+<script src="js/app.js?v=41"></script>
+<script src="js/compare.js?v=41"></script>
 <!-- Instalación en el dispositivo y modo sin internet. Va último: si algo de
      esto falla, la app funciona igual, solo que sin la copia guardada. -->
-<script src="js/pwa.js?v=40"></script>
+<script src="js/pwa.js?v=41"></script>
 <!-- Analitica de Vercel: cuenta visitas y pantallas, sin cookies y sin
      identificar a nadie. La sirve el mismo Vercel desde /_vercel/. -->
 <script defer src="/_vercel/insights/script.js"></script>

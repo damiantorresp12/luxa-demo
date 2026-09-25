@@ -741,6 +741,7 @@ svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width:
 /* Cadena de varios videos: los dos reproductores van en la misma celda, uno
    encima del otro, y se cruzan con un fundido (ver chainVideos en app.js). */
 .home-video-head { margin-bottom: 30px; }
+.home-video-sub { margin: 10px 0 0; font-size: 0.86rem; letter-spacing: 0.02em; color: var(--ink-dim); }
 .home-video-frame.is-chain { display: grid; }
 .home-video-frame.is-chain > .home-video-player {
   grid-area: 1 / 1;
