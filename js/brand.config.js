@@ -76,7 +76,19 @@ window.BRAND = {
     /* Dirección completa de las redes. Dejá '' para que el ícono no aparezca. */
     linkedin:  'https://www.linkedin.com/company/tdrender/',
     instagram: 'https://www.instagram.com/td.render/'
-  }
+  },
+
+
+  /* --- Videos del home ---------------------------------------------------- */
+
+  /* Lista de videos que se reproducen en bucle debajo del hero. Empiezan por
+     el primero, cuando termina arranca el siguiente, y cuando termina el
+     último vuelve al primero — en loop infinito. Para sumar un video nuevo,
+     ponelo en assets/Videos/ y agregá su ruta acá abajo. Podés reordenar la
+     lista para cambiar el orden de reproducción. */
+  homeVideos: [
+    'assets/Videos/LUXA video 01.mp4'
+  ]
 
 };
 

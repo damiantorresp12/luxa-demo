@@ -1,7 +1,7 @@
 {
   "_readme": "Generado por tools/build-offline-list.ps1. NO editar a mano: se reescribe entero. Es la lista de archivos que la app guarda para andar sin internet.",
-  "version": "5c6d06a4fa96",
-  "pesoMB": 112,
+  "version": "c6820765a430",
+  "pesoMB": 116,
   "armazon": [
     "./",
     "index.html",
@@ -277,6 +277,7 @@
     "assets/ies/bitpop_c_2.2_ies/bitpop_c_2.2_ies/BITPOP C 2.2 F 30° [3000K 18W 230Vac].IES",
     "assets/pdfs/luxa-general-catalog-2026.pdf",
     "assets/og-preview.jpg",
+    "assets/Videos/LUXA video 01.mp4",
     "assets/Transiciones/Bathroom 01/bathroom 01 tran 01.mp4",
     "assets/Transiciones/Bathroom 01/bathroom 01 tran 02.mp4",
     "assets/Transiciones/Bathroom 02/Bathroom 02 tran 01.mp4",

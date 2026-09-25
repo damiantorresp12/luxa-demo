@@ -92,6 +92,9 @@ if (Test-Path -LiteralPath $fotometria) {
 }
 $pesados += Sumar-Carpeta 'assets/pdfs'         '^\.pdf$'
 $pesados += 'assets/og-preview.jpg'
+# Videos del home (los que se reproducen debajo del banner). Van antes que
+# las transiciones porque se ven apenas abre la app.
+$pesados += Sumar-Carpeta 'assets/Videos'       '^\.(mp4|webm)$'
 $pesados += Sumar-Carpeta 'assets/Transiciones' '^\.(mp4|webm)$'
 
 $armazon = $armazon | Select-Object -Unique

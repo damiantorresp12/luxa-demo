@@ -15,7 +15,7 @@
        ====================================================================== -->
   <title>LUXA · Lighting Experience</title>
   <meta name="description" content="LUXA — experiencia interactiva de iluminación por TD Lighting Experience." />
-  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg?v=37" />
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg?v=38" />
 
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://luxa.tdrender.com/" />
@@ -34,7 +34,7 @@
 
   <!-- Ficha de instalación: nombre, ícono y colores con los que el showroom se
        guarda en el celular. Se genera con tools/aplicar-marca.ps1. -->
-  <link rel="manifest" href="manifest.webmanifest?v=37" />
+  <link rel="manifest" href="manifest.webmanifest?v=38" />
   <meta name="theme-color" content="#08080A" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -43,10 +43,10 @@
 
   <!-- Las tipografías viven en el proyecto (assets/fonts/), no se piden a Google.
        Así la app se ve igual sin internet y carga más rápido. -->
-  <link rel="stylesheet" href="css/fonts.css?v=37" />
+  <link rel="stylesheet" href="css/fonts.css?v=38" />
   <!-- Bump ?v= al pushear cambios grandes de CSS/JS para invalidar el caché de los navegadores de los usuarios.
        Todos los assets versionan a la par para evitar mezclas HTML/CSS/JS de builds distintos. -->
-  <link rel="stylesheet" href="css/styles.css?v=37" />
+  <link rel="stylesheet" href="css/styles.css?v=38" />
 </head>
 <body>
 
@@ -174,15 +174,17 @@
           <div class="home-hero-scroll"><span data-i18n="home.scroll">Deslizá para ver más</span></div>
         </div>
 
-        <!-- Video debajo del banner principal. Reproduce en bucle sin
-             controles ni sonido. Damián irá sumando videos con el tiempo:
-             cuando llegue el segundo, transformamos este bloque en un
-             pequeño carrusel; por ahora un solo video simple. -->
-        <section class="home-video" id="homeVideo">
+        <!-- Video(s) debajo del banner principal. Reproduce en bucle sin
+             controles ni sonido. La lista de videos vive en
+             brand.config.js → BRAND.homeVideos. Cuando termina uno arranca
+             el siguiente, y al terminar el último vuelve al primero. Con un
+             solo video, actúa igual que un loop simple. La sección se
+             oculta sola si la lista está vacía. -->
+        <section class="home-video" id="homeVideo" hidden>
           <video
             class="home-video-player"
-            src="assets/Videos/LUXA%20video%2001.mp4"
-            autoplay muted loop playsinline
+            id="homeVideoPlayer"
+            autoplay muted playsinline
             preload="metadata"
             aria-hidden="true"></video>
         </section>
@@ -396,15 +398,15 @@
 </div>
 
 <!-- brand.config.js va PRIMERO: el resto de la app lee la marca de ahí. -->
-<script src="js/brand.config.js?v=37"></script>
-<script src="js/catalog.data.js?v=37"></script>
+<script src="js/brand.config.js?v=38"></script>
+<script src="js/catalog.data.js?v=38"></script>
 <!-- Lector de archivos IES: curva y datos de la sección "Fotometría" de la ficha. -->
-<script src="js/ies.js?v=37"></script>
-<script src="js/app.js?v=37"></script>
-<script src="js/compare.js?v=37"></script>
+<script src="js/ies.js?v=38"></script>
+<script src="js/app.js?v=38"></script>
+<script src="js/compare.js?v=38"></script>
 <!-- Instalación en el dispositivo y modo sin internet. Va último: si algo de
      esto falla, la app funciona igual, solo que sin la copia guardada. -->
-<script src="js/pwa.js?v=37"></script>
+<script src="js/pwa.js?v=38"></script>
 <!-- Analitica de Vercel: cuenta visitas y pantallas, sin cookies y sin
      identificar a nadie. La sirve el mismo Vercel desde /_vercel/. -->
 <script defer src="/_vercel/insights/script.js"></script>

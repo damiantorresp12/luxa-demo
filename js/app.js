@@ -727,7 +727,34 @@
     renderHomeTypes();
     renderHomeSpaces();
     initHomeCta();
+    initHomeVideos();
     refreshHomeMetas();
+  }
+
+  /* Playlist secuencial de videos del home. La lista sale de BRAND.homeVideos
+     (js/brand.config.js). Cuando termina un video arranca el siguiente y al
+     llegar al final vuelve al primero. Con un solo video actúa como loop
+     simple. Si la lista está vacía, escondemos la sección. */
+  function initHomeVideos() {
+    var section = $('#homeVideo');
+    var video   = $('#homeVideoPlayer');
+    if (!section || !video) return;
+    var list = (window.BRAND && Array.isArray(window.BRAND.homeVideos))
+      ? window.BRAND.homeVideos.filter(Boolean)
+      : [];
+    if (!list.length) { section.hidden = true; return; }
+    section.hidden = false;
+    var idx = 0;
+    function play(i) {
+      idx = i % list.length;
+      video.src = encodeURI(list[idx]);
+      // muted + autoplay + playsinline permite arrancar sin gesto del usuario
+      // en todos los navegadores modernos, incluidos mobile.
+      var p = video.play();
+      if (p && typeof p.catch === 'function') p.catch(function () { /* silencio */ });
+    }
+    video.addEventListener('ended', function () { play(idx + 1); });
+    play(0);
   }
 
   // Hero slideshow. With 1 image we just paint it as the hero background.
