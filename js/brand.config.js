@@ -87,7 +87,8 @@ window.BRAND = {
      ponelo en assets/Videos/ y agregá su ruta acá abajo. Podés reordenar la
      lista para cambiar el orden de reproducción. */
   homeVideos: [
-    'assets/Videos/LUXA video 01.mp4'
+    'assets/Videos/LUXA video 01.mp4',
+    'assets/Videos/LUXA video 02.mp4'
   ]
 
 };

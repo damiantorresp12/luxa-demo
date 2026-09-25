@@ -1,7 +1,7 @@
 {
   "_readme": "Generado por tools/build-offline-list.ps1. NO editar a mano: se reescribe entero. Es la lista de archivos que la app guarda para andar sin internet.",
-  "version": "c6820765a430",
-  "pesoMB": 116,
+  "version": "456932a0e612",
+  "pesoMB": 120,
   "armazon": [
     "./",
     "index.html",
@@ -278,6 +278,7 @@
     "assets/pdfs/luxa-general-catalog-2026.pdf",
     "assets/og-preview.jpg",
     "assets/Videos/LUXA video 01.mp4",
+    "assets/Videos/LUXA video 02.mp4",
     "assets/Transiciones/Bathroom 01/bathroom 01 tran 01.mp4",
     "assets/Transiciones/Bathroom 01/bathroom 01 tran 02.mp4",
     "assets/Transiciones/Bathroom 02/Bathroom 02 tran 01.mp4",
