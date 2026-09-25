@@ -744,17 +744,65 @@
       : [];
     if (!list.length) { section.hidden = true; return; }
     section.hidden = false;
-    var idx = 0;
-    function play(i) {
-      idx = i % list.length;
-      video.src = encodeURI(list[idx]);
-      // muted + autoplay + playsinline permite arrancar sin gesto del usuario
-      // en todos los navegadores modernos, incluidos mobile.
-      var p = video.play();
-      if (p && typeof p.catch === 'function') p.catch(function () { /* silencio */ });
+    chainVideos(section, list);
+  }
+
+  /* Dos reproductores apilados: mientras pasa uno, el siguiente ya se está
+     cargando atrás. Con uno solo, cambiarle el archivo al terminar dejaba la
+     pantalla en negro mientras cargaba el próximo. Ahora el último cuadro del
+     que terminó se queda a la vista hasta que el nuevo ya está andando, y
+     recién ahí se cruzan. Con un solo video alcanza con el bucle del propio
+     reproductor. Se arma una sola vez: el home se vuelve a dibujar al cambiar
+     de idioma y antes eso sumaba otro "al terminar" cada vez. */
+  function chainVideos(box, list) {
+    var a = box.querySelector('video');
+    if (!a || !list.length || box._chain) return;
+    box._chain = true;
+    // muted + autoplay + playsinline permite arrancar sin gesto del usuario
+    // en todos los navegadores modernos, incluidos mobile.
+    function play(v) { var p = v.play(); if (p && p.catch) p.catch(function () {}); }
+    if (list.length === 1) { a.loop = true; a.src = encodeURI(list[0]); play(a); return; }
+
+    var b = a.cloneNode(false);
+    b.removeAttribute('id');
+    box.appendChild(b);
+    box.classList.add('is-chain');
+    /* En cadena los arranca el codigo, no el navegador: con autoplay el de
+       atras empezaba solo apenas cargaba y entraba a la mitad. */
+    a.autoplay = false; b.autoplay = false;
+    var cur = a, nxt = b, idx = 0;
+    function load(v, i) { v.preload = 'auto'; v.src = encodeURI(list[i % list.length]); v.load(); }
+
+    function onEnded(e) {
+      if (e.target !== cur) return;
+      var prev = cur;
+      cur = nxt; nxt = prev;
+      idx = (idx + 1) % list.length;
+      var hecho = false;
+      function cruzar() {
+        if (hecho) return;
+        hecho = true;
+        cur.classList.add('on');
+        prev.classList.remove('on');
+        // El que terminó se recarga recién cuando ya quedó tapado.
+        setTimeout(function () { load(prev, idx + 1); }, 700);
+      }
+      cur.currentTime = 0;
+      cur.addEventListener('playing', cruzar, { once: true });
+      setTimeout(cruzar, 1500);
+      play(cur);
     }
-    video.addEventListener('ended', function () { play(idx + 1); });
-    play(0);
+    a.addEventListener('ended', onEnded);
+    b.addEventListener('ended', onEnded);
+    /* Si el navegador lo freno con la pestana escondida, al volver sigue. */
+    document.addEventListener('visibilitychange', function () {
+      if (!document.hidden && document.body.contains(box) && cur.paused) play(cur);
+    });
+
+    a.classList.add('on');
+    a.src = encodeURI(list[0]);
+    play(a);
+    load(b, 1);
   }
 
   // Hero slideshow. With 1 image we just paint it as the hero background.

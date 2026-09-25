@@ -60,8 +60,8 @@ window.BRAND = {
     /* Descripción corta del showroom. Es lo que aparece debajo del título
        cuando se comparte el link, y en los resultados de Google. */
     description: {
-      es: 'Experiencias de iluminación para espacios modernos — cada luminaria explorada en sus propios términos.',
-      en: 'Lighting experiences for modern spaces — every luminaire explored on its own terms.'
+      es: 'Creamos experiencias para tus productos: renders, animación cinematográfica y showroom interactivo. Demo de iluminación.',
+      en: 'We create experiences for your products: renders, cinematic animation and interactive showroom. Lighting demo.'
     }
   },
 
