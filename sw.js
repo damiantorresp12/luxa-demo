@@ -35,7 +35,7 @@ var PREFIJO = 'luxa-offline-';
    con el mismo nombre y este archivo no cambia, el cliente sigue viendo la foto
    vieja para siempre. Con la huella acá adentro, cambiar contenido cambia el
    guardián. */
-var VERSION_CONTENIDO = '456932a0e612';
+var VERSION_CONTENIDO = '6440f20a8f1e';
 
 /* Los archivos se guardan por su ruta limpia ('css/styles.css'), pero la página
    los pide con la marca de versión pegada atrás ('css/styles.css?v=11'). Sin
