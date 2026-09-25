@@ -236,6 +236,15 @@ svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width:
   letter-spacing: 0.05em;
 }
 
+/* Cantidad de productos: dato, no aviso. Va apagado para no competir con el
+   dorado de "Tu Proyecto", que sí pide atención. */
+.nav-badge-count {
+  background: var(--graphite-2);
+  color: var(--ink-dim);
+  border: 1px solid var(--line);
+}
+.nav-badge[hidden] { display: none; }
+
 /* Language toggle ES / EN — segmented pill in sidebar */
 .lang-toggle {
   display: inline-flex;
@@ -714,6 +723,25 @@ svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width:
    (Colgantes, De pie, De techo). 3 cards de igual peso, close-up del producto
    más curado de cada categoría como portada.
    ========================================================================== */
+/* Video debajo del hero. Un solo archivo por ahora (LUXA video 01.mp4),
+   preparado para sumar más videos en el futuro. Autoplay + muted + loop +
+   playsinline; sin controles ni overlay. */
+.home-video {
+  padding: 40px var(--gutter);
+  border-top: 1px solid var(--line-soft);
+}
+.home-video-player {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: var(--radius);
+  background: #000;
+  object-fit: cover;
+}
+@media (max-width: 700px) {
+  .home-video { padding: 24px var(--gutter); }
+}
+
 .home-types {
   padding: 70px var(--gutter) 28px;
   display: flex;

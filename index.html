@@ -15,7 +15,7 @@
        ====================================================================== -->
   <title>LUXA · Lighting Experience</title>
   <meta name="description" content="LUXA — experiencia interactiva de iluminación por TD Lighting Experience." />
-  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg?v=36" />
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg?v=37" />
 
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://luxa.tdrender.com/" />
@@ -34,7 +34,7 @@
 
   <!-- Ficha de instalación: nombre, ícono y colores con los que el showroom se
        guarda en el celular. Se genera con tools/aplicar-marca.ps1. -->
-  <link rel="manifest" href="manifest.webmanifest?v=36" />
+  <link rel="manifest" href="manifest.webmanifest?v=37" />
   <meta name="theme-color" content="#08080A" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -43,10 +43,10 @@
 
   <!-- Las tipografías viven en el proyecto (assets/fonts/), no se piden a Google.
        Así la app se ve igual sin internet y carga más rápido. -->
-  <link rel="stylesheet" href="css/fonts.css?v=36" />
+  <link rel="stylesheet" href="css/fonts.css?v=37" />
   <!-- Bump ?v= al pushear cambios grandes de CSS/JS para invalidar el caché de los navegadores de los usuarios.
        Todos los assets versionan a la par para evitar mezclas HTML/CSS/JS de builds distintos. -->
-  <link rel="stylesheet" href="css/styles.css?v=36" />
+  <link rel="stylesheet" href="css/styles.css?v=37" />
 </head>
 <body>
 
@@ -73,6 +73,7 @@
       <button class="nav-item" data-route="products" type="button">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z"/></svg>
         <span data-i18n="nav.products">Productos</span>
+        <span class="nav-badge nav-badge-count" id="productsBadge" hidden>0</span>
       </button>
       <button class="nav-item" data-route="spaces" type="button">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10 12 3l9 7v11H3zM10 21v-6h4v6"/></svg>
@@ -114,7 +115,7 @@
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 3.5A10.4 10.4 0 0 0 12 .2C6.3.2 1.6 4.9 1.6 10.6c0 1.8.5 3.6 1.4 5.1L1.5 21.8l6.3-1.6c1.5.8 3.2 1.2 4.9 1.2h.1c5.7 0 10.4-4.6 10.4-10.4 0-2.7-1.1-5.4-3-7.3l.3-.2zM12 19.5h-.1c-1.6 0-3.1-.4-4.4-1.2l-.3-.2-3.3.9.9-3.2-.2-.3a8.3 8.3 0 0 1-1.3-4.5c0-4.7 3.8-8.5 8.5-8.5 2.3 0 4.4.9 6 2.5 1.6 1.6 2.5 3.7 2.5 6 .1 4.7-3.7 8.5-8.3 8.5zm4.8-6.4c-.3-.1-1.5-.7-1.8-.8-.3-.1-.4-.1-.6.1-.2.3-.7.8-.8.9-.1.2-.3.2-.5.1-.3-.1-1.1-.4-2.1-1.3-.8-.7-1.3-1.6-1.5-1.8-.1-.3 0-.4.1-.5.1-.1.3-.3.4-.5.1-.2.2-.3.3-.5.1-.2 0-.3 0-.5-.1-.1-.6-1.5-.9-2-.2-.5-.5-.5-.6-.5h-.5c-.2 0-.4.1-.7.3-.3.3-1 .9-1 2.3 0 1.4 1 2.7 1.1 2.9.1.2 2 3.1 4.8 4.3.7.3 1.2.5 1.6.6.7.2 1.3.2 1.8.1.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.2-.2-.4-.3z"/></svg>
         </a>
       </div>
-      <p class="sidebar-foot-sub" id="sidebarFootCopy">© 2026 LUXA</p>
+      <p class="sidebar-foot-sub" id="sidebarFootCopy" data-i18n="sidebar.madeBy">Hecho por TD Experience</p>
     </div>
   </aside>
 
@@ -163,8 +164,8 @@
           <div class="home-hero-text">
             <p class="eyebrow" id="heroEyebrow">TD Lighting Experience</p>
             <h2 class="home-hero-title"><span class="serif-xl" id="heroBrand">LUXA</span></h2>
-            <p class="home-hero-tag" data-i18n-html="home.tag">Experiencias de iluminación<br/>para espacios modernos</p>
-            <p class="home-hero-sub" data-i18n="home.sub">Explorá productos, ambientes y recursos técnicos en un catálogo interactivo.</p>
+            <p class="home-hero-tag" data-i18n-html="home.tag">Creamos experiencias<br/>para tus productos.</p>
+            <p class="home-hero-sub" data-i18n="home.sub">Renders · Animación cinematográfica · Showroom interactivo</p>
             <div class="home-hero-ctas">
               <button class="btn btn-primary home-hero-cta" data-route="products" data-i18n="home.cta">Ingresar al catálogo</button>
               <button class="btn btn-ghost home-hero-cta home-hero-cta-light" id="homeHeroLightCta" type="button" hidden data-i18n="homeLight.cta">Ver el estudio de luz</button>
@@ -172,6 +173,19 @@
           </div>
           <div class="home-hero-scroll"><span data-i18n="home.scroll">Deslizá para ver más</span></div>
         </div>
+
+        <!-- Video debajo del banner principal. Reproduce en bucle sin
+             controles ni sonido. Damián irá sumando videos con el tiempo:
+             cuando llegue el segundo, transformamos este bloque en un
+             pequeño carrusel; por ahora un solo video simple. -->
+        <section class="home-video" id="homeVideo">
+          <video
+            class="home-video-player"
+            src="assets/Videos/LUXA%20video%2001.mp4"
+            autoplay muted loop playsinline
+            preload="metadata"
+            aria-hidden="true"></video>
+        </section>
 
         <!-- Estudio de luz: la escena con mapa de luz como protagonista (foto ↔ mapa, datos y acceso directo) -->
         <section class="home-light" id="homeLight" hidden></section>
@@ -382,15 +396,15 @@
 </div>
 
 <!-- brand.config.js va PRIMERO: el resto de la app lee la marca de ahí. -->
-<script src="js/brand.config.js?v=36"></script>
-<script src="js/catalog.data.js?v=36"></script>
+<script src="js/brand.config.js?v=37"></script>
+<script src="js/catalog.data.js?v=37"></script>
 <!-- Lector de archivos IES: curva y datos de la sección "Fotometría" de la ficha. -->
-<script src="js/ies.js?v=36"></script>
-<script src="js/app.js?v=36"></script>
-<script src="js/compare.js?v=36"></script>
+<script src="js/ies.js?v=37"></script>
+<script src="js/app.js?v=37"></script>
+<script src="js/compare.js?v=37"></script>
 <!-- Instalación en el dispositivo y modo sin internet. Va último: si algo de
      esto falla, la app funciona igual, solo que sin la copia guardada. -->
-<script src="js/pwa.js?v=36"></script>
+<script src="js/pwa.js?v=37"></script>
 <!-- Analitica de Vercel: cuenta visitas y pantallas, sin cookies y sin
      identificar a nadie. La sirve el mismo Vercel desde /_vercel/. -->
 <script defer src="/_vercel/insights/script.js"></script>

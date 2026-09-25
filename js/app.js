@@ -658,9 +658,12 @@
     var heroEyebrow = $('#heroEyebrow');
     if (heroEyebrow) { heroEyebrow.textContent = by; heroEyebrow.hidden = !by; }
 
-    /* Pie del menú lateral. El año se calcula solo, no hay que actualizarlo. */
-    var copy = $('#sidebarFootCopy');
-    if (copy) copy.textContent = '© ' + new Date().getFullYear() + ' ' + name;
+    /* El pie del menú lateral firma el servicio ("Hecho por TD Experience"),
+       no la marca del cliente: sale del diccionario, igual en LUXA y ATMO. */
+
+    /* Cantidad de piezas al lado de "Productos", como en ATMO. */
+    var pb = $('#productsBadge');
+    if (pb) { pb.textContent = DATA.products.length; pb.hidden = !DATA.products.length; }
   }
 
   function initSidebarSocial() {

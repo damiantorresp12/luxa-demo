@@ -6,7 +6,7 @@
     {
       "id": "flat-floor",
       "code": "DVA-5945",
-      "name": "DVA-5945 Flat Floor Lamp",
+      "name": "5945 Flat Floor Lamp",
       "category": "Floor Lamps",
       "collection": "Flat",
       "spaces": [
@@ -45,7 +45,7 @@
     {
       "id": "flat-table",
       "code": "DVA-5965",
-      "name": "DVA-5965 Flat Table Lamp",
+      "name": "5965 Flat Table Lamp",
       "category": "Table Lamps",
       "collection": "Flat",
       "spaces": [
@@ -84,7 +84,7 @@
     {
       "id": "aballs-a-ceiling",
       "code": "DVA-ABC",
-      "name": "DVA-Aballs A II Ceiling Light",
+      "name": "Aballs A II Ceiling Light",
       "category": "Ceiling Lights",
       "collection": "Aballs",
       "spaces": [
@@ -124,7 +124,7 @@
     {
       "id": "aballs-a-wall",
       "code": "DVA-ABW",
-      "name": "DVA-Aballs A Wall Light",
+      "name": "Aballs A Wall Light",
       "category": "Wall Lights",
       "collection": "Aballs",
       "spaces": [
@@ -164,7 +164,7 @@
     {
       "id": "aballs-chandelier-12",
       "code": "DVA-AB12",
-      "name": "DVA-Aballs Chandelier 12",
+      "name": "Aballs Chandelier 12",
       "category": "Chandeliers",
       "collection": "Aballs",
       "spaces": [
@@ -281,7 +281,7 @@
     {
       "id": "aballs-m-table",
       "code": "DVA-ABM",
-      "name": "DVA-Aballs M Table Lamp",
+      "name": "Aballs M Table Lamp",
       "category": "Table Lamps",
       "collection": "Aballs",
       "spaces": [
@@ -435,7 +435,7 @@
     {
       "id": "arum-table",
       "code": "DVA-ART",
-      "name": "DVA-Arum Table Lamp",
+      "name": "Arum Table Lamp",
       "category": "Table Lamps",
       "collection": "Arum",
       "spaces": [
@@ -515,7 +515,7 @@
     {
       "id": "arum-wall",
       "code": "DVA-ARW",
-      "name": "DVA-Arum Wall Lamp",
+      "name": "Arum Wall Lamp",
       "category": "Wall Lights",
       "collection": "Arum",
       "spaces": [
@@ -1237,7 +1237,7 @@
     {
       "id": "lighto-a-wall",
       "code": "DVA-LTW",
-      "name": "DVA-Lighto A Wall Light",
+      "name": "Lighto A Wall Light",
       "category": "Wall Lights",
       "collection": "Lighto",
       "spaces": [
@@ -1277,7 +1277,7 @@
     {
       "id": "lighto-c-ceiling",
       "code": "DVA-LTC",
-      "name": "DVA-Lighto C Ceiling Light",
+      "name": "Lighto C Ceiling Light",
       "category": "Ceiling Lights",
       "collection": "Lighto",
       "spaces": [

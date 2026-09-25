@@ -37,6 +37,7 @@
         'nav.downloads':  'Descargas',
         'nav.favorites':  'Tu Proyecto',
         'nav.about':      'Acerca',
+        'sidebar.madeBy': 'Hecho por TD Experience',
 
         // Topbar (eyebrow + title) por ruta
         'topbar.home.eyebrow':      'Bienvenido',
@@ -77,8 +78,8 @@
         'detail.collection':        'Colección',
 
         // Home
-        'home.tag':        'Experiencias de iluminación<br/>para espacios modernos',
-        'home.sub':        'Ambientes con la luz calculada a partir de la fotometría real de cada luminaria.',
+        'home.tag':        'Creamos experiencias<br/>para tus productos.',
+        'home.sub':        'Renders · Animación cinematográfica · Showroom interactivo',
         'home.cta':        'Ingresar al catálogo',
         'home.scroll':     'Deslizá para ver más',
 
@@ -290,6 +291,7 @@
         'nav.downloads':  'Downloads',
         'nav.favorites':  'Your Project',
         'nav.about':      'About',
+        'sidebar.madeBy': 'Made by TD Experience',
 
         'topbar.home.eyebrow':      'Welcome',
         'topbar.home.title':        'Home',
@@ -327,8 +329,8 @@
         'compare.legend.same':      'Matches',
         'detail.collection':        'Collection',
 
-        'home.tag':        'Lighting Experiences<br/>for Modern Spaces',
-        'home.sub':        'Spaces with their light calculated from each luminaire’s real photometry.',
+        'home.tag':        'We create experiences<br/>for your products.',
+        'home.sub':        'Renders · Cinematic animation · Interactive showroom',
         'home.cta':        'Enter the catalog',
         'home.scroll':     'Scroll for more',
 
